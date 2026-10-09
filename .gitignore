@@ -1,8 +1,0 @@
-node_modules/
-*.log
-
-# Dağıtım çıktıları: araclar/paketle.sh ile üretilir
-dagitim/
-
-# İmza anahtarı asla depoya girmez
-*.pem
