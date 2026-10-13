@@ -1,0 +1,52 @@
+name: Build and publish Maliye çalışma masası
+
+on:
+  push:
+    branches:
+      - master
+      - codex/study-app
+    paths:
+      - "maliye/**"
+      - "site/**"
+      - "scripts/build_content.py"
+      - ".github/workflows/publish-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kaynakları al
+        uses: actions/checkout@v4
+      - name: Python hazırla
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: P.A.C.E.R. çalışma içeriklerini oluştur
+        run: python scripts/build_content.py
+      - name: GitHub Pages kullan
+        uses: actions/configure-pages@v5
+      - name: Site paketini hazırla
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Siteyi yayımla
+        id: deployment
+        uses: actions/deploy-pages@v4
