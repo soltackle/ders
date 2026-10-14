@@ -289,7 +289,7 @@ function renderStudy() {
     workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">1</span><div><div class="eyebrow">TÜKET · ${block.readMinutes ? `~${block.readMinutes} DK` : 'OKU'}</div><h2>${esc(block.title)}</h2><p>${esc(block.readInstruction || 'Metni kendi hızında oku. Kavram haritanı veya analoji notunu istediğin anda ekleyebilirsin.')}</p></div></div>${course.studyGuide?.length ? `<details class="pacer-guide"><summary>P.A.C.E.R. çalışma rehberi</summary><ol>${course.studyGuide.filter(line => /^\d+[.)]/.test(line)).map(line => `<li>${esc(line.replace(/^\d+[.)]\s*/, ''))}</li>`).join('')}</ol></details>` : ''}
       <div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metni oku</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></label><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime arka planı ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Okuma ayarları →</button></div>
       ${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}
-        <details class="quick-workbench"><summary>Okurken çalış · P / A / C</summary><label><span>C · Kavram haritası ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Kavram → ilişki fiili → kavram">${esc(progress.mapNotes || '')}</textarea></label><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
+        <details class="quick-workbench"><summary>Okurken çalış · P / A / C</summary><div class="map-editor"><label><span>C · Kavram haritası ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki fiili → kavram">${esc(progress.mapNotes || '')}</textarea></label><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
       ${course.knowledgeProfile?.length ? `<details class="knowledge-profile"><summary>Bu derste hangi tür bilgi var?</summary><div class="knowledge-profile-list">${course.knowledgeProfile.map(item => `<article><strong>${esc(item.type)} · ${esc(item.label)}</strong><span>${esc(item.weight)}</span><p>${esc(item.description)}</p></article>`).join('')}</div></details>` : ''}
       <div class="phase-footer"><span>Bu notlar ve okuma konumun otomatik kaydolur.</span><button class="btn" data-action="consume-done">Okudum, sindirmeye geç →</button></div></section>`;
   } else {
@@ -321,6 +321,18 @@ function renderReadingPanel(block) {
   const prefs = state.preferences;
   const body = block.reading.map((para, i) => `<p class="reading-paragraph ${prefs.focusParagraph && i === 0 ? 'current' : ''}" data-reading-paragraph="${i}">${prefs.bionic ? bionic(para.text) : esc(para.text)}</p>`).join('');
   return `${direction}<div class="reading-panel ${prefs.focusParagraph ? 'focus-mode' : ''}" id="reading-panel">${body}</div><div class="paragraph-focus"><button class="answer-button" data-action="reading-prev">↑ Önceki paragraf</button><button class="answer-button" data-action="reading-next">Sonraki paragraf ↓</button><span class="reading-mode-line" id="reading-position">${block.reading.length} kaynak paragrafı</span></div>`;
+}
+
+function renderMapPreview(raw) {
+  const links = String(raw || '').split(/\n+/u).map(line => line.split('→').map(part => part.trim())).filter(parts => parts.length >= 3 && parts[0] && parts[1] && parts.slice(2).join(' → '));
+  if (!links.length) return '<p class="map-empty">Bağlantıları yazdıkça harita burada görünür.</p>';
+  const height = Math.max(130, links.length * 92 + 24);
+  const rows = links.map((parts, index) => {
+    const y = 45 + index * 92;
+    const [from, relation, ...toParts] = parts;
+    return `<g class="map-edge"><path d="M 230 ${y} C 310 ${y}, 410 ${y}, 490 ${y}" marker-end="url(#map-arrow)"/><rect x="8" y="${y - 20}" width="222" height="40" rx="12"/><text x="119" y="${y + 5}" text-anchor="middle">${esc(from)}</text><rect x="490" y="${y - 20}" width="222" height="40" rx="12"/><text x="601" y="${y + 5}" text-anchor="middle">${esc(toParts.join(' → '))}</text><text class="map-relation" x="360" y="${y - 9}" text-anchor="middle">${esc(relation)}</text></g>`;
+  }).join('');
+  return `<svg class="knowledge-map" viewBox="0 0 720 ${height}" role="img" aria-label="Kavram bağlantı haritası"><defs><marker id="map-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker></defs>${rows}</svg>`;
 }
 
 function splitWords(block) {
@@ -369,9 +381,11 @@ function renderTask(course, block, task) {
 function renderWrapUp(course, progress) {
   const done = !!progress.completedAt;
   const rating = progress.rating || '';
-  const wrapGroups = course.wrapUp.length ? `<section class="study-card"><div class="study-card-head"><span class="step-badge">✦</span><div><h2>Kanıtları kullanarak prova et</h2><p>İddianı örnek, tarih veya sayıyla destekle. Cevap anahtarını açıp sonra yanıtını karşılaştır.</p></div></div><div class="tasks-stack">${course.wrapUp.map(task => renderTask(course, { number: 'son' }, task)).join('')}</div></section>` : '';
+  const mapWalks = course.mapWalks || course.wrapUp || [];
+  const wrapGroups = mapWalks.length ? `<section class="study-card"><div class="study-card-head"><span class="step-badge">C</span><div><h2>Haritada gezin</h2><p>Oturum sonunda kavram haritandaki bağlantıları kullanarak soruları yanıtla.</p></div></div><div class="tasks-stack">${mapWalks.map(task => renderTask(course, { number: 'son' }, task)).join('')}</div></section>` : '';
+  const reflections = course.reflectionQuestions?.length ? `<section class="study-card reflection-card"><div class="study-card-head"><span class="step-badge">↻</span><div><h2>Oturum sonu değerlendirmesi</h2><p>Yanıtların sonraki çalışma oturumunda neyi değiştireceğine yardımcı olur.</p></div></div>${course.reflectionQuestions.map((question, index) => `<label class="reflection-item"><span>${index + 1}. ${esc(question)}</span><textarea data-reflection="${index}" data-course-id="${esc(course.id)}" placeholder="Kısa notunu yaz…">${esc(progress.reflections?.[String(index)] || '')}</textarea></label>`).join('')}</section>` : '';
   return `<div class="lesson-head"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · OTURUM SONU</div><h1>${esc(course.title)}</h1><p class="page-subtitle">Bu oturumda ${progress.completedBlocks || 0} / ${course.blocks.length} blok işaretledin. Cevapların kaydedildi; şimdi ne kadar rahat hatırladığını işaretle.</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>
-    ${wrapGroups}<section class="study-card"><div class="final-card"><div class="eyebrow">KISA ÖZ DEĞERLENDİRME</div><h2>${done ? 'Bu dersi tekrar açabilirsin.' : 'Nasıl hissettin?'}</h2><p>Bu seçim tamamlanma sayacından ayrı tutulur ve tekrar önerilerine yardımcı olur.</p><div class="rating-row">${[['confident','Rahat hatırlıyorum'],['review','Tekrar gerekli'],['difficult','Zorlandım']].map(([key,label]) => `<button class="rating-option ${rating === key ? 'active' : ''}" data-rating="${key}">${label}</button>`).join('')}</div><div class="finish-summary">${progress.completedBlocks || 0} blok tamamlandı · ${Object.values(progress.tasks).filter(task => task.answer?.trim()).length} cevap yazıldı · ${Object.values(progress.tasks).filter(task => task.revealed).length} örnek cevap görüldü</div><div class="lesson-actions"><button class="btn ghost small" data-action="prev-block">← Son bloğa dön</button><button class="btn" data-action="finish-course">${done ? 'Değerlendirmeyi güncelle' : 'Oturumu tamamla'}</button></div></div></section>`;
+    ${wrapGroups}${reflections}<section class="study-card"><div class="final-card"><div class="eyebrow">KISA ÖZ DEĞERLENDİRME</div><h2>${done ? 'Bu dersi tekrar açabilirsin.' : 'Nasıl hissettin?'}</h2><p>Bu seçim tamamlanma sayacından ayrı tutulur ve tekrar önerilerine yardımcı olur.</p><div class="rating-row">${[['confident','Rahat hatırlıyorum'],['review','Tekrar gerekli'],['difficult','Zorlandım']].map(([key,label]) => `<button class="rating-option ${rating === key ? 'active' : ''}" data-rating="${key}">${label}</button>`).join('')}</div><div class="finish-summary">${progress.completedBlocks || 0} blok tamamlandı · ${Object.values(progress.tasks).filter(task => task.answer?.trim()).length} cevap yazıldı · ${Object.values(progress.tasks).filter(task => task.revealed).length} örnek cevap görüldü</div><div class="lesson-actions"><button class="btn ghost small" data-action="prev-block">← Son bloğa dön</button><button class="btn" data-action="finish-course">${done ? 'Değerlendirmeyi güncelle' : 'Oturumu tamamla'}</button></div></div></section>`;
 }
 
 function renderSyncConflicts() {
@@ -426,6 +440,11 @@ function renderStats() {
   const blocks = courses.reduce((sum, course) => sum + getCourseStats(course).completedBlocks, 0);
   const answers = Object.values(state.lessons).reduce((sum, lesson) => sum + Object.values(lesson.tasks || {}).filter(task => task.answer?.trim()).length, 0);
   const revealed = Object.values(state.lessons).reduce((sum, lesson) => sum + Object.values(lesson.tasks || {}).filter(task => task.revealed).length, 0);
+  const phaseSeconds = Object.values(state.lessons).flatMap(lesson => Object.values(lesson.flow || {})).reduce((totals, flow) => {
+    totals.consume += Number(flow.seconds?.consume || 0);
+    totals.digest += Number(flow.seconds?.digest || 0);
+    return totals;
+  }, { consume: 0, digest: 0 });
   const typeStats = { P: { total: 0, worked: 0 }, A: { total: 0, worked: 0 }, C: { total: 0, worked: 0 }, E: { total: 0, worked: 0 }, R: { total: 0, worked: 0 } };
   for (const course of courses) for (const block of course.blocks) for (const section of block.sections) {
     for (const task of section.tasks) {
@@ -455,6 +474,7 @@ function renderStats() {
   });
   return `<div class="eyebrow">DÜZENLİ ÇALIŞMA İZLERİ</div><h1 class="page-title">İlerleme</h1><p class="page-subtitle">Bitirdiğin adımları, yazdığın cevapları ve kendi hatırlama değerlendirmeni ayrı ayrı gör.</p>
     <div class="stats-overview">${statCard('DERS TAMAMLANDI', `${done} / ${courses.length}`, 'Ders sonu değerlendirmesiyle')}${statCard('BLOK TAMAMLANDI', String(blocks), `${courses.reduce((s,c) => s+c.blocks.length,0)} blok içinde`)}${statCard('YAZILI CEVAP', String(answers), `${revealed} örnek cevap açıldı`)}</div>
+    <section class="phase-time-summary"><div><span>Tüket · okuma</span><strong>${fmtTime(phaseSeconds.consume)}</strong></div><div><span>Sindir · işleme</span><strong>${fmtTime(phaseSeconds.digest)}</strong></div><p>Bu süreler, sayfa görünür ve yakın zamanda etkileşim varken sayılır; sınav başarısı ölçümü değildir.</p></section>
     <div class="home-grid"><section class="chart-card"><div class="chart-title">Son 7 gün · etkin çalışma izi</div><div class="bar-chart">${week.map((day, i) => `<div class="bar-column"><div class="bar ${day.today ? 'today' : ''}" style="height:${day.seconds ? Math.max(9, day.seconds / max * 73) : 3}px" title="${day.seconds ? fmtTime(day.seconds) : 'Kayıt yok'}"></div><span class="bar-label">${esc(day.label)}</span></div>`).join('')}</div><p class="help-text">Süre, sayfa görünürken ve yakın zamanda etkileşim olduğunda sayılır.</p></section><section class="chart-card"><div class="chart-title">Cevap çalışma yaklaşımı</div><div class="chart-number">${answers ? Math.round(100 * Math.max(0, answers - revealed) / answers) : 0}%</div><div class="chart-sub">Yazdığın cevapların içinde örnek cevabı açmadıkların</div><div class="sync-status-box">Bu oran doğruluk puanı değildir; sadece kendin yazıp sonra karşılaştırabildiğin yanıtları gösterir.</div></section></div>
     <div class="section-heading"><div><h2>Bilgi türlerine göre çalışma</h2><p>İşlediğin görev sayısı</p></div></div>${Object.entries(typeStats).map(([type, stat]) => `<div class="category-row"><span>${type} · ${{ P: 'İşlemsel', A: 'Analojik', C: 'Kavramsal', E: 'Kanıt', R: 'Referans' }[type]}</span><div class="progress-track"><div class="progress-fill" style="width:${stat.total ? Math.round(100 * stat.worked / stat.total) : 0}%"></div></div><small>${stat.worked}/${stat.total}</small></div>`).join('')}<div class="section-heading"><div><h2>Konu başlıklarına göre</h2><p>Tamamlanan bloklar</p></div></div>${categories.map(row => `<div class="category-row"><span>${esc(row.category)}</span><div class="progress-track"><div class="progress-fill" style="width:${row.percent}%"></div></div><small>${row.completed}/${row.total}</small></div>`).join('')}`;
 }
@@ -1139,6 +1159,13 @@ document.addEventListener('input', event => {
     const next = $('#course-search'); if (next) { next.focus(); next.setSelectionRange(cursor, cursor); }
     return;
   }
+  if (input.matches('[data-reflection]')) {
+    const progress = lessonProgress(input.dataset.courseId);
+    progress.reflections ||= {};
+    progress.reflections[input.dataset.reflection] = input.value;
+    changeLesson(input.dataset.courseId, { reflections: progress.reflections }, 12_000);
+    return;
+  }
   if (input.matches('[data-answer]')) {
     const id = input.dataset.courseId, key = input.dataset.taskKey;
     const p = taskProgress(id, key);
@@ -1154,6 +1181,10 @@ document.addEventListener('input', event => {
     if (input.dataset.flowField === 'mapNotes') progress.mapNotes = input.value;
     else blockFlow(courseId, blockNumber)[input.dataset.flowField] = input.value;
     changeLesson(courseId, { flow: progress.flow, mapNotes: progress.mapNotes }, 10_000);
+    if (input.dataset.flowField === 'mapNotes') {
+      const preview = input.closest('.map-editor')?.querySelector('[data-map-preview]');
+      if (preview) preview.innerHTML = renderMapPreview(input.value);
+    }
     return;
   }
   if (input.matches('[data-card-answer]')) {

@@ -163,15 +163,15 @@ Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/pr
 ### İlk uygulamada teslim edilenler
 
 - DOCX tablo ayrıştırıcısı E/R görev metnini, kaynak referanslarını, K kartlarını, bilgi profillerini ve G kanıt provasını ayrı JSON alanlarına üretiyor. Kanıt provası, normal blok görevlerinden ayrıldı.
-- Ders ekranında Tüket ve Sindir adımları, görev başına ilerleme ve öz değerlendirme; yazarken aynı ekranda örnek cevabı açma/kopyalama; C harita ve A analoji notları bulunuyor.
+- Ders ekranında Tüket ve Sindir adımları, görev başına ilerleme ve öz değerlendirme; yazarken aynı ekranda örnek cevabı açma/kopyalama; C bağlantı satırları ve canlı harita önizlemesi ile A analoji notları bulunuyor.
 - Bionik görünüm, kelime vurgusu, kelime grubu, hız, yazı boyutu ve satır aralığı ayarları; son okuma konumu, cevaplar ve notlar mevcut yerel kayıt modelinde saklanıyor.
 - Hazır referans kartları seçilip aralıklı tekrara ekleniyor. Kanıt provası ve kanıt havuzu ayrı gösteriliyor.
-- Ana ekran, ilerleme istatistikleri ve telefon alt menüsü sadeleştirildi. Eşitleme birleştirmesinde yakın zamanda farklı düzenlenen metinler için seçim kartı eklendi.
+- Ana ekran, Tüket/Sindir süre özeti, ilerleme istatistikleri ve telefon alt menüsü sadeleştirildi. Kaynaklardaki 93 oturum sonu yansıtma sorusu ayrı kaydediliyor. Eşitleme birleştirmesinde yakın zamanda farklı düzenlenen metinler için seçim kartı eklendi.
 
 ### Henüz tamamlanmayanlar
 
-- Harita, düzenlenebilir `kavram → ilişki → kavram` satırları ve ağ görünümüne dönüşmedi; şimdilik saklanan metin alanı.
-- Oturum süresi kategori ve aşama bazında ayrılmıyor; mevcut ölçüm etkileşimli sayfa etkinliğinin toplamı.
+- Harita önizlemesi basit ve satır tabanlı; serbest sürükleme, otomatik düzen ve kaynak paragrafına göre etiketleme sonraki iş.
+- Süre kaydı sekme görünürlüğü ve yakın etkileşim koşuluna dayanıyor; kesin odak süresi sayılmaz.
 - İki ayrı cihazda gerçek GitHub App yetkilendirmesi ve eşitleme doğrulaması yapılmadı. Pages ortamı deploy erişim kuralı nedeniyle dal yayınına izin vermeyebilir; depo ortamı ayarı veya izinli dala yayın gerekebilir.
 - Mobil, klavye, yakınlaştırma ve canlı site kabul senaryoları bu uygulama adımında tarayıcıyla doğrulanmadı.
 

@@ -322,6 +322,7 @@ def extract_course(path: Path) -> dict:
         )
 
     wrap_up = []
+    reflection_questions = []
     proof_tasks = []
     for p in paras[block_starts[-1] : source_i]:
         task = TASK_ID.match(p)
@@ -342,6 +343,18 @@ def extract_course(path: Path) -> dict:
                     "answer": answers.get(task.group(1), ""),
                 }
             )
+
+    reflection_heading = next(
+        (i for i, p in enumerate(paras[:source_i]) if p.upper().startswith("OTURUM SONU") and "DEĞERLENDİRME" in p.upper()),
+        None,
+    )
+    if reflection_heading is not None:
+        for p in paras[reflection_heading + 1 : source_i]:
+            if p.upper().startswith("KAVRAM HARİTASI"):
+                break
+            question = re.match(r"^\d+[.)]\s*(.+)$", p)
+            if question:
+                reflection_questions.append(question.group(1).strip())
 
     map_heading = next(
         (i for i, p in enumerate(paras[:source_i]) if p.upper().startswith("KAVRAM HARİTASI")),
@@ -392,6 +405,8 @@ def extract_course(path: Path) -> dict:
         "outcomes": outcomes,
         "blocks": blocks,
         "wrapUp": wrap_up,
+        "mapWalks": wrap_up,
+        "reflectionQuestions": reflection_questions,
         "studyGuide": study_guide,
         "knowledgeProfile": knowledge_profile,
         "mapSetup": map_setup,
