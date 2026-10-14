@@ -8,6 +8,7 @@ KPSS A Maliye çalışma kâğıtlarını adım adım kullanmak için GitHub Pag
 - Tek çalışma ekranında okuma → kendi notların → sorular → blok özeti; sabit geri/devam düğmeleri ve adımından devam
 - 348 kavram ve 570 analoji/not görevinde belgedeki örnek cevabı yazarken açma ve kopyalama; P / E / R cevap alanları
 - Metin üzerinde ilerleyen kelime vurgusu ve ortada kelime gösterimi; her iki görünümde oynat/durdur, hız, konum seçme ve kaldığın kelimeden devam
+- Okurken kaynak cevaplarının yanında otomatik yazılma animasyonu; paragraf bağlantısı, durdur/devam, tam cevap ve kopyalama; bağımsız hız ve kapatma ayarları
 - Bionik vurgu, paragraf odağı, otomatik kaydırma ve hareket azaltma; kelime grubu, yazı boyutu ve duraklama tercihleri
 - Sıcak açık zemin ve dengeli koyu tema; derslerde varsayılan odak görünümü, açılır okuma seçenekleri ve rahat metin genişliği
 - Otomatik cihaz kaydı, çalışma istatistikleri, ders sonu öz değerlendirme ve zamanlı tekrar kartları

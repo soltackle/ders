@@ -252,3 +252,27 @@ kavram notlarında gösterilir; analoji örneği aynı not alanında açılır.
 Örneği açmak/kopyalamak yazılan notu veya görev tamamlama durumunu değiştirmez.
 360/1280 px ekranlarda göster/gizle, pano, not/imleç konumu ve yenileme sonrası
 notların korunması; 9 kaynak/içerik testi doğrulandı.
+
+
+### Okurken yazılan örnek cevap — 14 Ekim 2026
+
+Okuma ekranında kaynak cevaplarını yazarak gösteren bir panel eklendi. Bilgisayarda
+metnin yanında, küçük ekranlarda altında durur. Kelime oynatıcısındaki konum ya da
+elle kaydırılan paragraf değişince kaynak ¶ referansına uyan cevap seçilir. Bir
+paragrafın ayrı cevabı yoksa panel açıkça “Bu bloktan örnek” der; cevabı bulunan
+kaynak görevleri arasından bir örnek gösterir. İleri/geri düğmeleriyle diğer kaynak
+örnekleri de seçilebilir.
+
+Yazmayı durdur/devam, yeniden yazdır, tamamını göster ve kopyala kontrolleri vardır.
+Panel, animasyon ve 5–120 karakter/saniye yazılma hızı ayarlardan yönetilir; hız
+kelime oynatma hızından bağımsızdır. Hareketi azalt veya sistemin azaltılmış hareket
+tercihinde kaynak cevabı doğrudan gösterilir. Sayfa gizlenince ve çalışma alanından
+çıkılınca animasyon zamanlayıcısı durur. Panel hiçbir kişisel cevap alanını doldurmaz,
+görev tamamlama veya öğrenme durumunu değiştirmez.
+
+Kontroller: 360/768/1280 px ve yatay 844×390 ekranlarda gerçek yazılma ilerlemesi,
+durdur/devam, tam kaynak metni ve pano, ¶11 eşleşmesi, iki okuma görünümü, kişisel
+cevabın korunması, ayarları kaydedip yenileme ve azaltılmış hareket. Ayrıca kaynak
+örneği değişince durdurma tercihinin korunması, elle kaydırmada paragraf eşleşmesi,
+klavye ve sayfa görünürlüğü; 5 ve 100 karakter/saniye hızlarının gerçek yazılma
+miktarına etkisi doğrulandı.

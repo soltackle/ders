@@ -13,7 +13,7 @@ const DAY = 86_400_000;
 const ICONS = ['○', '→', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
   readingMode: 'page', bionic: true, highlightWord: true, boldPercent: 38, wpm: 220, groupWords: 1,
-  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, studyFocus: true, autoScroll: true, reduceMotion: false, theme: 'light', sessionMinutes: 20, breakMinutes: 5,
+  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, studyFocus: true, autoScroll: true, reduceMotion: false, answerCompanion: true, answerAnimation: true, answerTypingSpeed: 45, theme: 'light', sessionMinutes: 20, breakMinutes: 5,
 };
 
 let courses = [];
@@ -40,6 +40,10 @@ let activeSecondsRemainder = 0;
 let activeMapRouteId = '';
 let studyTool = '';
 let mapResizeObserver = null;
+const companionCache = new WeakMap();
+const answerCompanion = { context: '', paragraph: -1, example: 0, key: '', count: 0, paused: false, timer: 0, lastTick: 0 };
+let answerScrollTimer = 0;
+let companionScrollLockUntil = 0;
 
 function freshState() {
   return { version: 1, updatedAt: 0, lastCourseId: '', preferences: { ...DEFAULTS, updatedAt: 0 }, lessons: {}, review: {}, activeDays: {}, activitySeconds: 0, syncConflicts: [], session: null };
@@ -263,6 +267,8 @@ function navTo(next) {
 function markActivity() { lastTouch = Date.now(); }
 
 function render() {
+  stopAnswerAnimation();
+  clearTimeout(answerScrollTimer);
   const app = $('#app');
   if (!app || !courses.length) return;
   $$('.nav-item[data-view]').forEach(button => button.classList.toggle('active', button.dataset.view === view));
@@ -358,8 +364,116 @@ function renderStudyTools(hasReading = true) {
 
 function renderStudyReading(course, block) {
   const prefs = state.preferences;
-  return `<div class="workspace-reading"><div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metinde kelime takibi</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Ortada kelime göster</option></select></label><details class="reader-preferences"><summary>Okuma seçenekleri</summary><div class="reader-preferences-body"><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime vurgusu ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Tüm okuma ayarları →</button></div></details></div>${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}</div>`;
+  return `<div class="reading-layout ${prefs.answerCompanion ? 'with-companion' : ''}"><div class="workspace-reading"><div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metinde kelime takibi</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Ortada kelime göster</option></select></label><details class="reader-preferences"><summary>Okuma seçenekleri</summary><div class="reader-preferences-body"><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime vurgusu ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.answerCompanion ? 'active' : ''}" data-setting-toggle="answerCompanion">Okurken örnek cevap ${prefs.answerCompanion ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Tüm okuma ayarları →</button></div></details></div>${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}</div>${prefs.answerCompanion ? renderAnswerCompanion(block) : ''}</div>`;
 }
+
+function paragraphReferences(text) {
+  const numbers = new Set();
+  for (const match of String(text).matchAll(/¶\s*(\d+(?:\s*[-–—]\s*\d+)?(?:\s*[,;]\s*(?:¶\s*)?\d+(?:\s*[-–—]\s*\d+)?)*)/gu)) {
+    for (const part of match[1].split(/[,;]/u)) {
+      const range = part.replace(/¶/gu, '').trim().split(/[-–—]/u).map(Number);
+      const [lo, hi] = range.length === 2 ? [Math.min(...range), Math.max(...range)] : [range[0], range[0]];
+      for (let number = lo; number <= Math.min(hi, lo + 200); number++) numbers.add(number);
+    }
+  }
+  return numbers;
+}
+
+function companionData(block) {
+  if (!companionCache.has(block)) {
+    const seen = new Set(), priority = { C: 0, P: 1, A: 2, ER: 3 };
+    const examples = getBlockTasks(block).filter(({task}) => {
+      if (!task.answer || seen.has(task.answer)) return false;
+      seen.add(task.answer); return true;
+    }).sort((a, b) => priority[a.section.type] - priority[b.section.type]).map(({task,section}) => ({
+      ...task, kind: section.type, refs: paragraphReferences(`${task.prompt} ${(task.sourceRefs || []).join(' ')} ${task.answer}`),
+    }));
+    let end = 0;
+    const paragraphEnds = block.reading.map(paragraph => (end += paragraph.text.trim().split(/\s+/u).filter(Boolean).length));
+    companionCache.set(block, { examples, paragraphEnds });
+  }
+  return companionCache.get(block);
+}
+
+function renderAnswerCompanion(block) {
+  const examples = companionData(block).examples;
+  return `<aside class="answer-companion" aria-label="Okurken kaynak cevabı"><div class="companion-heading"><strong>Okurken örnek cevap</strong><span class="companion-counter" data-companion-count></span><div><button class="answer-button" data-action="companion-prev" aria-label="Önceki örnek cevap" ${examples.length > 1 ? '' : 'disabled'}>←</button><button class="answer-button" data-action="companion-next" aria-label="Sonraki örnek cevap" ${examples.length > 1 ? '' : 'disabled'}>→</button></div></div><div class="companion-source" data-companion-source></div><p class="companion-question" data-companion-question></p><div class="companion-answer" data-companion-answer aria-label="Kaynak cevap metni" aria-live="off" tabindex="0"></div><div class="companion-controls"><button class="answer-button" data-action="companion-pause" ${examples.length ? '' : 'disabled'}>Yazmayı durdur</button><button class="answer-button" data-action="companion-show" ${examples.length ? '' : 'disabled'}>? Tamamını göster</button><button class="text-button" data-action="companion-copy" ${examples.length ? '' : 'disabled'}>Kopyala</button></div></aside>`;
+}
+
+function stopAnswerAnimation() {
+  clearTimeout(answerCompanion.timer); answerCompanion.timer = 0;
+}
+
+function activeCompanionExample() {
+  const block = currentCourse()?.blocks[activeBlock];
+  return block ? companionData(block).examples[answerCompanion.example] : null;
+}
+
+function updateCompanionText() {
+  const box = $('[data-companion-answer]'), example = activeCompanionExample();
+  if (!box) return;
+  if (!example) { box.textContent = 'Bu blok için ayrı bir örnek cevap yok.'; return; }
+  const chars = Array.from(example.answer), length = Math.floor(answerCompanion.count);
+  const text = chars.slice(0, length).join('');
+  if (box.textContent !== text) { box.textContent = text; box.scrollTop = box.scrollHeight; }
+  const done = length >= chars.length;
+  box.classList.toggle('is-typing', !done && !answerCompanion.paused);
+  const pause = $('[data-action="companion-pause"]');
+  if (pause) {
+    const enabled = state.preferences.answerAnimation && !state.preferences.reduceMotion && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    pause.disabled = !enabled;
+    pause.setAttribute('aria-pressed', String(answerCompanion.paused));
+    pause.textContent = !enabled ? 'Animasyon kapalı' : done ? 'Yeniden yazdır' : answerCompanion.paused ? 'Yazmaya devam et' : 'Yazmayı durdur';
+  }
+}
+
+function runAnswerAnimation() {
+  stopAnswerAnimation();
+  const example = activeCompanionExample();
+  if (!example || !$('.answer-companion') || document.hidden || view !== 'study') return;
+  const length = Array.from(example.answer).length;
+  if (!state.preferences.answerAnimation || state.preferences.reduceMotion || matchMedia('(prefers-reduced-motion: reduce)').matches) answerCompanion.count = length;
+  updateCompanionText();
+  if (answerCompanion.paused || answerCompanion.count >= length) return;
+  answerCompanion.lastTick = performance.now();
+  const tick = () => {
+    answerCompanion.timer = 0;
+    if (document.hidden || view !== 'study' || !$('.answer-companion') || answerCompanion.paused) return;
+    const now = performance.now();
+    answerCompanion.count = Math.min(length, answerCompanion.count + Math.min(now - answerCompanion.lastTick, 250) * state.preferences.answerTypingSpeed / 1000);
+    answerCompanion.lastTick = now; updateCompanionText();
+    if (answerCompanion.count < length) answerCompanion.timer = setTimeout(tick, 50);
+  };
+  answerCompanion.timer = setTimeout(tick, 50);
+}
+
+function syncAnswerCompanion(block, paragraphIndex, manualIndex = null) {
+  if (!$('.answer-companion')) return;
+  const {examples} = companionData(block), context = `${currentCourse().id}:${block.number}`;
+  if (!examples.length) { updateCompanionText(); return; }
+  const paragraph = block.reading[paragraphIndex];
+  if (manualIndex !== null) answerCompanion.example = Math.max(0, Math.min(manualIndex, examples.length - 1));
+  else if (answerCompanion.context !== context || answerCompanion.paragraph !== paragraphIndex) {
+    let index = examples.findIndex(example => example.refs.has(paragraph?.number));
+    if (index < 0) {
+      // Clearly label this as a block example when the paragraph has no keyed answer.
+      const available = new Set(block.reading.map(item => item.number));
+      const distances = examples.map(example => Math.min(...[...example.refs].filter(number => available.has(number)).map(number => Math.abs(number - (paragraph?.number || 0)))));
+      const nearest = Math.min(...distances); index = Number.isFinite(nearest) ? distances.indexOf(nearest) : 0;
+    }
+    answerCompanion.example = index;
+  }
+  const newContext = answerCompanion.context !== context;
+  answerCompanion.context = context; answerCompanion.paragraph = paragraphIndex;
+  const example = examples[answerCompanion.example], key = `${context}:${example.id}`;
+  if (key !== answerCompanion.key) { stopAnswerAnimation(); answerCompanion.key = key; answerCompanion.count = 0; if (newContext) answerCompanion.paused = false; }
+  $('[data-companion-source]').textContent = `Cevap anahtarı · ${example.id} · ${example.refs.has(paragraph?.number) ? `Bu paragrafla bağlantılı · ¶${paragraph.number}` : 'Bu bloktan örnek'}`;
+  $('[data-companion-question]').textContent = example.prompt;
+  $('[data-companion-count]').textContent = `${answerCompanion.example + 1} / ${examples.length}`;
+  updateCompanionText();
+  if (!answerCompanion.timer) runAnswerAnimation();
+}
+
 
 function noteSourceAnswers(course, block, kind) {
   const tasks = getBlockTasks(block).filter(entry => entry.section.type === kind).map(entry => entry.task);
@@ -619,6 +733,7 @@ function renderSettings() {
         <div class="setting-row"><div><label>Hareketi azalt</label><small>Kaydırmada geçiş animasyonunu kaldırır</small></div><button class="toggle ${p.reduceMotion ? 'active' : ''}" data-setting-toggle="reduceMotion">${p.reduceMotion ? 'Açık' : 'Kapalı'}</button></div>
         <div class="setting-row"><div><label>Paragraf takibi</label><small>Okurken bulunduğun paragrafı vurgula</small></div><button class="toggle ${p.focusParagraph ? 'active' : ''}" data-setting-toggle="focusParagraph">${p.focusParagraph ? 'Açık' : 'Kapalı'}</button></div>
       </section>
+      <section class="setting-card"><h2>Okurken örnek cevap</h2><p>Belgedeki cevap, okuma alanının yanında kendiliğinden yazılır. Kaynak paragrafıyla bağlantılı örnekler önceliklidir; kendi cevap alanların değişmez.</p><div class="setting-row"><div><label>Okurken cevap paneli</label><small>Metin ve ortada kelime görünümünde örnekleri gösterir</small></div><button class="toggle ${p.answerCompanion ? 'active' : ''}" data-setting-toggle="answerCompanion">${p.answerCompanion ? 'Açık' : 'Kapalı'}</button></div><div class="setting-row"><div><label>Yazılma animasyonu</label><small>Kapalıysa kaynak cevabının tamamı hemen görünür</small></div><button class="toggle ${p.answerAnimation ? 'active' : ''}" data-setting-toggle="answerAnimation">${p.answerAnimation ? 'Açık' : 'Kapalı'}</button></div><div class="setting-row"><div><label for="answer-typing-speed">Cevabın yazılma hızı</label><small>Saniyede gösterilen karakter sayısı; okuma hızından bağımsızdır</small></div><input id="answer-typing-speed" class="field-input" type="number" min="5" max="120" step="5" value="${p.answerTypingSpeed}" data-setting-number="answerTypingSpeed"></div><p class="help-text">Hareketi azalt tercihi açıksa cevap animasyonsuz gösterilir. Örneği izlemek görevlerini tamamlamaz.</p></section>
       <section class="setting-card"><h2>Ekran görünümü</h2><p>Yazıların rahat okunması için metin görünümünü değiştir.</p>
         <div class="setting-row"><div><label for="font-size">Metin boyutu</label><small>Okuma panelindeki yazı</small></div><input id="font-size" class="setting-control field-input" type="number" min="13" max="30" step="1" value="${p.fontSize}" data-setting-number="fontSize"></div>
         <div class="setting-row"><div><label for="line-height">Satır aralığı</label><small>Okuma metninin aralığı</small></div><input id="line-height" class="setting-control field-input" type="number" min="1.3" max="2.8" step="0.1" value="${p.lineHeight}" data-setting-number="lineHeight"></div>
@@ -875,8 +990,8 @@ function finishCourse() {
 
 function updateReadingSetting(key, raw) {
   let value = raw;
-  if (['boldPercent','wpm','groupWords','punctuationPause','fontSize','lineHeight'].includes(key)) value = Number(raw);
-  const limits = { boldPercent: [15,60], wpm: [60,1000], groupWords: [1,3], punctuationPause: [0,2000], fontSize:[13,30], lineHeight:[1.3,2.8] };
+  if (['boldPercent','wpm','groupWords','punctuationPause','fontSize','lineHeight','answerTypingSpeed'].includes(key)) value = Number(raw);
+  const limits = { boldPercent: [15,60], wpm: [60,1000], groupWords: [1,3], punctuationPause: [0,2000], fontSize:[13,30], lineHeight:[1.3,2.8], answerTypingSpeed:[5,120] };
   if (limits[key]) value = Math.max(limits[key][0], Math.min(limits[key][1], Number(value) || limits[key][0]));
   if (key === 'lineHeight') value = Math.round(value * 10) / 10;
   state.preferences[key] = value;
@@ -886,11 +1001,12 @@ function updateReadingSetting(key, raw) {
   $$(`[data-range-label="${key}"]`).forEach(node => { node.textContent = key === 'wpm' ? `${value} k/dk` : `${value}%`; });
   $$(`[data-setting-range="${key}"]`).forEach(node => { if (node.value !== String(value)) node.value = String(value); });
   $$(`[data-setting-number="${key}"]`).forEach(node => { if (node.value !== String(value)) node.value = String(value); });
-  if (['readingMode','groupWords','fontSize','focusParagraph','theme','bionic','highlightWord','boldPercent','autoScroll','reduceMotion','studyFocus'].includes(key)) {
+  if (['readingMode','groupWords','fontSize','focusParagraph','theme','bionic','highlightWord','boldPercent','autoScroll','reduceMotion','studyFocus','answerCompanion','answerAnimation'].includes(key)) {
     const scroll = $('#reading-panel')?.scrollTop || 0;
     render();
     const panel = $('#reading-panel'); if (panel) panel.scrollTop = scroll;
   }
+  if (key === 'answerTypingSpeed' && $('.answer-companion')) runAnswerAnimation();
   if (playerRunning && ['wpm','groupWords','punctuationPause'].includes(key)) {
     clearTimeout(playerTimer); runPlayerStep();
   }
@@ -943,6 +1059,8 @@ function refreshPlayerDisplay() {
   $$('.reading-paragraph').forEach(node => node.classList.toggle('current', state.preferences.focusParagraph && node === paragraph));
   const position = $('#reading-position');
   if (position && paragraph) position.textContent = `Paragraf ${Number(paragraph.dataset.readingParagraph) + 1} / ${block.reading.length}`;
+  const paragraphIndex = paragraph ? Number(paragraph.dataset.readingParagraph) : Math.max(0, companionData(block).paragraphEnds.findIndex(end => wordIndex < end));
+  syncAnswerCompanion(block, paragraphIndex);
   const panel = $('#reading-panel');
   if (active && panel && playerRunning && state.preferences.autoScroll) {
     const rect = active.getBoundingClientRect(), bounds = panel.getBoundingClientRect();
@@ -968,6 +1086,8 @@ function advanceWord(delta) {
 }
 
 function seekWord(position) {
+  companionScrollLockUntil = performance.now() + 350;
+  clearTimeout(answerScrollTimer);
   const block = currentCourse()?.blocks[activeBlock];
   if (!block) return;
   wordIndex = Math.max(0, Math.min(Math.max(0, splitWords(block).length - 1), position));
@@ -1441,6 +1561,24 @@ document.addEventListener('click', async event => {
   const settingToggle = event.target.closest('[data-setting-toggle]');
   if (settingToggle) { const key = settingToggle.dataset.settingToggle; updateReadingSetting(key, !state.preferences[key]); return; }
   const action = event.target.closest('[data-action]')?.dataset.action;
+  if (action?.startsWith('companion-')) {
+    const block = currentCourse()?.blocks[activeBlock], example = activeCompanionExample();
+    if (!block || !example) return;
+    if (action === 'companion-prev' || action === 'companion-next') {
+      const length = companionData(block).examples.length;
+      syncAnswerCompanion(block, answerCompanion.paragraph, (answerCompanion.example + (action === 'companion-next' ? 1 : -1) + length) % length);
+    } else if (action === 'companion-pause') {
+      if (answerCompanion.count >= Array.from(example.answer).length) { answerCompanion.count = 0; answerCompanion.paused = false; }
+      else answerCompanion.paused = !answerCompanion.paused;
+      runAnswerAnimation();
+    } else if (action === 'companion-show') {
+      stopAnswerAnimation(); answerCompanion.count = Array.from(example.answer).length; answerCompanion.paused = false; updateCompanionText();
+    } else if (action === 'companion-copy') {
+      try { await navigator.clipboard.writeText(example.answer); showToast('Kaynak cevabı kopyalandı.'); }
+      catch { showToast('Tamamını göster düğmesiyle cevabı açıp seçerek kopyalayabilirsin.'); }
+    }
+    return;
+  }
   if (action === 'show-answer-map' || action === 'show-study-reading' || action === 'close-study-tool') {
     stopPlayer(); studyTool = action === 'show-answer-map' ? 'map' : action === 'show-study-reading' ? 'reading' : '';
     render(); return;
@@ -1703,7 +1841,7 @@ document.addEventListener('submit', event => {
 
 document.addEventListener('keydown', event => {
   markActivity();
-  if (view === 'study' && $('#word-play') && !document.activeElement?.closest('textarea, input, select, button, a, summary, [role="button"], [contenteditable]')) {
+  if (view === 'study' && $('#word-play') && !document.activeElement?.closest('textarea, input, select, button, a, summary, [role="button"], [contenteditable], .answer-companion')) {
     if (event.code === 'Space') { event.preventDefault(); togglePlayer(); }
     if (event.key === 'ArrowLeft') { event.preventDefault(); advanceWord(-1); }
     if (event.key === 'ArrowRight') { event.preventDefault(); advanceWord(1); }
@@ -1726,12 +1864,25 @@ document.addEventListener('focusout', event => {
   }
 });
 
+document.addEventListener('scroll', event => {
+  if (event.target.id !== 'reading-panel' || playerRunning || performance.now() < companionScrollLockUntil || !$('.answer-companion')) return;
+  clearTimeout(answerScrollTimer);
+  const panel = event.target;
+  answerScrollTimer = setTimeout(() => {
+    if (!panel.isConnected || playerRunning || view !== 'study') return;
+    const bounds = panel.getBoundingClientRect(), paragraphs = $$('.reading-paragraph', panel);
+    const index = paragraphs.findIndex(paragraph => paragraph.getBoundingClientRect().bottom > bounds.top + 24);
+    const block = currentCourse()?.blocks[activeBlock];
+    if (block && index >= 0) syncAnswerCompanion(block, index);
+  }, 160);
+}, true);
+
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    stopPlayer();
+    stopPlayer(); stopAnswerAnimation(); clearTimeout(answerScrollTimer);
     touchState(15_000);
     if (activeSyncProvider()) syncNow();
-  }
+  } else if (view === 'study') refreshPlayerDisplay();
 });
 addEventListener('pagehide', () => { touchState(15_000); if (activeSyncProvider()) syncNow(); });
 
