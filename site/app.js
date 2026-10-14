@@ -2,6 +2,7 @@ const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const STORAGE_KEY = 'ders-maliye-progress-v1';
 const SYNC_KEY = 'ders-maliye-github-v1';
+const DEFAULT_GITHUB_CLIENT_ID = 'Iv23liJeFWuLkdXEkG4K';
 const DAY = 86_400_000;
 const ICONS = ['◌', '↗', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
@@ -41,8 +42,10 @@ function loadState() {
 }
 
 function loadGithub() {
-  try { return { clientId: '', owner: '', repo: '', token: '', sha: '', ...(JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || {}) }; }
-  catch { return { clientId: '', owner: '', repo: '', token: '', sha: '' }; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || {};
+    return { owner: '', repo: '', token: '', sha: '', ...saved, clientId: saved.clientId || DEFAULT_GITHUB_CLIENT_ID };
+  } catch { return { clientId: DEFAULT_GITHUB_CLIENT_ID, owner: '', repo: '', token: '', sha: '' }; }
 }
 
 function persistGithub() {
@@ -362,10 +365,10 @@ function renderSettings() {
       <section class="setting-card"><h2>GitHub cihazlar arası eşitleme</h2><p>İlerlemeni özel GitHub depona kaydet. GitHub koduyla bu tarayıcıyı yetkilendir; kişisel erişim anahtarını kopyalayıp yapıştırman gerekmez.</p>
         <ol class="guide-list"><li>GitHub’da bir <strong>private</strong> ilerleme deposu oluştur.</li><li><a href="https://github.com/settings/apps/new" target="_blank" rel="noopener">GitHub App oluştur</a>; webhook’u kapat, yalnızca <strong>Contents: Read and write</strong> depo izni ver ve Device Flow’u etkinleştir.</li><li>App’i yalnızca ilerleme deposuna kur. Client ID’yi, depo sahibini ve depo adını gir; ardından GitHub’ın verdiği kodu onayla.</li></ol>
         <form id="github-device-form" autocomplete="off">
-        <div class="field"><label for="github-client-id">GitHub App Client ID</label><input id="github-client-id" value="${esc(github.clientId || '')}" placeholder="Iv1.…" autocomplete="off"></div>
+        <div class="field"><label for="github-client-id">GitHub App Client ID</label><input id="github-client-id" value="${esc(github.clientId || DEFAULT_GITHUB_CLIENT_ID)}" autocomplete="off" readonly></div>
         <div class="field"><label for="github-owner">Depo sahibi</label><input id="github-owner" value="${esc(github.owner)}" placeholder="kullanıcı-adın" autocomplete="username"></div>
         <div class="field"><label for="github-repo">Özel ilerleme deposu</label><input id="github-repo" value="${esc(github.repo)}" placeholder="ders-ilerlemem" autocomplete="off"></div>
-        <p class="help-text">Client ID gizli değildir. Yetkilendirme kodu GitHub’da onaylanır; uygulama erişimi, GitHub App’ini kurduğun depolarla sınırlıdır.</p>
+        <p class="help-text">Client ID uygulamaya tanımlı. Yetkilendirme kodu GitHub’da onaylanır; uygulama erişimi, GitHub App’ini kurduğun depolarla sınırlıdır.</p>
         <div class="sync-status-box" id="settings-sync-status">${isConnected ? esc(syncLabel) : 'GitHub bağlantısı isteğe bağlıdır. Bağlamadan bu cihazda çalışmaya devam edebilirsin.'}</div>
         <div class="setting-actions"><button type="submit" class="btn small">${isConnected ? 'GitHub bağlantısını yenile' : 'GitHub ile yetkilendir'}</button>${isConnected ? '<button type="button" class="btn ghost small" data-action="disconnect-github">Bu cihazdan bağlantıyı kaldır</button>' : ''}</div>
         </form>

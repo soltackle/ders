@@ -40,7 +40,7 @@ Betik Python standart kütüphanesini kullanır; uygulama paketleri yüklenmez.
 1. GitHub hesabında örneğin `ders-ilerlemem` adlı **private** bir depo aç.
 2. [Yeni GitHub App oluştur](https://github.com/settings/apps/new). Webhook kullanma; Repository permissions altında yalnızca **Contents: Read and write** izni seç. Oluşturduktan sonra app ayarlarından **Device Flow**’u etkinleştir.
 3. **Install App** sayfasından app’i yalnızca `ders-ilerlemem` deposuna kur.
-4. App’in Client ID’sini al. Sitede **Ayarlar → GitHub cihazlar arası eşitleme** bölümüne Client ID, GitHub kullanıcı adın ve depo adını yazıp **GitHub ile yetkilendir**’e bas. Gösterilen kodu GitHub cihaz yetkilendirme sayfasında onayla.
+4. Sitede **Ayarlar → GitHub cihazlar arası eşitleme** bölümüne GitHub kullanıcı adını ve depo adını yazıp **GitHub ile yetkilendir**’e bas. App’in Client ID’si sitede önceden tanımlıdır. Gösterilen kodu GitHub cihaz yetkilendirme sayfasında onayla.
 5. Diğer cihazlarda da kendi tarayıcılarının Ayarlar ekranından aynı işlemi yap.
 
 Client ID gizli değildir; app erişimi yalnızca kurduğun depolar ve verdiğin içerik izniyle sınırlıdır. Yetkilendirme tokenı cihazın tarayıcı saklama alanında tutulur, kaynak koduna veya ilerleme deposuna yazılmaz. İstersen Ayarlar’da önceden oluşturduğun fine-grained tokenla bağlanma seçeneği de vardır. Bağlantı olmadan yerel çalışma ve dışa aktarma/geri yükleme kullanılabilir.
