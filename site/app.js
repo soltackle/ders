@@ -8,7 +8,7 @@ const DEFAULT_GITHUB_REPO = 'ders-ilerlemem';
 const DAY = 86_400_000;
 const ICONS = ['◌', '↗', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
-  readingMode: 'page', bionic: true, boldPercent: 38, wpm: 220, groupWords: 1,
+  readingMode: 'page', bionic: true, highlightWord: true, boldPercent: 38, wpm: 220, groupWords: 1,
   punctuationPause: 320, fontSize: 17, lineHeight: 1.9, focusParagraph: false, theme: 'light',
 };
 
@@ -46,7 +46,7 @@ function loadState() {
 function loadGithub() {
   try {
     const saved = JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || {};
-    return { token: '', sha: '', ...saved, clientId: saved.clientId || DEFAULT_GITHUB_CLIENT_ID, owner: saved.owner || DEFAULT_GITHUB_OWNER, repo: saved.repo || DEFAULT_GITHUB_REPO };
+    return { sha: '', ...saved, clientId: saved.clientId || DEFAULT_GITHUB_CLIENT_ID, owner: saved.owner || DEFAULT_GITHUB_OWNER, repo: saved.repo || DEFAULT_GITHUB_REPO, token: saved.token || '' };
   } catch { return { clientId: DEFAULT_GITHUB_CLIENT_ID, owner: DEFAULT_GITHUB_OWNER, repo: DEFAULT_GITHUB_REPO, token: '', sha: '' }; }
 }
 
@@ -309,11 +309,20 @@ function splitWords(block) {
   return text.match(/\S+/gu) || [];
 }
 
+function renderWordContext(words, start, active, count = 1) {
+  return words.slice(start, active + 10).map((word, offset) => {
+    const index = start + offset;
+    const current = state.preferences.highlightWord && index >= active && index < active + count;
+    return `<span class="context-word ${current ? 'current' : ''}">${esc(word)}</span>`;
+  }).join(' ');
+}
+
 function renderWordPlayer(course, block, blockIndex) {
   const words = splitWords(block);
   const position = lessonProgress(course.id).reader?.[String(blockIndex)] ?? 0;
   wordIndex = Math.max(0, Math.min(position, Math.max(0, words.length - 1)));
-  const context = words.slice(Math.max(0, wordIndex - 9), wordIndex + 10).join(' ');
+  const contextStart = Math.max(0, wordIndex - 9);
+  const context = renderWordContext(words, contextStart, wordIndex, Math.max(1, Number(state.preferences.groupWords) || 1));
   const current = words[wordIndex] || 'Bu blokta kelime bulunamadı';
   const speed = state.preferences.wpm;
   return `${block.readInstruction ? `<div class="read-direction"><span>BU BLOKTA OKU</span><p>${esc(block.readInstruction)}</p></div>` : ''}<div class="word-player" id="word-player" data-word-count="${words.length}"><p class="player-context">${esc(context)}</p><div class="player-word" id="player-word">${bionic(current)}</div><div class="player-word-counter"><span id="word-current">${words.length ? wordIndex + 1 : 0}</span> / ${words.length} kelime</div><div class="player-controls"><button data-action="word-prev" aria-label="Önceki kelime">←</button><button class="play-button" data-action="word-play" id="word-play" aria-label="${playerRunning ? 'Durdur' : 'Oynat'}">${playerRunning ? 'Ⅱ' : '▶'}</button><button data-action="word-next" aria-label="Sonraki kelime">→</button></div><input class="player-slider" type="range" min="0" max="${Math.max(words.length - 1, 0)}" value="${wordIndex}" data-word-slider aria-label="Metinde ilerle"><div class="player-options"><label>Hız <input type="number" min="60" max="1000" step="10" value="${speed}" data-setting-number="wpm" aria-label="Dakikadaki kelime hızı"> kelime / dk</label><label>Gösterim <select class="select-small" data-setting-select="groupWords"><option value="1" ${state.preferences.groupWords === 1 ? 'selected' : ''}>1 kelime</option><option value="2" ${state.preferences.groupWords === 2 ? 'selected' : ''}>2 kelime</option><option value="3" ${state.preferences.groupWords === 3 ? 'selected' : ''}>3 kelime</option></select></label><label>Duraklama <input type="number" min="0" max="2000" step="50" value="${state.preferences.punctuationPause}" data-setting-number="punctuationPause" aria-label="Noktalama duraklama süresi"> ms</label></div></div>`;
@@ -351,8 +360,9 @@ function renderSettings() {
       <section class="setting-card"><h2>Okuma tercihi</h2><p>Bionik vurgu ve kelime oynatıcısını sana göre ayarla.</p>
         <div class="setting-row"><div><label for="pref-mode">Okuma biçimi</label><small>Metnin tamamı veya kelime kelime</small></div><select id="pref-mode" class="select-small setting-control" data-pref="readingMode"><option value="page" ${p.readingMode === 'page' ? 'selected' : ''}>Metin görünümü</option><option value="word" ${p.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></div>
         <div class="setting-row"><div><label>Bionik kelime vurgusu</label><small>Uzun kelimelerin başlangıcını belirginleştir</small></div><button class="toggle ${p.bionic ? 'active' : ''}" data-setting-toggle="bionic">${p.bionic ? 'Açık' : 'Kapalı'}</button></div>
+        <div class="setting-row"><div><label>Geçerli kelimeyi vurgula</label><small>Kelime kelime oynatıcıda sıradaki kelimenin arka planını boya</small></div><button class="toggle ${p.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">${p.highlightWord ? 'Açık' : 'Kapalı'}</button></div>
         <div class="setting-row"><div><label for="bold-range">Kalın başlangıç miktarı</label><small>Kelimenin başlangıç bölümünün uzunluğu</small></div><span class="range-control"><input id="bold-range" type="range" min="15" max="60" step="5" value="${p.boldPercent}" data-setting-range="boldPercent"><span data-range-label="boldPercent">${p.boldPercent}%</span></span></div>
-        <div class="setting-row"><div><label for="wpm-pref">Kelime hızı</label><small>Dakikadaki kelime sayısı</small></div><input id="wpm-pref" class="setting-control field-input" type="number" min="60" max="1000" step="10" value="${p.wpm}" data-setting-number="wpm"></div>
+        <div class="setting-row"><div><label for="wpm-pref">Kayma hızı</label><small>Dakikadaki kelime sayısı</small></div><span class="speed-control"><input id="wpm-range" type="range" min="60" max="1000" step="10" value="${p.wpm}" data-setting-range="wpm" aria-label="Kayma hızı"><input id="wpm-pref" class="field-input" type="number" min="60" max="1000" step="10" value="${p.wpm}" data-setting-number="wpm"><span data-range-label="wpm">${p.wpm} k/dk</span></span></div>
         <div class="setting-row"><div><label>Kelime grubu</label><small>Her adımda gösterilen kelime sayısı</small></div><select class="select-small setting-control" data-setting-select="groupWords"><option value="1" ${p.groupWords === 1 ? 'selected' : ''}>1 kelime</option><option value="2" ${p.groupWords === 2 ? 'selected' : ''}>2 kelime</option><option value="3" ${p.groupWords === 3 ? 'selected' : ''}>3 kelime</option></select></div>
         <div class="setting-row"><div><label>Noktalama duraklaması</label><small>Cümle sonlarında eklenecek bekleme</small></div><input class="setting-control field-input" type="number" min="0" max="2000" step="50" value="${p.punctuationPause}" data-setting-number="punctuationPause"></div>
         <div class="setting-row"><div><label>Paragraf takibi</label><small>Okurken bulunduğun paragrafı vurgula</small></div><button class="toggle ${p.focusParagraph ? 'active' : ''}" data-setting-toggle="focusParagraph">${p.focusParagraph ? 'Açık' : 'Kapalı'}</button></div>
@@ -519,11 +529,13 @@ function updateReadingSetting(key, raw) {
   state.preferences.updatedAt = Date.now();
   touchState(5_000);
   applyReadingSettings();
-  $$(`[data-range-label="${key}"]`).forEach(node => { node.textContent = `${value}%`; });
+  $$(`[data-range-label="${key}"]`).forEach(node => { node.textContent = key === 'wpm' ? `${value} k/dk` : `${value}%`; });
+  $$(`[data-setting-range="${key}"]`).forEach(node => { if (node.value !== String(value)) node.value = String(value); });
+  $$(`[data-setting-number="${key}"]`).forEach(node => { if (node.value !== String(value)) node.value = String(value); });
   if (view === 'study' && key === 'boldPercent' && state.preferences.readingMode === 'page') {
     const course = currentCourse(); if (course) { const block = course.blocks[activeBlock]; if (block) { const panel = $('#reading-panel'); if (panel) panel.innerHTML = renderReadingPanel(block).match(/<div class="reading-panel[\s\S]*?<\/div>/)?.[0] || panel.innerHTML; } }
   }
-  if (['readingMode','groupWords','fontSize','focusParagraph','theme','bionic'].includes(key)) render();
+  if (['readingMode','groupWords','fontSize','focusParagraph','theme','bionic','highlightWord'].includes(key)) render();
 }
 
 function applyReaderPosition(delta) {
