@@ -35,11 +35,12 @@ Betik Python standart kütüphanesini kullanır; uygulama paketleri yüklenmez.
 
 ## Kişisel ilerlemeyi GitHub'da saklama
 
-İlerleme, yanıtlar ve okuma ayarları varsayılan olarak kullandığın tarayıcıda kaydedilir. Cihazlar arasında eşitlemek istersen:
+İlerleme, yanıtlar ve okuma ayarları varsayılan olarak kullandığın tarayıcıda kaydedilir. Cihazlar arasında anahtar kopyalayıp yapıştırmadan eşitlemek için bir kez GitHub App kur:
 
 1. GitHub hesabında örneğin `ders-ilerlemem` adlı **private** bir depo aç.
-2. Fine-grained personal access token oluştur; yalnızca bu depoyu seç ve **Contents: Read and write** izni ver.
-3. Site → **Ayarlar** ekranında GitHub kullanıcı adını, özel depo adını ve tokenı bir kez gir.
-4. Diğer cihazlarda da kendi tarayıcılarının Ayarlar ekranından aynı depoya bağlan.
+2. [Yeni GitHub App oluştur](https://github.com/settings/apps/new). Webhook kullanma; Repository permissions altında yalnızca **Contents: Read and write** izni seç. Oluşturduktan sonra app ayarlarından **Device Flow**’u etkinleştir.
+3. **Install App** sayfasından app’i yalnızca `ders-ilerlemem` deposuna kur.
+4. App’in Client ID’sini al. Sitede **Ayarlar → GitHub cihazlar arası eşitleme** bölümüne Client ID, GitHub kullanıcı adın ve depo adını yazıp **GitHub ile yetkilendir**’e bas. Gösterilen kodu GitHub cihaz yetkilendirme sayfasında onayla.
+5. Diğer cihazlarda da kendi tarayıcılarının Ayarlar ekranından aynı işlemi yap.
 
-Token her tarayıcının yerel saklama alanında durur, uygulama kaynak koduna veya ilerleme deposuna yazılmaz. Token süresi biterse yeni bir tokenla bağlantıyı yenileyebilirsin. Bağlantı olmadan yerel çalışma ve dışa aktarma/geri yükleme kullanılabilir.
+Client ID gizli değildir; app erişimi yalnızca kurduğun depolar ve verdiğin içerik izniyle sınırlıdır. Yetkilendirme tokenı cihazın tarayıcı saklama alanında tutulur, kaynak koduna veya ilerleme deposuna yazılmaz. İstersen Ayarlar’da önceden oluşturduğun fine-grained tokenla bağlanma seçeneği de vardır. Bağlantı olmadan yerel çalışma ve dışa aktarma/geri yükleme kullanılabilir.

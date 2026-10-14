@@ -23,6 +23,7 @@ let playerRunning = false;
 let syncTimer = 0;
 let stateRevision = 0;
 let syncLabel = 'Bu cihazda kaydediliyor';
+let githubDeviceFlowActive = false;
 let toastTimer = 0;
 let lastTouch = Date.now();
 let activeSecondsRemainder = 0;
@@ -40,8 +41,8 @@ function loadState() {
 }
 
 function loadGithub() {
-  try { return JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || { owner: '', repo: '', token: '', sha: '' }; }
-  catch { return { owner: '', repo: '', token: '', sha: '' }; }
+  try { return { clientId: '', owner: '', repo: '', token: '', sha: '', ...(JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || {}) }; }
+  catch { return { clientId: '', owner: '', repo: '', token: '', sha: '' }; }
 }
 
 function persistGithub() {
@@ -358,16 +359,19 @@ function renderSettings() {
         <div class="setting-row"><div><label>Verilerini dışa aktar</label><small>Çalışma kaydının JSON yedeğini indir</small></div><button class="btn ghost small" data-action="export">Yedek indir</button></div>
         <div class="setting-row"><div><label>Yedekten geri yükle</label><small>Önceden indirdiğin yedek dosyasını aç</small></div><label class="btn ghost small" for="import-file">Yedek seç</label><input id="import-file" type="file" accept="application/json" hidden></div>
       </section>
-      <section class="setting-card"><h2>GitHub cihazlar arası eşitleme</h2><p>Özel bir depodaki kişisel ilerleme dosyanı kullan. Bağlantı bu tarayıcıda hatırlanır; yeni cihazda bu adımı bir kez kurarsın.</p>
-        <ol class="guide-list"><li>GitHub'da <strong>özel (private)</strong> bir depo oluştur.</li><li>Fine-grained token oluştur; yalnızca bu depoya <strong>Contents: Read and write</strong> izni ver.</li><li>Depo sahibi, depo adı ve tokenı aşağıya girip bağlan.</li></ol>
-        <form id="github-form" autocomplete="off">
-        <div class="field"><label for="github-owner">GitHub kullanıcı adı</label><input id="github-owner" value="${esc(github.owner)}" placeholder="kullanıcı-adın" autocomplete="username"></div>
+      <section class="setting-card"><h2>GitHub cihazlar arası eşitleme</h2><p>İlerlemeni özel GitHub depona kaydet. GitHub koduyla bu tarayıcıyı yetkilendir; kişisel erişim anahtarını kopyalayıp yapıştırman gerekmez.</p>
+        <ol class="guide-list"><li>GitHub’da bir <strong>private</strong> ilerleme deposu oluştur.</li><li><a href="https://github.com/settings/apps/new" target="_blank" rel="noopener">GitHub App oluştur</a>; webhook’u kapat, yalnızca <strong>Contents: Read and write</strong> depo izni ver ve Device Flow’u etkinleştir.</li><li>App’i yalnızca ilerleme deposuna kur. Client ID’yi, depo sahibini ve depo adını gir; ardından GitHub’ın verdiği kodu onayla.</li></ol>
+        <form id="github-device-form" autocomplete="off">
+        <div class="field"><label for="github-client-id">GitHub App Client ID</label><input id="github-client-id" value="${esc(github.clientId || '')}" placeholder="Iv1.…" autocomplete="off"></div>
+        <div class="field"><label for="github-owner">Depo sahibi</label><input id="github-owner" value="${esc(github.owner)}" placeholder="kullanıcı-adın" autocomplete="username"></div>
         <div class="field"><label for="github-repo">Özel ilerleme deposu</label><input id="github-repo" value="${esc(github.repo)}" placeholder="ders-ilerlemem" autocomplete="off"></div>
-        <div class="field"><label for="github-token">Fine-grained token</label><input id="github-token" type="password" value="${esc(github.token)}" placeholder="github_pat_…" autocomplete="new-password"></div>
-        <p class="help-text">Token yalnızca bu tarayıcıda saklanır ve GitHub API isteğinde kullanılır. Sohbet, çalışma kodu ve ders belgelerine eklenmez. Özel depo adı genellikle <code>kullanıcı-adın/depo-adı</code> biçimindedir.</p>
+        <p class="help-text">Client ID gizli değildir. Yetkilendirme kodu GitHub’da onaylanır; uygulama erişimi, GitHub App’ini kurduğun depolarla sınırlıdır.</p>
         <div class="sync-status-box" id="settings-sync-status">${isConnected ? esc(syncLabel) : 'GitHub bağlantısı isteğe bağlıdır. Bağlamadan bu cihazda çalışmaya devam edebilirsin.'}</div>
-        <div class="setting-actions"><button type="submit" class="btn small" data-action="connect-github">${isConnected ? 'Bağlantıyı doğrula ve eşitle' : 'GitHub’a bağla'}</button>${isConnected ? '<button type="button" class="btn ghost small" data-action="disconnect-github">Bu cihazdan bağlantıyı kaldır</button>' : ''}</div>
+        <div class="setting-actions"><button type="submit" class="btn small">${isConnected ? 'GitHub bağlantısını yenile' : 'GitHub ile yetkilendir'}</button>${isConnected ? '<button type="button" class="btn ghost small" data-action="disconnect-github">Bu cihazdan bağlantıyı kaldır</button>' : ''}</div>
         </form>
+        <details class="legacy-token-option"><summary>Fine-grained token ile bağlan</summary><p class="help-text">Önceden oluşturduğun, yalnızca bu private depoda Contents: Read and write izni olan fine-grained tokenı kullanabilirsin.</p>
+          <form id="github-form" autocomplete="off"><div class="field"><label for="github-token">Fine-grained token</label><input id="github-token" type="password" placeholder="github_pat_…" autocomplete="new-password"></div><button type="submit" class="btn ghost small" data-action="connect-github">Token ile bağlan</button></form>
+        </details>
       </section>
       <section class="setting-card"><h2>Kelime kelime oynatıcı</h2><p>Aktif ders ekranında boşluk çubuğuyla başlat/durdur; ok tuşlarıyla kelimeleri değiştir. Yalnızca oynatıcı açıksa klavye kısayolları çalışır.</p><div class="sync-status-box">Hız: ${p.wpm} kelime/dakika · Kelime grubu: ${p.groupWords} · Noktalama duraklaması: ${p.punctuationPause} ms<br>Oynatma konumun çalışma ilerlemenle birlikte saklanır.</div></section>
     </div>`;
@@ -704,33 +708,113 @@ async function syncNow() {
   return syncPromise;
 }
 
-async function connectGithub() {
-  const owner = $('#github-owner')?.value.trim();
-  const repo = $('#github-repo')?.value.trim();
-  const token = $('#github-token')?.value.trim();
-  if (!owner || !repo || !token) { showToast('Kullanıcı adını, özel depo adını ve tokenı gir.'); return; }
-  if (!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(owner) || !/^[a-z\d._-]{1,100}$/i.test(repo)) { showToast('GitHub kullanıcı adı veya depo adını kontrol et.'); return; }
+function validGithubTarget(owner, repo) {
+  return /^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(owner) && /^[a-z\d._-]{1,100}$/i.test(repo);
+}
+
+function setGithubAuthStatus(message, isHtml = false) {
+  const panel = $('#settings-sync-status');
+  if (!panel) return;
+  if (isHtml) panel.innerHTML = message;
+  else panel.textContent = message;
+}
+
+async function connectGithubWithToken(owner, repo, token, clientId = github.clientId || '') {
   const old = github;
-  github = { owner, repo, token, sha: '' };
+  github = { ...github, clientId, owner, repo, token, sha: '' };
   setSyncLabel('Depo erişimi kontrol ediliyor…', 'busy');
-  if ($('#settings-sync-status')) $('#settings-sync-status').textContent = 'Özel depo erişimi kontrol ediliyor…';
+  setGithubAuthStatus('Özel depo erişimi kontrol ediliyor…');
   try {
     const info = await githubRequest(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
     if (!info.private) throw new Error('İlerleme bilgileri için bu deponun GitHub’da özel (private) olması gerekiyor.');
-    if (!info.permissions?.push) throw new Error('Tokenın depoya yazma izni görünmüyor. Contents için Read and write iznini ekle.');
-    persistGithub();
     const remote = await readRemote();
     if (remote) state = mergeNode(state, remote);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     if (!remote || JSON.stringify(state) !== JSON.stringify(remote)) await writeRemote();
+    persistGithub();
     setSyncLabel(`GitHub ile eşitlendi · ${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`);
     showToast('GitHub bağlantısı kuruldu. İlerlemen eşitlendi.');
     render();
+    return true;
   } catch (error) {
     github = old;
     setSyncLabel(error.message || 'GitHub bağlantısı kurulamadı', 'error');
-    const panel = $('#settings-sync-status');
-    if (panel) panel.textContent = `${error.message} · Yerel kayıt bu cihazda çalışmaya devam ediyor.`;
+    setGithubAuthStatus(`${error.message} · Bu cihazdaki yerel kayıt çalışmaya devam ediyor.`);
+    return false;
+  }
+}
+
+async function connectGithub() {
+  const owner = $('#github-owner')?.value.trim();
+  const repo = $('#github-repo')?.value.trim();
+  const token = $('#github-token')?.value.trim();
+  if (!owner || !repo || !token) { showToast('Depo sahibini, depo adını ve fine-grained tokenı gir.'); return; }
+  if (!validGithubTarget(owner, repo)) { showToast('GitHub depo sahibi veya depo adını kontrol et.'); return; }
+  await connectGithubWithToken(owner, repo, token);
+}
+
+async function githubDeviceRequest(url, fields) {
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(fields),
+    });
+  } catch {
+    throw new Error('GitHub yetkilendirme servisine erişilemedi. Sayfayı HTTPS üzerinden açıp tekrar dene.');
+  }
+  let data;
+  try { data = await response.json(); }
+  catch { throw new Error('GitHub beklenmeyen bir yanıt verdi. GitHub App’inde Device Flow’un açık olduğunu kontrol et.'); }
+  if (!response.ok) throw new Error(data.error_description || data.message || `GitHub yanıtı ${response.status}.`);
+  return data;
+}
+
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function authorizeGithubDevice() {
+  if (githubDeviceFlowActive) return;
+  const clientId = $('#github-client-id')?.value.trim();
+  const owner = $('#github-owner')?.value.trim();
+  const repo = $('#github-repo')?.value.trim();
+  if (!clientId || !owner || !repo) { setGithubAuthStatus('Client ID, depo sahibi ve depo adını doldur.'); return; }
+  if (!validGithubTarget(owner, repo)) { setGithubAuthStatus('GitHub depo sahibi veya depo adını kontrol et.'); return; }
+  githubDeviceFlowActive = true;
+  github = { ...github, clientId, owner, repo };
+  persistGithub();
+  setGithubAuthStatus('GitHub onay kodu alınıyor…');
+  setSyncLabel('GitHub yetkilendirmesi bekleniyor…', 'busy');
+  try {
+    const device = await githubDeviceRequest('https://github.com/login/device/code', { client_id: clientId });
+    if (!device.device_code || !device.user_code || !device.verification_uri) throw new Error('GitHub App Client ID geçersiz veya Device Flow kapalı.');
+    const safeUri = device.verification_uri.startsWith('https://github.com/') ? device.verification_uri : 'https://github.com/login/device';
+    setGithubAuthStatus(`GitHub’da <a href="${esc(safeUri)}" target="_blank" rel="noopener">cihaz yetkilendirme sayfasını aç</a> ve şu kodu gir: <strong><code>${esc(device.user_code)}</code></strong>. Bu sayfayı kapatma; onay sonrası bağlantı tamamlanacak.`, true);
+    let interval = Math.max(5, Number(device.interval) || 5) * 1000;
+    const expiresAt = Date.now() + Math.max(60, Number(device.expires_in) || 900) * 1000;
+    let accessToken = '';
+    while (Date.now() < expiresAt) {
+      await wait(interval);
+      const result = await githubDeviceRequest('https://github.com/login/oauth/access_token', {
+        client_id: clientId,
+        device_code: device.device_code,
+        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+      });
+      if (result.access_token) { accessToken = result.access_token; break; }
+      if (result.error === 'authorization_pending') continue;
+      if (result.error === 'slow_down') { interval += 5000; continue; }
+      if (result.error === 'expired_token') throw new Error('Onay kodunun süresi doldu. Yeniden GitHub ile yetkilendir.');
+      if (result.error === 'access_denied') throw new Error('GitHub yetkilendirmesi iptal edildi.');
+      if (result.error) throw new Error(result.error_description || `GitHub yetkilendirmesi başarısız: ${result.error}`);
+    }
+    if (!accessToken) throw new Error('Onay kodunun süresi doldu. Yeniden GitHub ile yetkilendir.');
+    const connected = await connectGithubWithToken(owner, repo, accessToken, clientId);
+    if (!connected) throw new Error('Yetkilendirme alındı, ancak seçilen özel depoya erişilemedi. App kurulumunu ve Contents yazma iznini kontrol et.');
+  } catch (error) {
+    setSyncLabel(error.message || 'GitHub yetkilendirmesi tamamlanamadı', 'error');
+    setGithubAuthStatus(error.message || 'GitHub yetkilendirmesi tamamlanamadı.');
+  } finally {
+    githubDeviceFlowActive = false;
   }
 }
 
@@ -852,6 +936,7 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('submit', event => {
+  if (event.target.matches('#github-device-form')) { event.preventDefault(); authorizeGithubDevice(); return; }
   if (event.target.matches('#github-form')) { event.preventDefault(); connectGithub(); }
 });
 
