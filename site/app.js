@@ -9,7 +9,7 @@ const DAY = 86_400_000;
 const ICONS = ['◌', '↗', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
   readingMode: 'page', bionic: true, highlightWord: true, boldPercent: 38, wpm: 220, groupWords: 1,
-  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, theme: 'light',
+  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, theme: 'light', sessionMinutes: 20, breakMinutes: 5,
 };
 
 let courses = [];
@@ -34,7 +34,7 @@ let lastTouch = Date.now();
 let activeSecondsRemainder = 0;
 
 function freshState() {
-  return { version: 1, updatedAt: 0, lastCourseId: '', preferences: { ...DEFAULTS, updatedAt: 0 }, lessons: {}, review: {}, activeDays: {}, activitySeconds: 0, syncConflicts: [] };
+  return { version: 1, updatedAt: 0, lastCourseId: '', preferences: { ...DEFAULTS, updatedAt: 0 }, lessons: {}, review: {}, activeDays: {}, activitySeconds: 0, syncConflicts: [], session: null };
 }
 
 function loadState() {
@@ -159,6 +159,20 @@ function getDueCards() {
   return cards;
 }
 
+function getDeferredTasks(dueOnly = false) {
+  const today = dayKey();
+  return getAllTasks().flatMap(item => {
+    const saved = lessonProgress(item.course.id).tasks[item.key];
+    if (saved?.status !== 'deferred' || !saved.deferUntil) return [];
+    return !dueOnly || saved.deferUntil <= today ? [{ ...item, saved }] : [];
+  });
+}
+
+function taskIsDone(courseId, key) {
+  const saved = taskProgress(courseId, key);
+  return ['worked', 'again'].includes(saved.status) || (saved.status === 'deferred' && saved.deferUntil > dayKey());
+}
+
 function getBlockTasks(block) {
   return block.sections.flatMap((section, sectionIndex) => section.tasks.map(task => ({ section, sectionIndex, task })));
 }
@@ -230,6 +244,7 @@ function renderHome() {
   const completed = courses.length - unfinished;
   const blocksDone = courses.reduce((n, c) => n + getCourseStats(c).completedBlocks, 0);
   const due = getDueCards().length;
+  const deferred = getDeferredTasks(true);
   const target = continueTarget();
   const targetStats = getCourseStats(target);
   const startBlock = Math.min(Number.isInteger(targetStats.activeBlock) ? targetStats.activeBlock : targetStats.completedBlocks, target.blocks.length);
@@ -239,8 +254,13 @@ function renderHome() {
   const seenMinutes = fmtTime(state.activitySeconds);
   const dayCount = Object.keys(state.activeDays).length;
   const groups = categoryList();
-  return `<section class="home-focus"><div class="home-focus-main"><div class="eyebrow">KALDIĞIN YER</div><h1>${esc(target.title)}</h1><p class="home-next-block">${block ? `Blok ${startBlock + 1} · ${esc(block.title)}` : 'Oturum sonu'}</p><div class="home-next-phase">${block ? (flow.phase === 'digest' ? 'Şimdi sindir' : 'Şimdi tüket') : 'Kısa öz değerlendirme'} · ${duration} dk oturum</div><div class="progress-track"><div class="progress-fill" style="width:${targetStats.percent}%"></div></div><small>${targetStats.completedBlocks} / ${target.blocks.length} blok tamamlandı</small><button class="btn" data-action="continue">Çalışmaya devam et →</button></div><aside class="home-focus-side"><div class="eyebrow">BUGÜN</div><strong>${due} tekrar kartı</strong><p>${seenMinutes} çalışma süresi · ${dayCount} etkin gün</p><button class="btn secondary small" data-view="reviews">Tekrarlara git</button><div class="home-lesson-count">${blocksDone} blok · ${completed} ders tamamlandı</div></aside></section><div class="section-heading"><div><h2>Derslerin</h2><p>${courses.length} çalışma kâğıdı · ${groups.length} konu başlığı</p></div><button class="text-button" data-view="courses">Tüm dersleri gör →</button></div><div class="course-grid">${courses.slice(0, 6).map(courseCard).join('')}</div>`;
+  const session = state.session;
+  const sessionText = session ? (session.phase === 'break' ? `Mola · ${countdown(session.endsAt)}` : `Çalışma · ${countdown(session.endsAt)}`) : 'Bir çalışma süresi seç, mola süresini belirle ve zamanlayıcıyı başlat.';
+  const deferredMarkup = deferred.length ? `<section class="deferred-list"><h2>Erteleme zamanı gelen görevler · ${deferred.length}</h2>${deferred.map(item => `<button class="deferred-item" data-action="resume-deferred" data-course-id="${esc(item.course.id)}" data-task-key="${esc(item.key)}"><span><strong>${esc(item.course.title)}</strong><small>${esc(item.task.id)} · ${esc(item.task.prompt)}</small></span><span>${item.saved.deferUntil < dayKey() ? 'Gecikti' : 'Bugün'} →</span></button>`).join('')}</section>` : '';
+  return `<section class="home-focus"><div class="home-focus-main"><div class="eyebrow">KALDIĞIN YER</div><h1>${esc(target.title)}</h1><p class="home-next-block">${block ? `Blok ${startBlock + 1} · ${esc(block.title)}` : 'Oturum sonu'}</p><div class="home-next-phase">${block ? (flow.phase === 'digest' ? 'Şimdi sindir' : 'Şimdi tüket') : 'Kısa öz değerlendirme'} · ${duration} dk tahmini ders</div><div class="progress-track"><div class="progress-fill" style="width:${targetStats.percent}%"></div></div><small>${targetStats.completedBlocks} / ${target.blocks.length} blok tamamlandı</small><button class="btn" data-action="continue">Çalışmaya devam et →</button></div><aside class="home-focus-side"><div class="eyebrow">BUGÜN</div><strong>${due} tekrar kartı</strong><p>${seenMinutes} çalışma süresi · ${dayCount} etkin gün</p><button class="btn secondary small" data-view="reviews">Tekrarlara git</button><div class="home-lesson-count">${blocksDone} blok · ${completed} ders tamamlandı</div></aside></section>${deferredMarkup}<section class="session-planner"><div><div class="eyebrow">ÇALIŞMA OTURUMU</div><h2>Bir adımda, kendi temponda</h2><p data-session-status>${esc(sessionText)}</p></div><div class="session-controls"><label>Çalışma<select class="select-small" data-session-setting="sessionMinutes"><option value="10" ${state.preferences.sessionMinutes == 10 ? 'selected' : ''}>10 dk</option><option value="20" ${state.preferences.sessionMinutes == 20 ? 'selected' : ''}>20 dk</option><option value="40" ${state.preferences.sessionMinutes == 40 ? 'selected' : ''}>40 dk</option><option value="custom" ${![10,20,40].includes(Number(state.preferences.sessionMinutes)) ? 'selected' : ''}>Özel</option></select></label><input aria-label="Özel çalışma dakikası" type="number" min="1" max="180" data-session-custom value="${![10,20,40].includes(Number(state.preferences.sessionMinutes)) ? esc(state.preferences.sessionMinutes) : ''}" placeholder="dk" ${[10,20,40].includes(Number(state.preferences.sessionMinutes)) ? 'hidden' : ''}><label>Mola<select class="select-small" data-session-setting="breakMinutes"><option value="3" ${state.preferences.breakMinutes == 3 ? 'selected' : ''}>3 dk</option><option value="5" ${state.preferences.breakMinutes == 5 ? 'selected' : ''}>5 dk</option><option value="10" ${state.preferences.breakMinutes == 10 ? 'selected' : ''}>10 dk</option></select></label><button class="btn small" data-action="${session ? 'session-stop' : 'session-start'}">${session ? 'Oturumu bitir' : 'Oturumu başlat'}</button></div></section><div class="section-heading"><div><h2>Derslerin</h2><p>${courses.length} çalışma kâğıdı · ${groups.length} konu başlığı</p></div><button class="text-button" data-view="courses">Tüm dersleri gör →</button></div><div class="course-grid">${courses.slice(0, 6).map(courseCard).join('')}</div>`;
 }
+
+function countdown(endsAt) { return `${Math.floor(Math.max(0, endsAt - Date.now()) / 60_000)}:${String(Math.floor(Math.max(0, endsAt - Date.now()) / 1000) % 60).padStart(2, '0')}`; }
 
 function statCard(label, value, note) {
   return `<article class="stat-card"><div class="stat-label">${esc(label)}</div><div class="stat-value">${esc(value)}</div><div class="stat-note">${esc(note)}</div></article>`;
@@ -281,7 +301,7 @@ function renderStudy() {
   const current = tasks[Math.min(flow.taskIndex || 0, Math.max(0, tasks.length - 1))];
   const statuses = tasks.map(({ task }) => progress.blocks[block.number]?.completed ? 'worked' : taskProgress(course.id, taskKey(block, task)).status);
   const worked = statuses.filter(status => ['worked', 'again'].includes(status)).length;
-  const remaining = statuses.filter(status => !['worked', 'again'].includes(status)).length;
+  const remaining = tasks.filter(({ task }) => !progress.blocks[block.number]?.completed && !taskIsDone(course.id, taskKey(block, task))).length;
   const navigation = `<div class="lesson-actions"><button class="btn ghost small" data-action="prev-block" ${activeBlock === 0 ? 'disabled' : ''}>← Önceki blok</button><small>${percent}% · ${progress.completedBlocks || 0} blok tamam</small><button class="btn ghost small" data-action="leave-block">${activeBlock === course.blocks.length - 1 ? 'Oturum sonuna geç' : 'Sonraki bloğa geç'}</button></div>`;
   const phaseTabs = `<div class="phase-tabs" role="tablist" aria-label="Çalışma aşaması"><button class="phase-tab ${flow.phase === 'consume' ? 'active' : ''}" data-action="phase-consume">1 · Tüket</button><button class="phase-tab ${flow.phase === 'digest' ? 'active' : ''}" data-action="phase-digest">2 · Sindir</button></div>`;
   let workspace = '';
@@ -289,14 +309,15 @@ function renderStudy() {
     workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">1</span><div><div class="eyebrow">TÜKET · ${block.readMinutes ? `~${block.readMinutes} DK` : 'OKU'}</div><h2>${esc(block.title)}</h2><p>${esc(block.readInstruction || 'Metni kendi hızında oku. Kavram haritanı veya analoji notunu istediğin anda ekleyebilirsin.')}</p></div></div>${course.studyGuide?.length ? `<details class="pacer-guide"><summary>P.A.C.E.R. çalışma rehberi</summary><ol>${course.studyGuide.filter(line => /^\d+[.)]/.test(line)).map(line => `<li>${esc(line.replace(/^\d+[.)]\s*/, ''))}</li>`).join('')}</ol></details>` : ''}
       <div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metni oku</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></label><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime arka planı ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Okuma ayarları →</button></div>
       ${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}
-        <details class="quick-workbench"><summary>Okurken çalış · P / A / C</summary><div class="map-editor"><label><span>C · Kavram haritası ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki fiili → kavram">${esc(progress.mapNotes || '')}</textarea></label><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
+        <details class="quick-workbench"><summary>Okurken çalış · P / A / C</summary><div class="map-editor"><div><label><span>C · Kaynaklı kavram bağlantısı ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span></label><div class="map-link-form"><input data-map-from placeholder="Kavram" aria-label="Başlangıç kavramı"><input data-map-relation placeholder="İlişki (oluşturur, etkiler…)" aria-label="İlişki"><input data-map-to placeholder="Bağlı kavram" aria-label="Hedef kavram"><select data-map-source aria-label="Kaynak paragrafı"><option value="">Kaynak paragrafı seç (isteğe bağlı)</option>${block.reading.map((para, i) => `<option value="${block.number}:${i + 1}">Blok ${block.number} · ¶${i + 1} · ${esc(shorten(para.text, 54))}</option>`).join('')}</select><button class="btn small" data-action="map-add">Bağlantı ekle</button></div><label class="map-notes-label"><span>Bağlantıları düzenle</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki → kavram | B1 ¶2">${esc(progress.mapNotes || '')}</textarea></label></div><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
       ${course.knowledgeProfile?.length ? `<details class="knowledge-profile"><summary>Bu derste hangi tür bilgi var?</summary><div class="knowledge-profile-list">${course.knowledgeProfile.map(item => `<article><strong>${esc(item.type)} · ${esc(item.label)}</strong><span>${esc(item.weight)}</span><p>${esc(item.description)}</p></article>`).join('')}</div></details>` : ''}
       <div class="phase-footer"><span>Bu notlar ve okuma konumun otomatik kaydolur.</span><button class="btn" data-action="consume-done">Okudum, sindirmeye geç →</button></div></section>`;
   } else {
     const taskPanel = current ? renderSection(course, block, { ...current.section, tasks: [current.task] }, `${current.section.label || current.section.type} · ${current.task.id}`) : '<p>Bu blokta ayrıca sindirme görevi yok.</p>';
     const saved = current ? taskProgress(course.id, taskKey(block, current.task)) : null;
     const taskStatus = progress.blocks[block.number]?.completed ? 'worked' : saved?.status;
-    const taskStep = current ? `<div class="task-step"><span>Görev ${flow.taskIndex + 1} / ${tasks.length} · ${worked} işlendi</span><span>${taskStatus === 'again' ? 'Tekrar gerekli' : taskStatus === 'worked' ? 'İşlendi' : 'Henüz işlenmedi'}</span></div>${taskPanel}<div class="self-check"><span>Nasıl gitti?</span><button class="answer-button ${taskStatus === 'worked' ? 'selected' : ''}" data-action="task-status" data-status="worked" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Hatırladım / işledim</button><button class="answer-button ${taskStatus === 'again' ? 'selected' : ''}" data-action="task-status" data-status="again" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Tekrar gerekli</button></div><div class="task-pagination"><button class="btn ghost small" data-action="task-prev" ${flow.taskIndex === 0 ? 'disabled' : ''}>← Önceki</button><button class="btn small" data-action="task-next">${flow.taskIndex === tasks.length - 1 ? 'Özeti gör' : 'Sonraki görev →'}</button></div>` : '<div class="empty-state">Bu blokta sindirme sorusu yok. Okuma adımını tamamladıktan sonra bloğu bitirebilirsin.</div>';
+    const deferDate = saved?.deferUntil || dayKey();
+    const taskStep = current ? `<div class="task-step"><span>Görev ${flow.taskIndex + 1} / ${tasks.length} · ${worked} işlendi</span><span>${taskStatus === 'again' ? 'Tekrar gerekli' : taskStatus === 'worked' ? 'İşlendi' : taskStatus === 'deferred' ? `Ertelendi · ${niceDate(new Date(`${saved.deferUntil}T12:00:00`))}` : 'Henüz işlenmedi'}</span></div>${taskPanel}<div class="self-check"><span>Nasıl gitti?</span><button class="answer-button ${taskStatus === 'worked' ? 'selected' : ''}" data-action="task-status" data-status="worked" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Hatırladım / işledim</button><button class="answer-button ${taskStatus === 'again' ? 'selected' : ''}" data-action="task-status" data-status="again" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Tekrar gerekli</button></div><div class="task-defer"><label>Tekrar tarihi<input type="date" data-defer-date min="${dayKey()}" value="${esc(deferDate)}" aria-label="Görev için tekrar tarihi"></label><button class="answer-button ${taskStatus === 'deferred' ? 'selected' : ''}" data-action="task-defer" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Bu tarihe ertele</button>${taskStatus === 'deferred' ? '<button class="text-button" data-action="task-undefer" data-task-key="' + esc(taskKey(block, current.task)) + '" data-course-id="' + esc(course.id) + '">Ertelemeyi kaldır</button>' : ''}</div><div class="task-pagination"><button class="btn ghost small" data-action="task-prev" ${flow.taskIndex === 0 ? 'disabled' : ''}>← Önceki</button><button class="btn small" data-action="task-next">${flow.taskIndex === tasks.length - 1 ? 'Özeti gör' : 'Sonraki görev →'}</button></div>` : '<div class="empty-state">Bu blokta sindirme sorusu yok. Okuma adımını tamamladıktan sonra bloğu bitirebilirsin.</div>';
     const canComplete = remaining === 0;
     workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">2</span><div><div class="eyebrow">SİNDİR · ${block.digestMinutes ? `~${block.digestMinutes} DK` : 'İŞLE'}</div><h2>${esc(block.title)}</h2><p>Kendi cevabını yaz. Örneği açıp karşılaştırabilir, sonra hatırlama durumunu işaretleyebilirsin.</p></div></div><div class="digest-note"><strong>P · A · C · E · R</strong><span>Görev türü, kullanacağın işlemi belirtir. P/A/C/E/R sırası zorunlu bir liste değildir.</span></div>${taskStep}<div class="phase-footer"><span>${remaining ? `${remaining} görev işlenmedi; bloğu sonraya bırakabilirsin.` : 'Bloktaki görevler işlendi.'}</span><button class="btn ${canComplete ? '' : 'ghost'}" data-action="${canComplete ? 'next-block' : 'leave-block'}">${canComplete ? (activeBlock === course.blocks.length - 1 ? 'Bloğu bitir ve oturum sonuna geç →' : 'Bloğu tamamla →') : 'Sonraki bloğa geç →'}</button></div></section>`;
   }
@@ -324,13 +345,18 @@ function renderReadingPanel(block) {
 }
 
 function renderMapPreview(raw) {
-  const links = String(raw || '').split(/\n+/u).map(line => line.split('→').map(part => part.trim())).filter(parts => parts.length >= 3 && parts[0] && parts[1] && parts.slice(2).join(' → '));
+  const links = String(raw || '').split(/\n+/u).map(line => {
+    const [body, source = ''] = line.split(/\s*\|\s*/u);
+    const parts = body.split('→').map(part => part.trim());
+    const citation = source.match(/B([^\s|]+)\s*¶\s*(\d+)/u);
+    const sourceNumber = source.match(/¶\s*(\d+)/u)?.[1] || '';
+    return { from: parts[0], relation: parts[1], to: parts.slice(2).join(' → '), sourceNumber, sourceBlock: citation?.[1] || '' };
+  }).filter(link => link.from && link.relation && link.to);
   if (!links.length) return '<p class="map-empty">Bağlantıları yazdıkça harita burada görünür.</p>';
   const height = Math.max(130, links.length * 92 + 24);
-  const rows = links.map((parts, index) => {
+  const rows = links.map((link, index) => {
     const y = 45 + index * 92;
-    const [from, relation, ...toParts] = parts;
-    return `<g class="map-edge"><path d="M 230 ${y} C 310 ${y}, 410 ${y}, 490 ${y}" marker-end="url(#map-arrow)"/><rect x="8" y="${y - 20}" width="222" height="40" rx="12"/><text x="119" y="${y + 5}" text-anchor="middle">${esc(from)}</text><rect x="490" y="${y - 20}" width="222" height="40" rx="12"/><text x="601" y="${y + 5}" text-anchor="middle">${esc(toParts.join(' → '))}</text><text class="map-relation" x="360" y="${y - 9}" text-anchor="middle">${esc(relation)}</text></g>`;
+    return `<g class="map-edge"><path d="M 230 ${y} C 310 ${y}, 410 ${y}, 490 ${y}" marker-end="url(#map-arrow)"/><rect x="8" y="${y - 20}" width="222" height="40" rx="12"/><text x="119" y="${y + 5}" text-anchor="middle">${esc(link.from)}</text><rect x="490" y="${y - 20}" width="222" height="40" rx="12"/><text x="601" y="${y + 5}" text-anchor="middle">${esc(link.to)}</text><text class="map-relation" x="360" y="${y - 9}" text-anchor="middle">${esc(link.relation)}</text>${link.sourceNumber ? `<text class="map-source" x="700" y="${y + 34}" text-anchor="end">Kaynak ${link.sourceBlock ? `Blok ${esc(link.sourceBlock)} · ` : ''}¶${esc(link.sourceNumber)}</text>` : ''}</g>`;
   }).join('');
   return `<svg class="knowledge-map" viewBox="0 0 720 ${height}" role="img" aria-label="Kavram bağlantı haritası"><defs><marker id="map-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker></defs>${rows}</svg>`;
 }
@@ -581,7 +607,7 @@ function markBlockDone() {
   const course = currentCourse();
   const block = course?.blocks[activeBlock];
   if (!block) return;
-  const pending = progressBlockDone(course.id, block.number) ? [] : getBlockTasks(block).filter(({ task }) => !['worked', 'again'].includes(taskProgress(course.id, taskKey(block, task)).status));
+  const pending = progressBlockDone(course.id, block.number) ? [] : getBlockTasks(block).filter(({ task }) => !taskIsDone(course.id, taskKey(block, task)));
   if (pending.length) { showToast(`${pending.length} görev bekliyor. Bunları sonraya bırakıp ilerleyebilirsin.`); return; }
   const p = lessonProgress(course.id);
   p.blocks[block.number] = { completed: true, updatedAt: Date.now() };
@@ -612,7 +638,7 @@ function moveDigestTask(delta) {
     if (saved.status === 'todo') saved.status = saved.answer?.trim() ? 'worked' : 'skipped';
     saved.updatedAt = Date.now();
   }
-  const pendingIndices = tasks.map(({ task }, i) => ['worked', 'again'].includes(taskProgress(course.id, taskKey(block, task)).status) ? -1 : i).filter(i => i >= 0);
+  const pendingIndices = tasks.map(({ task }, i) => taskIsDone(course.id, taskKey(block, task)) ? -1 : i).filter(i => i >= 0);
   if (delta > 0 && flow.taskIndex >= tasks.length - 1 && pendingIndices.length === 0) {
     changeLesson(course.id, {}, 1_500);
     markBlockDone();
@@ -1067,6 +1093,48 @@ document.addEventListener('click', async event => {
     resolveSyncConflict(Number(button.dataset.conflictIndex), button.dataset.conflictChoice); return;
   }
   if (action === 'continue') { const course = continueTarget(); if (course) startCourse(course); return; }
+  if (action === 'session-start') {
+    const minutes = Math.max(1, Math.min(180, Number(state.preferences.sessionMinutes) || 20));
+    state.session = { phase: 'work', startedAt: Date.now(), endsAt: Date.now() + minutes * 60_000, durationMinutes: minutes, breakMinutes: Number(state.preferences.breakMinutes) || 5 };
+    touchState(1_000); render(); return;
+  }
+  if (action === 'session-stop') { state.session = null; touchState(1_000); render(); return; }
+  if (action === 'map-add') {
+    const form = event.target.closest('.map-editor');
+    const from = form?.querySelector('[data-map-from]')?.value.trim();
+    const relation = form?.querySelector('[data-map-relation]')?.value.trim();
+    const to = form?.querySelector('[data-map-to]')?.value.trim();
+    const source = form?.querySelector('[data-map-source]')?.value;
+    if (!from || !relation || !to) { showToast('Bağlantı için kavram, ilişki ve hedef kavramı yaz.'); return; }
+    const textarea = form.querySelector('[data-flow-field="mapNotes"]');
+    const [sourceBlock, sourceParagraph] = source ? source.split(':') : [];
+    const line = `${from} → ${relation} → ${to}${source ? ` | B${sourceBlock} ¶${sourceParagraph}` : ''}`;
+    textarea.value = `${textarea.value.trim()}${textarea.value.trim() ? '\n' : ''}${line}`;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    form.querySelectorAll('[data-map-from], [data-map-relation], [data-map-to]').forEach(input => { input.value = ''; });
+    form.querySelector('[data-map-source]').value = '';
+    form.querySelector('[data-map-from]').focus(); return;
+  }
+  if (action === 'task-defer' || action === 'task-undefer') {
+    const button = event.target.closest('[data-action]');
+    const date = button.closest('.phase-card')?.querySelector('[data-defer-date]')?.value;
+    const saved = taskProgress(button.dataset.courseId, button.dataset.taskKey);
+    if (action === 'task-defer') {
+      if (!date || date < dayKey()) { showToast('Bugün veya ileri bir tekrar tarihi seç.'); return; }
+      saved.status = 'deferred'; saved.deferUntil = date;
+    } else { saved.status = 'todo'; delete saved.deferUntil; }
+    saved.updatedAt = Date.now(); touchState(1_500); render(); return;
+  }
+  if (action === 'resume-deferred') {
+    const button = event.target.closest('[data-action="resume-deferred"]');
+    const item = getDeferredTasks(true).find(task => task.course.id === button.dataset.courseId && task.key === button.dataset.taskKey);
+    if (!item) return;
+    const progress = lessonProgress(item.course.id); const block = item.course.blocks.find(value => String(value.number) === String(item.block.number));
+    delete progress.blocks[item.block.number]; progress.completedAt = null;
+    const saved = taskProgress(item.course.id, item.key); saved.status = 'todo'; delete saved.deferUntil; saved.updatedAt = Date.now();
+    const flow = blockFlow(item.course.id, item.block.number); flow.phase = 'digest'; flow.taskIndex = getBlockTasks(block).findIndex(entry => entry.task.id === item.task.id);
+    touchState(1_000); startCourse(item.course, item.course.blocks.indexOf(block)); return;
+  }
   if (action === 'next-block') { markBlockDone(); return; }
   if (action === 'leave-block') { leaveBlock(); return; }
   if (action === 'phase-consume' || action === 'phase-digest' || action === 'consume-done') {
@@ -1081,7 +1149,7 @@ document.addEventListener('click', async event => {
   if (action === 'task-next' || action === 'task-prev') { moveDigestTask(action === 'task-next' ? 1 : -1); return; }
   if (action === 'task-status') {
     const saved = taskProgress(event.target.closest('[data-course-id]').dataset.courseId, event.target.closest('[data-task-key]').dataset.taskKey);
-    saved.status = event.target.dataset.status; saved.updatedAt = Date.now();
+    saved.status = event.target.dataset.status; delete saved.deferUntil; saved.updatedAt = Date.now();
     touchState(1_500); render(); return;
   }
   if (action === 'prev-block') { changeBlock(-1); return; }
@@ -1203,6 +1271,17 @@ document.addEventListener('change', event => {
   if (input.matches('#reading-mode')) { stopPlayer(); updateReadingSetting('readingMode', input.value); return; }
   if (input.matches('[data-pref]')) { updateReadingSetting(input.dataset.pref, input.value); return; }
   if (input.matches('[data-setting-select]')) { updateReadingSetting(input.dataset.settingSelect, input.value); return; }
+  if (input.matches('[data-session-setting]')) {
+    const key = input.dataset.sessionSetting;
+    if (key === 'sessionMinutes' && input.value === 'custom') { const custom = $('[data-session-custom]'); custom.hidden = false; custom.focus(); return; }
+    state.preferences[key] = Number(input.value); state.preferences.updatedAt = Date.now(); touchState(1_500);
+    if (key === 'sessionMinutes') { const custom = $('[data-session-custom]'); if (custom) custom.hidden = true; }
+    return;
+  }
+  if (input.matches('[data-session-custom]')) {
+    const value = Math.max(1, Math.min(180, Number(input.value) || 20)); input.value = value;
+    state.preferences.sessionMinutes = value; state.preferences.updatedAt = Date.now(); touchState(1_500); return;
+  }
   if (input.matches('[data-card-course]')) { activeReviewCourseId = input.value; render(); return; }
   if (input.matches('#import-file') && input.files[0]) { importState(input.files[0]); input.value = ''; }
 });
@@ -1259,6 +1338,24 @@ setInterval(() => {
   }
   if (activeSecondsRemainder >= 60) { activeSecondsRemainder = 0; touchState(15_000); }
 }, 10_000);
+
+setInterval(() => {
+  const session = state.session;
+  if (session && Date.now() >= session.endsAt) {
+    if (session.phase === 'work') {
+      session.phase = 'break'; session.endsAt = Date.now() + session.breakMinutes * 60_000;
+      showToast(`Çalışma süresi tamamlandı. ${session.breakMinutes} dakikalık mola başladı.`);
+    } else {
+      state.session = null; showToast('Mola bitti. Hazır olduğunda yeni oturum başlatabilirsin.');
+    }
+    touchState(1_000);
+    if (view === 'home') render();
+  }
+  if (view === 'home' && state.session) {
+    const status = $('[data-session-status]');
+    if (status) status.textContent = `${state.session.phase === 'break' ? 'Mola' : 'Çalışma'} · ${countdown(state.session.endsAt)}`;
+  }
+}, 1_000);
 
 async function init() {
   try {

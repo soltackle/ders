@@ -1,6 +1,6 @@
 # P.A.C.E.R. çalışma sitesi — ayrıntılı geliştirme planı
 
-Durum: ilk uygulama paketi eklendi (`codex/study-app`). Ana Tüket/Sindir akışı, DOCX içeriği, okuma ayarları, referans kartları, kanıt provası ve ilerleme görünümü uygulandı. Aşağıdaki kapsam tablosu, tamamlananları ve sonraki pakete kalan işleri ayırır. Canlı yayın ve gerçek iki cihaz eşitlemesi ayrıca doğrulanmalıdır.
+Durum: temel uygulama ve ek çalışma paketi `codex/study-app` dalında. Oturum/mola sayacı, tarihli görev erteleme, kaynak paragrafı etiketli düzenlenebilir kavram bağlantıları ve Chromium tarayıcı kontrolleri eklendi. Gerçek iki cihaz eşitlemesi, GitHub App yetkilendirmesi gerektirdiği için kullanıcı tarayıcılarında ayrıca doğrulanmalı; serbest sürüklemeli grafik sonraki geliştirme olarak duruyor.
 
 ## 1. Hedef ve temel kararlar
 
@@ -158,7 +158,7 @@ Kod, mevcut statik yapı içinde içerik, kayıt, okuma, P.A.C.E.R. alanları, t
 | **6 — İstatistik ve eşitleme** | Aşama bazlı ölçümler, haftalık özet, hata/çakışma durumları ve GitHub bağlantısını doğrulama. | Durumu anlaşılır, birden çok cihazda devam edilebilir kayıt. | Gerçek kullanıcı senaryosu; iki cihaz değişikliği; ağ kesintisi ve yeniden deneme; yedek geri yükleme. |
 | **7 — Yayın ve son kontrol** | GitHub Pages iş akışı, içerik üretimi ve son sürüm kontrolü. | Yayınlanmış ve canlı adresinde kontrol edilmiş sürüm. | CI başarılı; canlı sitede ana ekran → okuma → sindirme → kayıt → tekrar akışı çalışıyor. |
 
-Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/prova işlerinin 5. aşaması**. Kod mevcut `v1` tarayıcı kaydına yeni alanlar ekler; cevaplar ve eski kayıtlar korunur. Aşama 4'ün gelişmiş ağ görünümü, 6. aşamanın eksiksiz aşama süreleri ve iki cihazda çakışma senaryoları ile 7. aşamanın canlı doğrulaması hâlâ sonraki iş olarak duruyor.
+Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/prova işlerinin 5. aşaması**. Ek pakette çalışma/mola zamanlayıcısı, tekrar tarihi ve paragraf/block kaynak etiketli düzenlenebilir harita bağlantıları eklendi. Kod mevcut `v1` tarayıcı kaydına yeni alanlar ekler; cevaplar ve eski kayıtlar korunur. Serbest sürüklemeli ağ düzeni, gerçek iki cihaz yetkilendirme/eşitleme testi ve canlı kabul akışı ayrıca yapılmalı.
 
 ### İlk uygulamada teslim edilenler
 
@@ -170,10 +170,10 @@ Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/pr
 
 ### Henüz tamamlanmayanlar
 
-- Harita önizlemesi basit ve satır tabanlı; serbest sürükleme, otomatik düzen ve kaynak paragrafına göre etiketleme sonraki iş.
+- Harita bağlantıları satır tabanlı biçimde düzenlenebilir ve kaynak paragrafı etiketleri görünür. Serbest sürükleme ve otomatik grafik yerleşimi sonraki iş.
 - Süre kaydı sekme görünürlüğü ve yakın etkileşim koşuluna dayanıyor; kesin odak süresi sayılmaz.
-- İki ayrı cihazda gerçek GitHub App yetkilendirmesi ve eşitleme doğrulaması yapılmadı. Pages iş akışı depo ortamında izinli olan `codex/study-app` dalını yayımlar; `master` dalı koruma kuralıyla reddediliyor.
-- Mobil, klavye, yakınlaştırma ve canlı site kabul senaryoları bu uygulama adımında tarayıcıyla doğrulanmadı.
+- İki ayrı cihazda gerçek GitHub App yetkilendirmesi ve eşitleme doğrulaması yapılamadı; bunun için kullanıcı hesabıyla iki tarayıcıda oturum açılması gerekiyor. Pages iş akışı depo ortamında izinli olan `codex/study-app` dalını yayımlar; `master` dalı koruma kuralıyla reddediliyor.
+- Chromium’da 360 px mobil genişlik, 180 CSS px dar görünüm (yaklaşık %200 yakınlaştırma), klavye ile ders açma ve temel çalışma akışları kontrol edildi. Canlı site ve cihazlar arası eşitleme son kontrolü ayrıca bekliyor.
 
 ## 9. Son kabul senaryosu
 

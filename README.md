@@ -8,7 +8,8 @@ KPSS A Maliye çalışma kâğıtlarını adım adım kullanmak için GitHub Pag
 - P / A / C / E / R görevlerine göre yapılandırılmış cevap alanları; örnek cevabı açma ve kopyalama
 - Bionik vurgu, paragraf odağı ve kelime kelime okuma; hız, kelime grubu, vurgu, boyut ve duraklama tercihleri
 - Otomatik cihaz kaydı, çalışma istatistikleri, ders sonu öz değerlendirme ve zamanlı tekrar kartları
-- Kavram → ilişki → kavram haritası, ders sonu kaynak soruları ve Tüket/Sindir süre özeti
+- Kaynak paragrafına bağlı, düzenlenebilir kavram bağlantıları; ders sonu kaynak soruları ve Tüket/Sindir süre özeti
+- 10/20/40 dakikalık veya özel çalışma oturumu, mola sayacı ve tarihli görev erteleme
 - Opsiyonel GitHub özel depo eşitlemesi; Supabase veya uygulama sunucusu gerektirmez
 
 Uygulanan kapsam ve sıradaki işler: [P.A.C.E.R. geliştirme planı](docs/pacer-gelistirme-plani.md).
