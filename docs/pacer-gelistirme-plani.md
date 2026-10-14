@@ -14,7 +14,7 @@ Temel, DOCX belgelerinin ilk sayfalarındaki yöntem olacak:
 - Referans bilgisi kartla hatırlanacak; kanıt ise bir kavramı açıklama veya savunmada kullanılacak.
 - Cevabı açma ve kopyalama korunacak. Bu işlemler, bilginin bağımsız olarak hatırlandığı anlamına gelmeyecek.
 
-İlk sürüm, mevcut GitHub Pages yayını ve statik uygulama yapısı üzerinde geliştirilecek. Supabase kurulumu gerekmeyecek.
+Uygulama GitHub Pages üzerinde statik kalacak; cihazlar arası ilerleme Supabase Auth + RLS korumalı tabloya yazılacak. Supabase sunucu kodu veya service_role anahtarı sitede tutulmayacak.
 
 ## 2. İncelemede doğrulanan mevcut durum
 
@@ -103,7 +103,7 @@ Ayarlar şu gruplarda düzenlenecek:
 2. **Oynatma:** kelime/dakika hızı, kelime grubu, noktalama beklemesi, otomatik kaydırma ve hareket azaltma.
 3. **Görünüm:** tema, yazı boyutu, satır aralığı, okuma genişliği ve odak modu.
 4. **Çalışma:** oturum süresi, isteğe bağlı mola ve tekrar hedefi.
-5. **Veriler:** kayıt/eşitleme durumu, yedek indirme, geri yükleme ve GitHub bağlantısı.
+5. **Veriler:** kayıt/eşitleme durumu, yedek indirme, geri yükleme ve Supabase/GitHub bağlantısı.
 
 Hız seçimi öğrenme puanı olarak kullanılmayacak. Oynatma hızı ile yumuşak ekran kaydırması ayrı tercihler olacak.
 
@@ -140,9 +140,9 @@ Yeni veri sürümüne geçişte:
 3. Biten dersleri **önceki sürümde tamamlandı** olarak koru. Sonradan eklenen işleri ayrıca göster; eski ilerlemeyi sessizce sıfırlama veya yeni görevleri otomatik tamamlanmış sayma.
 4. Hata olursa eski kaydı yüklemeye devam et; yedeği geri alma yolunu koru.
 
-GitHub eşitlemesi mevcut özel ilerleme deposunu kullanacak. Bu cihazda kayıt, eşitleme bekliyor, eşitlendi ve hata durumları açık gösterilecek. İki cihaz aynı yanıtı değiştirirse farklı sürüm saklanıp seçilebilir olacak; yanıt sessizce kaybedilmeyecek.
+Supabase eşitlemesi kullanıcıya ait `study_progress` satırını kullanır; RLS aynı kullanıcının dışındaki erişimleri engeller. Bu cihazda kayıt, eşitleme bekliyor, eşitlendi ve hata durumları gösterilir. GitHub özel depo eşitlemesi alternatif olarak durur.
 
-İlk sürümde tarayıcıdaki mevcut bağlantı hatırlanacak. Anahtarsız GitHub girişi, mevcut başarısız tarayıcı akışından ayrı bir iş olarak doğrulanacak; gerekiyorsa yalnız yetkilendirmeyi yapan küçük bir aracı servis kullanılacak. Bu servis Supabase gerektirmez. Açık site dosyalarında token tutulmayacak.
+Supabase Auth e-posta/şifre oturumu her cihazda saklanır ve yenilenir. İlerleme JSONB satırında saklanır; RLS kullanıcının kendi satırına erişmesini sağlar. Publishable key açık istemci kodunda kullanılmak üzere tasarlanmıştır; service_role anahtarı hiçbir zaman sitede bulunmaz.
 
 Kod, mevcut statik yapı içinde içerik, kayıt, okuma, P.A.C.E.R. alanları, tekrarlar, istatistikler ve eşitleme sorumluluklarına bölünecek. Sırf görünümü değiştirmek için büyük bir framework geçişi yapılmayacak.
 
@@ -155,7 +155,7 @@ Kod, mevcut statik yapı içinde içerik, kayıt, okuma, P.A.C.E.R. alanları, t
 | **3 — Aşamalı çalışma ve kayıt** | Tüket/sindir ayrımı, tek görev ilerlemesi, eski veri geçişi ve tamamlanma kuralları. | Dersin doğru aşamasından devam edilen, veri kaybetmeyen çalışma. | Yenileme/geri dönüş/örnek cevabı açma senaryoları; kısmi ve tamamlanmış kayıt geçişi. |
 | **4 — Türlere uygun araçlar** | C bağlantı listesi ve ağ görünümü, A eleştirisi, P çözüm, E/R ayrımı ve kanıt bankası. | Her bilgi türünün kendi çıktısı. | Örnek bir derste bütün mevcut türleri işleme, kaydetme ve yeniden açma. |
 | **5 — Hatırlama ve prova** | Kaynaktaki K kartları, günlük tekrar takvimi, Y haritada gezinme ve G kanıt provası. | Günlük ve hafta sonu çalışmaları. | Doğru tarih hesapları, kaynaktaki ön/arka yüz eşleşmesi, E ve R'nin ayrı akışı. |
-| **6 — İstatistik ve eşitleme** | Aşama bazlı ölçümler, haftalık özet, hata/çakışma durumları ve GitHub bağlantısını doğrulama. | Durumu anlaşılır, birden çok cihazda devam edilebilir kayıt. | Gerçek kullanıcı senaryosu; iki cihaz değişikliği; ağ kesintisi ve yeniden deneme; yedek geri yükleme. |
+| **6 — İstatistik ve eşitleme** | Aşama bazlı ölçümler, haftalık özet, hata/çakışma durumları ve Supabase/GitHub bağlantılarını doğrulama. | Durumu anlaşılır, birden çok cihazda devam edilebilir kayıt. | Gerçek kullanıcı senaryosu; iki cihaz değişikliği; ağ kesintisi ve yeniden deneme; yedek geri yükleme. |
 | **7 — Yayın ve son kontrol** | GitHub Pages iş akışı, içerik üretimi ve son sürüm kontrolü. | Yayınlanmış ve canlı adresinde kontrol edilmiş sürüm. | CI başarılı; canlı sitede ana ekran → okuma → sindirme → kayıt → tekrar akışı çalışıyor. |
 
 Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/prova işlerinin 5. aşaması**. Ek pakette çalışma/mola zamanlayıcısı, tekrar tarihi ve paragraf/block kaynak etiketli düzenlenebilir harita bağlantıları eklendi. Kod mevcut `v1` tarayıcı kaydına yeni alanlar ekler; cevaplar ve eski kayıtlar korunur. Serbest sürüklemeli ağ düzeni, gerçek iki cihaz yetkilendirme/eşitleme testi ve canlı kabul akışı ayrıca yapılmalı.
@@ -172,7 +172,7 @@ Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/pr
 
 - Harita bağlantıları satır tabanlı biçimde düzenlenebilir ve kaynak paragrafı etiketleri görünür. Serbest sürükleme ve otomatik grafik yerleşimi sonraki iş.
 - Süre kaydı sekme görünürlüğü ve yakın etkileşim koşuluna dayanıyor; kesin odak süresi sayılmaz.
-- İki ayrı cihazda gerçek GitHub App yetkilendirmesi ve eşitleme doğrulaması yapılamadı; bunun için kullanıcı hesabıyla iki tarayıcıda oturum açılması gerekiyor. Pages iş akışı depo ortamında izinli olan `codex/study-app` dalını yayımlar; `master` dalı koruma kuralıyla reddediliyor.
+- Supabase istemci eşitlemesi ve RLS tablosu eklendi; canlı kimlik doğrulama testi bu çalışma ortamında Supabase yönetim araçları/API erişimi olmadığı için yapılamadı. Kullanıcı `supabase/setup.sql` dosyasını SQL Editor’da bir defa çalıştırmalı. Pages iş akışı `codex/study-app` dalını yayımlar.
 - Chromium’da 360 px mobil genişlik, 180 CSS px dar görünüm (yaklaşık %200 yakınlaştırma), klavye ile ders açma ve temel çalışma akışları kontrol edildi. Canlı site ve cihazlar arası eşitleme son kontrolü ayrıca bekliyor.
 
 ## 9. Son kabul senaryosu

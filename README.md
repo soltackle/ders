@@ -10,7 +10,7 @@ KPSS A Maliye çalışma kâğıtlarını adım adım kullanmak için GitHub Pag
 - Otomatik cihaz kaydı, çalışma istatistikleri, ders sonu öz değerlendirme ve zamanlı tekrar kartları
 - Kaynak paragrafına bağlı, düzenlenebilir kavram bağlantıları; ders sonu kaynak soruları ve Tüket/Sindir süre özeti
 - 10/20/40 dakikalık veya özel çalışma oturumu, mola sayacı ve tarihli görev erteleme
-- Opsiyonel GitHub özel depo eşitlemesi; Supabase veya uygulama sunucusu gerektirmez
+- Supabase e-posta hesabıyla cihazlar arası ilerleme eşitlemesi; GitHub özel depo eşitlemesi alternatif olarak durur
 
 Uygulanan kapsam ve sıradaki işler: [P.A.C.E.R. geliştirme planı](docs/pacer-gelistirme-plani.md).
 
@@ -37,14 +37,23 @@ Betik Python standart kütüphanesini kullanır; uygulama paketleri yüklenmez.
 
 `codex/study-app` dalına ders, site ya da içerik betiği değişikliği geldiğinde `.github/workflows/publish-pages.yml` siteyi üretip GitHub Pages'e yayımlar. Bu depo için Pages ortamı bu dalı kabul ediyor. Depoda **Settings → Pages → Build and deployment → Source: GitHub Actions** ayarı seçili olmalıdır. Yayın adresi GitHub Actions tamamlandığında iş akışındaki deployment çıktısında görünür.
 
-## Kişisel ilerlemeyi GitHub'da saklama
+## Supabase ile cihazlar arası ilerleme kaydı
 
-İlerleme, yanıtlar ve okuma ayarları varsayılan olarak kullandığın tarayıcıda kaydedilir. Cihazlar arasında anahtar kopyalayıp yapıştırmadan eşitlemek için bir kez GitHub App kur:
+İlerleme önce bu tarayıcıya kaydolur. Supabase hesabına giriş yaptığında yerel kayıt hesapla birleştirilir ve diğer cihazlarda aynı e-posta/şifreyle devam edebilirsin. Site yalnızca Supabase publishable anahtarını kullanır; kullanıcı verisini korumak için veritabanı erişimi oturum açmış kullanıcıya ve RLS kurallarına bağlıdır.
+
+Supabase projesinde bir defa:
+
+1. **SQL Editor → New query** bölümünde [`supabase/setup.sql`](supabase/setup.sql) içeriğini çalıştır.
+2. **Authentication → URL Configuration** içinde Site URL’yi `https://soltackle.github.io/ders/` yap ve Redirect URLs listesine `https://soltackle.github.io/ders/**` ekle.
+3. Email provider açık kalsın. Sitede **Ayarlar → Supabase cihazlar arası kayıt** bölümünden hesap oluştur; gerekiyorsa e-postanı doğrula. Diğer cihazda aynı hesapla giriş yap.
+
+Mevcut bu cihaz kaydı, ilk girişte Supabase hesabına aktarılır. İlerleme yerelde de kalır; bağlantı yoksa çalışmaya devam edebilirsin. `service_role` anahtarı siteye konmaz.
+
+## GitHub eşitlemesi (alternatif)
+
+GitHub App ile özel ilerleme deposu kullanmak istersen bu seçenek de Ayarlar’da duruyor:
 
 1. GitHub hesabında örneğin `ders-ilerlemem` adlı **private** bir depo aç.
 2. [Yeni GitHub App oluştur](https://github.com/settings/apps/new). Webhook kullanma; Repository permissions altında yalnızca **Contents: Read and write** izni seç. Oluşturduktan sonra app ayarlarından **Device Flow**’u etkinleştir.
 3. **Install App** sayfasından app’i yalnızca `ders-ilerlemem` deposuna kur.
-4. Sitede **Ayarlar → GitHub cihazlar arası eşitleme** bölümüne GitHub kullanıcı adını ve depo adını yazıp **GitHub ile yetkilendir**’e bas. App’in Client ID’si sitede önceden tanımlıdır. Gösterilen kodu GitHub cihaz yetkilendirme sayfasında onayla.
-5. Diğer cihazlarda da kendi tarayıcılarının Ayarlar ekranından aynı işlemi yap.
-
-Client ID gizli değildir; app erişimi yalnızca kurduğun depolar ve verdiğin içerik izniyle sınırlıdır. Yetkilendirme tokenı cihazın tarayıcı saklama alanında tutulur, kaynak koduna veya ilerleme deposuna yazılmaz. İstersen Ayarlar’da önceden oluşturduğun fine-grained tokenla bağlanma seçeneği de vardır. Bağlantı olmadan yerel çalışma ve dışa aktarma/geri yükleme kullanılabilir.
+4. Sitede **Ayarlar → GitHub cihazlar arası eşitleme** bölümünden GitHub kullanıcı adını ve depo adını girip yetkilendir.

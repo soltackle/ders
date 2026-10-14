@@ -2,6 +2,10 @@ const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const STORAGE_KEY = 'ders-maliye-progress-v1';
 const SYNC_KEY = 'ders-maliye-github-v1';
+const SUPABASE_AUTH_KEY = 'ders-maliye-supabase-auth-v1';
+const SUPABASE_URL = 'https://qznkkrosedtkwbzotuzg.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_m1ZGyif7raaeoUVuhC_FmQ_u3qqeHBe';
+const SUPABASE_PROGRESS_TABLE = 'study_progress';
 const DEFAULT_GITHUB_CLIENT_ID = 'Iv23liJeFWuLkdXEkG4K';
 const DEFAULT_GITHUB_OWNER = 'soltackle';
 const DEFAULT_GITHUB_REPO = 'ders-ilerlemem';
@@ -15,6 +19,7 @@ const DEFAULTS = {
 let courses = [];
 let state = loadState();
 let github = loadGithub();
+let supabaseSession = loadSupabaseSession();
 let view = 'home';
 let activeCourseId = null;
 let activeBlock = 0;
@@ -52,6 +57,22 @@ function loadGithub() {
   } catch { return { clientId: DEFAULT_GITHUB_CLIENT_ID, owner: DEFAULT_GITHUB_OWNER, repo: DEFAULT_GITHUB_REPO, token: '', sha: '' }; }
 }
 
+function loadSupabaseSession() {
+  try { return JSON.parse(localStorage.getItem(SUPABASE_AUTH_KEY) || 'null'); }
+  catch { return null; }
+}
+
+function persistSupabaseSession() {
+  if (supabaseSession) localStorage.setItem(SUPABASE_AUTH_KEY, JSON.stringify(supabaseSession));
+  else localStorage.removeItem(SUPABASE_AUTH_KEY);
+}
+
+function activeSyncProvider() {
+  if (supabaseSession?.access_token && supabaseSession?.user?.id) return 'supabase';
+  if (github.token && github.owner && github.repo) return 'github';
+  return '';
+}
+
 function persistGithub() {
   localStorage.setItem(SYNC_KEY, JSON.stringify(github));
 }
@@ -85,7 +106,7 @@ function touchState(delay = 12_000) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch { showToast('Cihazda yer kalmadı; bir yedek indirip tekrar deneyebilirsin.'); }
   updateSyncBadge();
-  if (github.token && github.owner && github.repo) scheduleSync(delay);
+  if (activeSyncProvider()) scheduleSync(delay);
 }
 
 function changeLesson(id, change, delay) {
@@ -423,7 +444,8 @@ function renderSyncConflicts() {
 function renderSettings() {
   const p = state.preferences;
   const isConnected = Boolean(github.owner && github.repo && github.token);
-  return `<div class="eyebrow">KİŞİSEL ÇALIŞMA ALANIN</div><h1 class="page-title">Ayarlar</h1><p class="page-subtitle">Okuma biçimini, görünümü ve ilerlemenin eşitleneceği GitHub alanını buradan yönetebilirsin.</p>
+  const supabaseConnected = Boolean(supabaseSession?.access_token && supabaseSession?.user?.id);
+  return `<div class="eyebrow">KİŞİSEL ÇALIŞMA ALANIN</div><h1 class="page-title">Ayarlar</h1><p class="page-subtitle">Okuma biçimini, görünümü ve cihazlar arası ilerleme kaydını buradan yönetebilirsin.</p>
     <div class="setting-grid">
       <section class="setting-card"><h2>Okuma tercihi</h2><p>Bionik vurgu ve kelime oynatıcısını sana göre ayarla.</p>
         <div class="setting-row"><div><label for="pref-mode">Okuma biçimi</label><small>Metnin tamamı veya kelime kelime</small></div><select id="pref-mode" class="select-small setting-control" data-pref="readingMode"><option value="page" ${p.readingMode === 'page' ? 'selected' : ''}>Metin görünümü</option><option value="word" ${p.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></div>
@@ -441,6 +463,9 @@ function renderSettings() {
         <div class="setting-row"><div><label>Renk teması</label><small>Açık veya koyu görünüm</small></div><select class="select-small setting-control" data-pref="theme"><option value="light" ${p.theme === 'light' ? 'selected' : ''}>Açık</option><option value="dark" ${p.theme === 'dark' ? 'selected' : ''}>Koyu</option></select></div>
         <div class="setting-row"><div><label>Verilerini dışa aktar</label><small>Çalışma kaydının JSON yedeğini indir</small></div><button class="btn ghost small" data-action="export">Yedek indir</button></div>
         <div class="setting-row"><div><label>Yedekten geri yükle</label><small>Önceden indirdiğin yedek dosyasını aç</small></div><label class="btn ghost small" for="import-file">Yedek seç</label><input id="import-file" type="file" accept="application/json" hidden></div>
+      </section>
+      <section class="setting-card"><h2>Supabase cihazlar arası kayıt</h2><p>İlerlemeni Supabase hesabına güvenli biçimde eşitler. Her cihazda aynı e-posta ve şifreyle giriş yap; bu cihazın yerel kaydı korunur ve hesapla birleştirilir.</p>
+        ${supabaseConnected ? `<div class="sync-status-box" id="supabase-sync-status">${esc(syncLabel)} · ${esc(supabaseSession.user.email || '')}</div><div class="setting-actions"><button class="btn ghost small" data-action="supabase-sync">Şimdi eşitle</button><button class="btn ghost small" data-action="supabase-disconnect">Bu cihazdan çıkış yap</button></div>` : `<form id="supabase-auth-form" autocomplete="on"><div class="field"><label for="supabase-email">E-posta</label><input id="supabase-email" type="email" autocomplete="email" required></div><div class="field"><label for="supabase-password">Şifre</label><input id="supabase-password" type="password" autocomplete="current-password" minlength="8" required></div><div class="sync-status-box" id="supabase-sync-status">Aynı hesapla diğer cihazlardan da giriş yapabilirsin. Yeni hesap oluşturulursa e-posta doğrulaması istenebilir.</div><div class="setting-actions"><button type="submit" class="btn small" data-supabase-submit="login">Giriş yap ve eşitle</button><button type="submit" class="btn ghost small" data-supabase-submit="signup">Hesap oluştur</button></div></form>`}
       </section>
       <section class="setting-card"><h2>GitHub cihazlar arası eşitleme</h2><p>İlerlemeni özel GitHub depona kaydet. GitHub koduyla bu tarayıcıyı yetkilendir; kişisel erişim anahtarını kopyalayıp yapıştırman gerekmez.</p>
         <ol class="guide-list"><li>GitHub’da bir <strong>private</strong> ilerleme deposu oluştur.</li><li><a href="https://github.com/settings/apps/new" target="_blank" rel="noopener">GitHub App oluştur</a>; webhook’u kapat, yalnızca <strong>Contents: Read and write</strong> depo izni ver ve Device Flow’u etkinleştir.</li><li>App’i yalnızca ilerleme deposuna kur. Client ID’yi, depo sahibini ve depo adını gir; ardından GitHub’ın verdiği kodu onayla.</li></ol>
@@ -525,7 +550,7 @@ function applyReadingSettings() {
   document.documentElement.style.setProperty('--line-reading', String(prefs.lineHeight));
   document.documentElement.style.setProperty('--bold-share', `${prefs.boldPercent}%`);
   $('#sync-mini-label').textContent = syncLabel;
-  $('#profile-label').textContent = github.token ? `${github.owner}/${github.repo}` : 'Çevrimdışı kayıt açık';
+  $('#profile-label').textContent = supabaseSession?.user?.email || (github.token ? `${github.owner}/${github.repo}` : 'Bu cihazda kayıt açık');
   $$('.status-dot').forEach(dot => dot.classList.toggle('error', syncLabel.toLocaleLowerCase('tr').includes('hata')));
 }
 
@@ -541,6 +566,8 @@ function setSyncLabel(label, kind = 'ok') {
   const mini = $('#sync-mini-label'); if (mini) mini.textContent = label;
   const panel = $('#settings-sync-status');
   if (panel) panel.textContent = label;
+  const supabasePanel = $('#supabase-sync-status');
+  if (supabasePanel) supabasePanel.textContent = label;
 }
 
 function showToast(message) {
@@ -874,36 +901,137 @@ async function writeRemote() {
   }
 }
 
+function supabaseErrorMessage(status, body) {
+  const message = body?.msg || body?.message || body?.error_description || body?.error || '';
+  if (status === 400 && /invalid login credentials/i.test(message)) return 'E-posta veya şifre hatalı.';
+  if (status === 400 && /email not confirmed/i.test(message)) return 'Önce Supabase’den gelen e-posta doğrulama bağlantısına tıkla.';
+  if (status === 429) return 'Supabase istek sınırına ulaşıldı; biraz sonra tekrar dene.';
+  if (status === 401) return 'Supabase oturumu geçersiz veya süresi dolmuş. Yeniden giriş yap.';
+  if (status === 404) return 'Supabase tablosu bulunamadı. supabase/setup.sql dosyasını SQL Editor’da çalıştır.';
+  if (status === 400 && /relation .* does not exist|schema cache/i.test(message)) return 'Supabase tablosu hazır değil. supabase/setup.sql dosyasını SQL Editor’da çalıştır.';
+  return message || `Supabase isteği başarısız oldu (${status}).`;
+}
+
+async function supabaseRequest(path, options = {}, accessToken = null) {
+  const response = await fetch(`${SUPABASE_URL}${path}`, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${accessToken || SUPABASE_PUBLISHABLE_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+  let data = null;
+  try { data = await response.json(); } catch {}
+  if (!response.ok) throw new Error(supabaseErrorMessage(response.status, data));
+  return data;
+}
+
+async function refreshSupabaseSession() {
+  if (!supabaseSession?.refresh_token) throw new Error('Supabase oturumu sona erdi. Yeniden giriş yap.');
+  const data = await supabaseRequest('/auth/v1/token?grant_type=refresh_token', {
+    method: 'POST', body: JSON.stringify({ refresh_token: supabaseSession.refresh_token }),
+  });
+  supabaseSession = { ...data, expires_at: Date.now() + Number(data.expires_in || 3600) * 1000 };
+  persistSupabaseSession();
+  return supabaseSession;
+}
+
+async function supabaseUserRequest(path, options = {}) {
+  if (!supabaseSession?.access_token) throw new Error('Supabase hesabına giriş yap.');
+  if (supabaseSession.expires_at && supabaseSession.expires_at < Date.now() + 30_000) await refreshSupabaseSession();
+  try { return await supabaseRequest(path, options, supabaseSession.access_token); }
+  catch (error) {
+    if (/oturumu geçersiz/i.test(error.message) && supabaseSession?.refresh_token) {
+      await refreshSupabaseSession();
+      return supabaseRequest(path, options, supabaseSession.access_token);
+    }
+    throw error;
+  }
+}
+
+async function readSupabaseRemote() {
+  const userId = encodeURIComponent(supabaseSession.user.id);
+  const rows = await supabaseUserRequest(`/rest/v1/${SUPABASE_PROGRESS_TABLE}?select=progress&user_id=eq.${userId}`);
+  return rows?.[0]?.progress || null;
+}
+
+async function writeSupabaseRemote() {
+  await supabaseUserRequest(`/rest/v1/${SUPABASE_PROGRESS_TABLE}?on_conflict=user_id`, {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({ user_id: supabaseSession.user.id, progress: state, updated_at: new Date().toISOString() }),
+  });
+}
+
+async function connectSupabaseSession(session) {
+  const expiry = Number(session.expires_at || 0);
+  supabaseSession = { ...session, expires_at: expiry > 10_000_000_000 ? expiry : expiry ? expiry * 1000 : Date.now() + Number(session.expires_in || 3600) * 1000 };
+  persistSupabaseSession();
+  setSyncLabel('Supabase ilerlemesi yükleniyor…', 'busy');
+  render();
+  const synced = await syncNow();
+  if (synced) showToast('Supabase hesabına bağlandın. İlerlemen eşitlendi.');
+}
+
+async function submitSupabaseAuth(form, mode) {
+  const email = $('#supabase-email')?.value.trim();
+  const password = $('#supabase-password')?.value;
+  const status = $('#supabase-sync-status');
+  if (!email || !password) { if (status) status.textContent = 'E-posta ve şifreyi doldur.'; return; }
+  if (password.length < 8) { if (status) status.textContent = 'Şifre en az 8 karakter olmalı.'; return; }
+  const buttons = $$('button[type="submit"]', form); buttons.forEach(button => { button.disabled = true; });
+  if (status) status.textContent = mode === 'signup' ? 'Hesap oluşturuluyor…' : 'Supabase hesabına giriş yapılıyor…';
+  try {
+    const data = mode === 'signup'
+      ? await supabaseRequest(`/auth/v1/signup?redirect_to=${encodeURIComponent(`${location.origin}${location.pathname}`)}`, { method: 'POST', body: JSON.stringify({ email, password, data: { app: 'ders-maliye' } }) })
+      : await supabaseRequest('/auth/v1/token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) });
+    if (data.access_token && data.user) await connectSupabaseSession(data);
+    else if (status) status.textContent = 'Hesap oluşturuldu. Gelen doğrulama e-postasındaki bağlantıya tıkla, sonra burada giriş yap.';
+  } catch (error) {
+    if (status) status.textContent = `${error.message} · Bu cihazdaki yerel kayıt korunuyor.`;
+    setSyncLabel(error.message, 'error');
+  } finally { buttons.forEach(button => { button.disabled = false; }); }
+}
+
 function scheduleSync(delay = 12_000) {
-  if (!github.token || !github.repo || !github.owner) return;
+  if (!activeSyncProvider()) return;
   clearTimeout(syncTimer);
-  setSyncLabel('GitHub’a kaydedilecek', 'busy');
+  setSyncLabel(activeSyncProvider() === 'supabase' ? 'Supabase’e kaydedilecek' : 'GitHub’a kaydedilecek', 'busy');
   syncTimer = setTimeout(syncNow, delay);
 }
 
 let syncPromise = null;
 async function syncNow() {
-  if (!github.token || !github.repo || !github.owner) return;
+  const provider = activeSyncProvider();
+  if (!provider) return;
   if (syncPromise) return syncPromise;
   const startedRevision = stateRevision;
   clearTimeout(syncTimer);
   syncPromise = (async () => {
-    setSyncLabel('GitHub ile eşitleniyor…', 'busy');
+    setSyncLabel(provider === 'supabase' ? 'Supabase ile eşitleniyor…' : 'GitHub ile eşitleniyor…', 'busy');
     try {
-      const remote = await readRemote();
+      const remote = provider === 'supabase' ? await readSupabaseRemote() : await readRemote();
       if (remote) mergeWithConflicts(remote);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       const remoteText = JSON.stringify(remote || {});
-      if (!remote || JSON.stringify(state) !== remoteText) await writeRemote();
-      setSyncLabel(`GitHub ile eşitlendi · ${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`);
+      if (!remote || JSON.stringify(state) !== remoteText) {
+        if (provider === 'supabase') await writeSupabaseRemote();
+        else await writeRemote();
+      }
+      setSyncLabel(`${provider === 'supabase' ? 'Supabase' : 'GitHub'} ile eşitlendi · ${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`);
       if ($('#settings-sync-status') || !document.activeElement?.matches('textarea,input,select')) render();
+      return true;
     } catch (error) {
-      console.error('GitHub eşitleme hatası:', error);
+      console.error(`${provider} eşitleme hatası:`, error);
       setSyncLabel(error.message || 'GitHub eşitleme hatası', 'error');
-      if ($('#settings-sync-status')) $('#settings-sync-status').textContent = `${error.message} · Bu cihazdaki yerel kayıt çalışmaya devam ediyor.`;
+      const panel = provider === 'supabase' ? $('#supabase-sync-status') : $('#settings-sync-status');
+      if (panel) panel.textContent = `${error.message} · Bu cihazdaki yerel kayıt çalışmaya devam ediyor.`;
+      return false;
     } finally {
       syncPromise = null;
-      if (github.token && stateRevision > startedRevision) scheduleSync(1_500);
+      if (activeSyncProvider() && stateRevision > startedRevision) scheduleSync(1_500);
     }
   })();
   return syncPromise;
@@ -1099,6 +1227,11 @@ document.addEventListener('click', async event => {
     touchState(1_000); render(); return;
   }
   if (action === 'session-stop') { state.session = null; touchState(1_000); render(); return; }
+  if (action === 'supabase-sync') { await syncNow(); return; }
+  if (action === 'supabase-disconnect') {
+    supabaseSession = null; persistSupabaseSession(); setSyncLabel('Bu cihazda kayıt açık');
+    showToast('Supabase hesabından bu cihazda çıkış yapıldı. Yerel ilerlemen korundu.'); render(); return;
+  }
   if (action === 'map-add') {
     const form = event.target.closest('.map-editor');
     const from = form?.querySelector('[data-map-from]')?.value.trim();
@@ -1289,6 +1422,9 @@ document.addEventListener('change', event => {
 document.addEventListener('submit', event => {
   if (event.target.matches('#github-device-form')) { event.preventDefault(); authorizeGithubDevice(); return; }
   if (event.target.matches('#github-form')) { event.preventDefault(); connectGithub(); }
+  if (event.target.matches('#supabase-auth-form')) {
+    event.preventDefault(); submitSupabaseAuth(event.target, event.submitter?.dataset.supabaseSubmit || 'login');
+  }
 });
 
 document.addEventListener('keydown', event => {
@@ -1319,10 +1455,10 @@ document.addEventListener('focusout', event => {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     touchState(15_000);
-    if (github.token) syncNow();
+    if (activeSyncProvider()) syncNow();
   }
 });
-addEventListener('pagehide', () => { touchState(15_000); if (github.token) syncNow(); });
+addEventListener('pagehide', () => { touchState(15_000); if (activeSyncProvider()) syncNow(); });
 
 document.addEventListener('pointerdown', markActivity, { passive: true });
 document.addEventListener('keydown', markActivity, { passive: true });
@@ -1363,10 +1499,28 @@ async function init() {
     if (!response.ok) throw new Error(`Dersler yüklenemedi (${response.status}).`);
     courses = await response.json();
     if (!Array.isArray(courses) || !courses.length) throw new Error('Ders listesi boş. İçerik oluşturucusunu çalıştır.');
+    await consumeSupabaseCallback();
     render();
-    if (github.token && github.owner && github.repo) syncNow();
+    if (activeSyncProvider()) syncNow();
   } catch (error) {
     $('#app').innerHTML = `<section class="study-card"><h1 class="page-title">Ders içeriği açılamadı</h1><p class="page-subtitle">${esc(error.message)} Bu klasörü yerel web sunucusuyla açabilir veya GitHub Pages yayınının tamamlanmasını bekleyebilirsin.</p></section>`;
+  }
+}
+
+async function consumeSupabaseCallback() {
+  if (!location.hash.includes('access_token=')) return;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  if (!accessToken || !refreshToken) return;
+  try {
+    const user = await supabaseRequest('/auth/v1/user', {}, accessToken);
+    const session = { access_token: accessToken, refresh_token: refreshToken, expires_in: Number(params.get('expires_in') || 3600), user };
+    history.replaceState(null, '', `${location.pathname}${location.search}`);
+    await connectSupabaseSession(session);
+  } catch (error) {
+    history.replaceState(null, '', `${location.pathname}${location.search}`);
+    showToast(error.message);
   }
 }
 
