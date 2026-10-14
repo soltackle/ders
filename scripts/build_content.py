@@ -35,12 +35,32 @@ def read_docx(path: Path) -> list[str]:
     return paragraphs
 
 
+def read_docx_tables(path: Path) -> list[list[str]]:
+    """Read table rows without flattening their cells into neighboring prompts."""
+    with zipfile.ZipFile(path) as doc:
+        xml = ET.fromstring(doc.read("word/document.xml"))
+    tables: list[list[str]] = []
+    for table in xml.findall(".//w:tbl", NS):
+        for row in table.findall("./w:tr", NS):
+            cells = []
+            for cell in row.findall("./w:tc", NS):
+                paragraphs = [
+                    "".join((run.text or "") for run in paragraph.findall(".//w:t", NS)).strip()
+                    for paragraph in cell.findall("./w:p", NS)
+                ]
+                cells.append(re.sub(r"\s+", " ", " ".join(p for p in paragraphs if p)).strip())
+            if any(cells):
+                tables.append(cells)
+    return tables
+
+
 def tidy_key(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.casefold()).strip("-")
 
 
 def extract_course(path: Path) -> dict:
     paras = read_docx(path)
+    table_rows = read_docx_tables(path)
     title = next((p for p in paras if p), path.stem)
     slug = path.stem.split("-", 1)[0] + "-" + tidy_key(title)
     meta = " ".join(paras[:8])
@@ -94,6 +114,58 @@ def extract_course(path: Path) -> dict:
         if match and match.group(1) not in answers:
             answers[match.group(1)] = match.group(2).strip()
 
+    detail_by_reference = {}
+    detail_by_id = {}
+    evidence_bank = []
+    seen_evidence = set()
+    reference_cards = []
+    seen_cards = set()
+    evidence_table_texts = set()
+    knowledge_profile = []
+    for row in table_rows:
+        first = row[0].strip() if row else ""
+        cells = [cell.strip() for cell in row]
+        profile_match = re.match(r"^([PCAER])\s*[·.]\s*(.+)$", first)
+        if profile_match and len(cells) >= 3 and cells[1] and cells[2]:
+            knowledge_profile.append(
+                {
+                    "type": profile_match.group(1),
+                    "label": profile_match.group(2),
+                    "weight": cells[1],
+                    "description": cells[2],
+                }
+            )
+        detail = next((cell for cell in cells[1:] if cell), "")
+        detail_match = re.match(r"^(D\d+)(?:\s*(¶\s*\d+))?$", first)
+        if detail_match and detail:
+            evidence_table_texts.add(detail)
+            task_id, reference = detail_match.groups()
+            if reference:
+                detail_by_reference[(task_id, re.sub(r"\s+", "", reference))] = detail
+            detail_by_id.setdefault(task_id, detail)
+            kind_answer = answers.get(task_id, "")
+            kind_match = re.search(r"→\s*([ER])\b", kind_answer, re.IGNORECASE)
+            evidence_key = (task_id, detail)
+            if evidence_key not in seen_evidence:
+                evidence_bank.append(
+                    {
+                        "id": task_id,
+                        "text": detail,
+                        "sourceRefs": re.findall(r"¶\s*\d+", first),
+                        "expectedKind": kind_match.group(1).upper() if kind_match else "",
+                    }
+                )
+                seen_evidence.add(evidence_key)
+            continue
+        card_match = re.match(r"^(K\d+)$", first)
+        if card_match and len(cells) >= 3 and cells[1] and cells[2]:
+            key = (card_match.group(1), cells[1], cells[2])
+            if key not in seen_cards:
+                reference_cards.append(
+                    {"id": key[0], "front": key[1], "back": key[2]}
+                )
+                seen_cards.add(key)
+
     analogy_answers = {}
     answer_block = None
     capturing_analogy = False
@@ -121,6 +193,13 @@ def extract_course(path: Path) -> dict:
     for n, start in enumerate(block_starts):
         stop = block_starts[n + 1] if n + 1 < len(block_starts) else source_i
         content = paras[start:stop]
+        if n == len(block_starts) - 1:
+            proof_heading = next(
+                (i for i, p in enumerate(content) if p.upper().startswith("GÜN SONU / HAFTA SONU")),
+                None,
+            )
+            if proof_heading is not None:
+                content = content[:proof_heading]
         heading = content[0]
         match = BLOCK.match(heading)
         block_number = int(match.group(1)) if match else n + 1
@@ -130,6 +209,8 @@ def extract_course(path: Path) -> dict:
         current = None
         for p in content[1:]:
             if not p:
+                continue
+            if p in evidence_table_texts:
                 continue
             section = re.match(r"^([PCAER])\s+(.{2,72})$", p)
             combined = re.match(r"^E\s+R\s+(Ayır ve sakla)$", p)
@@ -152,6 +233,13 @@ def extract_course(path: Path) -> dict:
             task = TASK_ID.match(p)
             if task:
                 task_id, prompt = task.group(1), task.group(2).strip()
+                source_refs = re.findall(r"¶\s*\d+", prompt)
+                if task_id.startswith("D") and re.fullmatch(r"¶\s*\d+", prompt):
+                    prompt = detail_by_reference.get(
+                        (task_id, re.sub(r"\s+", "", prompt)), prompt
+                    )
+                elif task_id.startswith("D") and not prompt:
+                    prompt = detail_by_id.get(task_id, prompt)
                 kind = "ER" if task_id.startswith("D") else task_id[0]
                 if task_id.startswith(("Y", "G")):
                     continue
@@ -164,7 +252,12 @@ def extract_course(path: Path) -> dict:
                         "tasks": [],
                     }
                     sections.append(current)
-                current["tasks"].append({"id": task_id, "prompt": prompt, "answer": answers.get(task_id, "")})
+                task_data = {"id": task_id, "prompt": prompt, "answer": answers.get(task_id, "")}
+                if kind == "ER":
+                    task_data["sourceRefs"] = source_refs
+                    classification = re.search(r"→\s*([ER])\b", task_data["answer"], re.IGNORECASE)
+                    task_data["expectedKind"] = classification.group(1).upper() if classification else ""
+                current["tasks"].append(task_data)
                 continue
             if current and p.startswith("③"):
                 current = None
@@ -229,9 +322,10 @@ def extract_course(path: Path) -> dict:
         )
 
     wrap_up = []
+    proof_tasks = []
     for p in paras[block_starts[-1] : source_i]:
         task = TASK_ID.match(p)
-        if task and task.group(1)[0] in "YG":
+        if task and task.group(1)[0] == "Y":
             wrap_up.append(
                 {
                     "id": task.group(1),
@@ -240,6 +334,51 @@ def extract_course(path: Path) -> dict:
                     "answer": answers.get(task.group(1), ""),
                 }
             )
+        elif task and task.group(1)[0] == "G":
+            proof_tasks.append(
+                {
+                    "id": task.group(1),
+                    "prompt": task.group(2).strip(),
+                    "answer": answers.get(task.group(1), ""),
+                }
+            )
+
+    map_heading = next(
+        (i for i, p in enumerate(paras[:source_i]) if p.upper().startswith("KAVRAM HARİTASI")),
+        None,
+    )
+    map_setup = {}
+    if map_heading is not None:
+        map_setup = {
+            "title": paras[map_heading],
+            "instruction": paras[map_heading + 1] if map_heading + 1 < source_i else "",
+            "starter": next(
+                (p.partition(":")[2].strip() for p in paras[map_heading + 2 : source_i] if p.lower().startswith("başlangıç önerisi:")),
+                "",
+            ),
+        }
+    proof_heading_text = next(
+        (p for p in paras[:source_i] if p.upper().startswith("GÜN SONU / HAFTA SONU")),
+        "",
+    )
+    proof_instructions = []
+    if proof_heading_text:
+        proof_index = paras.index(proof_heading_text)
+        proof_instructions = [
+            p for p in paras[proof_index + 1 : source_i]
+            if p and not TASK_ID.match(p) and not p.startswith(("#", "☐"))
+        ][:2]
+    study_guide_start = next(
+        (i for i, p in enumerate(paras[:source_i]) if p.lower() == "bu kağıt nasıl çalışır"),
+        None,
+    )
+    study_guide = []
+    if study_guide_start is not None:
+        guide_end = next(
+            (i for i in range(study_guide_start + 1, source_i) if paras[i].lower().startswith("bu konunun bilgi dokusu")),
+            source_i,
+        )
+        study_guide = [p for p in paras[study_guide_start + 1 : guide_end] if p]
 
     category = title.split(" — ", 1)[0].split(" 1/", 1)[0].split(" 2/", 1)[0]
     category = re.sub(r"\s+[1-5]/[1-5]$", "", category)
@@ -253,6 +392,17 @@ def extract_course(path: Path) -> dict:
         "outcomes": outcomes,
         "blocks": blocks,
         "wrapUp": wrap_up,
+        "studyGuide": study_guide,
+        "knowledgeProfile": knowledge_profile,
+        "mapSetup": map_setup,
+        "referenceCards": reference_cards,
+        "evidenceBank": evidence_bank,
+        "proofPractice": {
+            "title": proof_heading_text,
+            "instructions": proof_instructions,
+            "tasks": proof_tasks,
+            "evidenceIds": list(dict.fromkeys(item["id"] for item in evidence_bank)),
+        },
         "sourceIntro": source_intro,
         "answers": answers,
     }

@@ -9,7 +9,7 @@ const DAY = 86_400_000;
 const ICONS = ['◌', '↗', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
   readingMode: 'page', bionic: true, highlightWord: true, boldPercent: 38, wpm: 220, groupWords: 1,
-  punctuationPause: 320, fontSize: 17, lineHeight: 1.9, focusParagraph: false, theme: 'light',
+  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, theme: 'light',
 };
 
 let courses = [];
@@ -19,12 +19,14 @@ let view = 'home';
 let activeCourseId = null;
 let activeBlock = 0;
 let activeCategory = 'Tümü';
+let activeReviewCourseId = '';
 let searchQuery = '';
 let wordIndex = 0;
 let playerTimer = 0;
 let playerRunning = false;
 let syncTimer = 0;
 let stateRevision = 0;
+let mergeConflicts = [];
 let syncLabel = 'Bu cihazda kaydediliyor';
 let githubDeviceFlowActive = false;
 let toastTimer = 0;
@@ -32,7 +34,7 @@ let lastTouch = Date.now();
 let activeSecondsRemainder = 0;
 
 function freshState() {
-  return { version: 1, updatedAt: 0, preferences: { ...DEFAULTS, updatedAt: 0 }, lessons: {}, review: {}, activeDays: {}, activitySeconds: 0 };
+  return { version: 1, updatedAt: 0, lastCourseId: '', preferences: { ...DEFAULTS, updatedAt: 0 }, lessons: {}, review: {}, activeDays: {}, activitySeconds: 0, syncConflicts: [] };
 }
 
 function loadState() {
@@ -61,8 +63,19 @@ function lessonProgress(id) {
 
 function taskProgress(id, taskKey) {
   const progress = lessonProgress(id);
-  if (!progress.tasks[taskKey]) progress.tasks[taskKey] = { updatedAt: 0, answer: '', revealed: false, copied: false, confidence: '' };
+  if (!progress.tasks[taskKey]) progress.tasks[taskKey] = { updatedAt: 0, answer: '', revealed: false, copied: false, confidence: '', status: 'todo' };
   return progress.tasks[taskKey];
+}
+
+function blockFlow(id, blockNumber) {
+  const progress = lessonProgress(id);
+  progress.flow ||= {};
+  progress.flow[String(blockNumber)] ||= { phase: 'consume', taskIndex: 0, mapNotes: '', analogyNotes: '' };
+  return progress.flow[String(blockNumber)];
+}
+
+function progressBlockDone(courseId, blockNumber) {
+  return Boolean(lessonProgress(courseId).blocks[blockNumber]?.completed);
 }
 
 function touchState(delay = 12_000) {
@@ -121,19 +134,33 @@ function getAllTasks() {
   }
   for (const course of courses) {
     for (const task of course.wrapUp || []) list.push({ course, block: { number: 'son' }, section: { type: task.type }, task, key: `son:${task.id}` });
+    for (const task of course.proofPractice?.tasks || []) list.push({ course, block: { number: 'kanıt' }, section: { type: 'proof' }, task, key: `kanıt:${task.id}` });
   }
   return list;
 }
 
 function getDueCards() {
   const now = dayKey();
-  return getAllTasks().filter(({ section, task, key, course }) => {
-    if (section.type !== 'ER' || !task.answer) return false;
-    const answer = task.answer.toLocaleLowerCase('tr');
-    if (!/\b(r|referans)\b/.test(answer.split('→')[1] || answer)) return false;
+  const cards = courses.flatMap(course => (course.referenceCards || []).flatMap(card => {
+    const key = `K:${card.id}`;
     const review = state.review[`${course.id}:${key}`];
-    return review && review.due <= now;
-  });
+    return review && review.due <= now ? [{ course, card, key, review }] : [];
+  }));
+  for (const course of courses) for (const block of course.blocks) for (const section of block.sections) {
+    if (section.type !== 'ER') continue;
+    for (const task of section.tasks) {
+      if (task.expectedKind !== 'R') continue;
+      const key = `R:${block.number}:${task.id}`;
+      const selection = lessonProgress(course.id).tasks[`${block.number}:${task.id}`]?.kindChoice;
+      const review = state.review[`${course.id}:${key}`];
+      if (selection === 'R' && review && review.due <= now) cards.push({ course, card: { id: task.id, front: task.prompt, back: task.answer }, key, review });
+    }
+  }
+  return cards;
+}
+
+function getBlockTasks(block) {
+  return block.sections.flatMap((section, sectionIndex) => section.tasks.map(task => ({ section, sectionIndex, task })));
 }
 
 function visibleCourses() {
@@ -147,6 +174,8 @@ function visibleCourses() {
 }
 
 function continueTarget() {
+  const lastCourse = courses.find(course => course.id === state.lastCourseId && !lessonProgress(course.id).completedAt);
+  if (lastCourse) return lastCourse;
   const unfinished = courses.find(course => {
     const p = lessonProgress(course.id);
     return !p.completedAt && p.activeBlock > 0;
@@ -157,6 +186,7 @@ function continueTarget() {
 
 function startCourse(course, block = null) {
   activeCourseId = course.id;
+  state.lastCourseId = course.id;
   const p = lessonProgress(course.id);
   activeBlock = Math.max(0, Math.min(block ?? p.activeBlock ?? 0, course.blocks.length));
   view = 'study';
@@ -182,6 +212,7 @@ function render() {
   $$('.nav-item[data-view]').forEach(button => button.classList.toggle('active', button.dataset.view === view));
   $('#nav-course-count').textContent = String(courses.length);
   $('#nav-review-count').textContent = String(getDueCards().length);
+  const mobileReviewCount = $('#mobile-review-count'); if (mobileReviewCount) mobileReviewCount.textContent = String(getDueCards().length);
   document.body.classList.toggle('dark', state.preferences.theme === 'dark');
   if (view === 'home') app.innerHTML = renderHome();
   else if (view === 'courses') app.innerHTML = renderCourses();
@@ -201,35 +232,14 @@ function renderHome() {
   const due = getDueCards().length;
   const target = continueTarget();
   const targetStats = getCourseStats(target);
-  const startBlock = Math.min(targetStats.activeBlock || targetStats.completedBlocks, target.blocks.length - 1);
-  const block = target.blocks[Math.max(0, startBlock)];
+  const startBlock = Math.min(Number.isInteger(targetStats.activeBlock) ? targetStats.activeBlock : targetStats.completedBlocks, target.blocks.length);
+  const block = target.blocks[startBlock];
+  const flow = block ? blockFlow(target.id, block.number) : { phase: 'consume' };
   const duration = target.durationMinutes ? Math.round(target.durationMinutes) : 0;
   const seenMinutes = fmtTime(state.activitySeconds);
   const dayCount = Object.keys(state.activeDays).length;
   const groups = categoryList();
-  return `
-    <section class="hero">
-      <div class="hero-copy"><div class="eyebrow">BUGÜNÜN ÇALIŞMA ALANI</div><h1>Küçük bir adım, büyük bir konuyu açar.</h1><p>Bir ders seç, kaldığın yerden devam et. Cevapların ve ilerlemen seninle birlikte kaydolur.</p><button class="btn" data-action="continue">Kaldığım yerden devam et <span aria-hidden="true">↗</span></button></div>
-      <div class="hero-art" aria-hidden="true"><span>∑</span></div>
-    </section>
-    <div class="stats-grid">
-      ${statCard('TAMAMLANAN DERS', `${completed} / ${courses.length}`, 'Ders akışını bitirdiklerin')}
-      ${statCard('TAMAMLANAN BLOK', String(blocksDone), 'Küçük adımlarla ilerleme')}
-      ${statCard('BUGÜN TEKRAR', String(due), due ? 'Zamanı gelen referans kartları' : 'Bugün bekleyen kart yok')}
-      ${statCard('ÇALIŞMA SÜRESİ', seenMinutes, `${dayCount} aktif gün`)}
-    </div>
-    <div class="home-grid">
-      <article class="continue-card">
-        <div class="continue-top"><span class="course-glyph ${catColor(target.category)}">${ICONS[courses.indexOf(target) % ICONS.length]}</span><div><strong>Kaldığın yer</strong><small>${esc(target.category)} · yaklaşık ${duration} dk</small></div><span class="continue-meta">${targetStats.percent}%</span></div>
-        <div class="continue-title">${esc(target.title)}</div><p class="continue-desc">${esc(shorten(target.thesis || block?.title, 164))}</p>
-        <div class="progress-track"><div class="progress-fill" style="width:${targetStats.percent}%"></div></div>
-        <div class="continue-bottom"><small>${targetStats.completedBlocks} / ${target.blocks.length} blok tamamlandı${block ? ` · Sıradaki: ${esc(block.title)}` : ''}</small><button class="text-button" data-course="${esc(target.id)}">Derse dön&nbsp; →</button></div>
-      </article>
-      <article class="review-card"><div class="review-icon">↻</div><h3>${due ? `${due} kart tekrar bekliyor` : 'Tekrar listen sakin'}</h3><p>${due ? 'Kısa bir kart turu, zor ayrıntıları akılda tutmana yardım eder.' : 'Referans kartlarını dersleri tamamlarken işaretle; zamanı geldiğinde burada görünür.'}</p><button class="btn secondary small" data-view="reviews">Tekrarlara git <span>↗</span></button></article>
-    </div>
-    <div class="section-heading"><div><h2>Derslerine göz at</h2><p>${courses.length} çalışma kâğıdı · ${groups.length} konu başlığı</p></div><button class="text-button" data-view="courses">Tüm dersler&nbsp; →</button></div>
-    <div class="course-grid">${courses.slice(0, 6).map(courseCard).join('')}</div>
-  `;
+  return `<section class="home-focus"><div class="home-focus-main"><div class="eyebrow">KALDIĞIN YER</div><h1>${esc(target.title)}</h1><p class="home-next-block">${block ? `Blok ${startBlock + 1} · ${esc(block.title)}` : 'Oturum sonu'}</p><div class="home-next-phase">${block ? (flow.phase === 'digest' ? 'Şimdi sindir' : 'Şimdi tüket') : 'Kısa öz değerlendirme'} · ${duration} dk oturum</div><div class="progress-track"><div class="progress-fill" style="width:${targetStats.percent}%"></div></div><small>${targetStats.completedBlocks} / ${target.blocks.length} blok tamamlandı</small><button class="btn" data-action="continue">Çalışmaya devam et →</button></div><aside class="home-focus-side"><div class="eyebrow">BUGÜN</div><strong>${due} tekrar kartı</strong><p>${seenMinutes} çalışma süresi · ${dayCount} etkin gün</p><button class="btn secondary small" data-view="reviews">Tekrarlara git</button><div class="home-lesson-count">${blocksDone} blok · ${completed} ders tamamlandı</div></aside></section><div class="section-heading"><div><h2>Derslerin</h2><p>${courses.length} çalışma kâğıdı · ${groups.length} konu başlığı</p></div><button class="text-button" data-view="courses">Tüm dersleri gör →</button></div><div class="course-grid">${courses.slice(0, 6).map(courseCard).join('')}</div>`;
 }
 
 function statCard(label, value, note) {
@@ -266,22 +276,31 @@ function renderStudy() {
   if (activeBlock >= course.blocks.length) return renderWrapUp(course, progress);
   const block = course.blocks[activeBlock];
   const prefs = state.preferences;
-  const tasksCount = block.sections.reduce((n, section) => n + section.tasks.length, 0);
-  const done = !!progress.blocks[block.number]?.completed;
-  const typeLabels = { C: 'Kavram', P: 'Uygulama', A: 'Analoji', E: 'Kanıt', ER: 'E / R ayrımı' };
-  return `<div class="lesson-head"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · ${activeBlock + 1}. / ${course.blocks.length} BLOK</div><h1>${esc(course.title)}</h1><p class="page-subtitle">${esc(course.outcomes || course.thesis)}</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>
-    <div class="lesson-layout">
-      <aside class="block-nav"><div class="block-nav-title">OTURUM PLANI</div>${course.blocks.map((item, i) => `<button class="block-link ${i === activeBlock ? 'active' : ''} ${progress.blocks[item.number]?.completed ? 'done' : ''}" data-block="${i}"><span class="block-number">${progress.blocks[item.number]?.completed ? '✓' : i + 1}</span><span>${esc(item.title)}</span></button>`).join('')}<button class="block-link ${activeBlock === course.blocks.length ? 'active' : ''}" data-block="${course.blocks.length}"><span class="block-number">✦</span><span>Oturum sonu ve tekrar</span></button></aside>
-      <div class="lesson-content">
-        <section class="thesis-card"><div class="eyebrow">KONUNUN ÇEKİRDEĞİ</div><p>${esc(course.thesis)}</p></section>
-        <section class="study-card"><div class="study-card-head"><span class="step-badge">1</span><div><h2>${esc(block.title)}</h2><p>${block.readMinutes ? `Yaklaşık ${block.readMinutes} dk okuma` : ''}${block.readMinutes && block.digestMinutes ? ' · ' : ''}${block.digestMinutes ? `${block.digestMinutes} dk çalışma` : ''} · ${tasksCount} görev</p></div><div class="reading-settings"><select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metni oku</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></div></div>
-          <div class="reading-tools"><span class="tool-label">GÖRÜNÜM</span><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik vurgular ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.focusParagraph ? 'active' : ''}" data-setting-toggle="focusParagraph">Paragraf odağı ${prefs.focusParagraph ? 'Açık' : 'Kapalı'}</button><label class="range-control"><span>Vurgu</span><input type="range" min="15" max="60" step="5" value="${prefs.boldPercent}" data-setting-range="boldPercent" aria-label="Bionik vurgu miktarı"><span data-range-label="boldPercent">${prefs.boldPercent}%</span></label><button class="text-button" data-view="settings">Tüm ayarlar →</button></div>
-          ${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}
-        </section>
-        ${block.sections.length ? `<section class="study-card"><div class="study-card-head"><span class="step-badge">2</span><div><h2>Şimdi sindir</h2><p>Yazdıkların otomatik kaydolur. Cevabı açıp karşılaştırabilir, ardından klavyeyle ilerleyebilirsin.</p></div></div><div class="tasks-stack">${block.sections.map(section => renderSection(course, block, section, typeLabels[section.type])).join('')}</div></section>` : ''}
-        <div class="lesson-actions"><button class="btn ghost small" data-action="prev-block" ${activeBlock === 0 ? 'disabled' : ''}>← Önceki blok</button><small>${done ? 'Bu blok tamamlandı' : `${percent}% · ${progress.completedBlocks || 0} blok tamam`}</small><button class="btn small" data-action="next-block">${activeBlock === course.blocks.length - 1 ? 'Oturum sonuna geç' : done ? 'Sonraki blok →' : 'Bloğu tamamla →'}</button></div>
-      </div>
-    </div>`;
+  const flow = blockFlow(course.id, block.number);
+  const tasks = getBlockTasks(block);
+  const current = tasks[Math.min(flow.taskIndex || 0, Math.max(0, tasks.length - 1))];
+  const statuses = tasks.map(({ task }) => progress.blocks[block.number]?.completed ? 'worked' : taskProgress(course.id, taskKey(block, task)).status);
+  const worked = statuses.filter(status => ['worked', 'again'].includes(status)).length;
+  const remaining = statuses.filter(status => !['worked', 'again'].includes(status)).length;
+  const navigation = `<div class="lesson-actions"><button class="btn ghost small" data-action="prev-block" ${activeBlock === 0 ? 'disabled' : ''}>← Önceki blok</button><small>${percent}% · ${progress.completedBlocks || 0} blok tamam</small><button class="btn ghost small" data-action="leave-block">${activeBlock === course.blocks.length - 1 ? 'Oturum sonuna geç' : 'Sonraki bloğa geç'}</button></div>`;
+  const phaseTabs = `<div class="phase-tabs" role="tablist" aria-label="Çalışma aşaması"><button class="phase-tab ${flow.phase === 'consume' ? 'active' : ''}" data-action="phase-consume">1 · Tüket</button><button class="phase-tab ${flow.phase === 'digest' ? 'active' : ''}" data-action="phase-digest">2 · Sindir</button></div>`;
+  let workspace = '';
+  if (flow.phase === 'consume') {
+    workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">1</span><div><div class="eyebrow">TÜKET · ${block.readMinutes ? `~${block.readMinutes} DK` : 'OKU'}</div><h2>${esc(block.title)}</h2><p>${esc(block.readInstruction || 'Metni kendi hızında oku. Kavram haritanı veya analoji notunu istediğin anda ekleyebilirsin.')}</p></div></div>${course.studyGuide?.length ? `<details class="pacer-guide"><summary>P.A.C.E.R. çalışma rehberi</summary><ol>${course.studyGuide.filter(line => /^\d+[.)]/.test(line)).map(line => `<li>${esc(line.replace(/^\d+[.)]\s*/, ''))}</li>`).join('')}</ol></details>` : ''}
+      <div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metni oku</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></label><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime arka planı ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Okuma ayarları →</button></div>
+      ${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}
+        <details class="quick-workbench"><summary>Okurken çalış · P / A / C</summary><label><span>C · Kavram haritası ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Kavram → ilişki fiili → kavram">${esc(progress.mapNotes || '')}</textarea></label><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
+      ${course.knowledgeProfile?.length ? `<details class="knowledge-profile"><summary>Bu derste hangi tür bilgi var?</summary><div class="knowledge-profile-list">${course.knowledgeProfile.map(item => `<article><strong>${esc(item.type)} · ${esc(item.label)}</strong><span>${esc(item.weight)}</span><p>${esc(item.description)}</p></article>`).join('')}</div></details>` : ''}
+      <div class="phase-footer"><span>Bu notlar ve okuma konumun otomatik kaydolur.</span><button class="btn" data-action="consume-done">Okudum, sindirmeye geç →</button></div></section>`;
+  } else {
+    const taskPanel = current ? renderSection(course, block, { ...current.section, tasks: [current.task] }, `${current.section.label || current.section.type} · ${current.task.id}`) : '<p>Bu blokta ayrıca sindirme görevi yok.</p>';
+    const saved = current ? taskProgress(course.id, taskKey(block, current.task)) : null;
+    const taskStatus = progress.blocks[block.number]?.completed ? 'worked' : saved?.status;
+    const taskStep = current ? `<div class="task-step"><span>Görev ${flow.taskIndex + 1} / ${tasks.length} · ${worked} işlendi</span><span>${taskStatus === 'again' ? 'Tekrar gerekli' : taskStatus === 'worked' ? 'İşlendi' : 'Henüz işlenmedi'}</span></div>${taskPanel}<div class="self-check"><span>Nasıl gitti?</span><button class="answer-button ${taskStatus === 'worked' ? 'selected' : ''}" data-action="task-status" data-status="worked" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Hatırladım / işledim</button><button class="answer-button ${taskStatus === 'again' ? 'selected' : ''}" data-action="task-status" data-status="again" data-task-key="${esc(taskKey(block, current.task))}" data-course-id="${esc(course.id)}">Tekrar gerekli</button></div><div class="task-pagination"><button class="btn ghost small" data-action="task-prev" ${flow.taskIndex === 0 ? 'disabled' : ''}>← Önceki</button><button class="btn small" data-action="task-next">${flow.taskIndex === tasks.length - 1 ? 'Özeti gör' : 'Sonraki görev →'}</button></div>` : '<div class="empty-state">Bu blokta sindirme sorusu yok. Okuma adımını tamamladıktan sonra bloğu bitirebilirsin.</div>';
+    const canComplete = remaining === 0;
+    workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">2</span><div><div class="eyebrow">SİNDİR · ${block.digestMinutes ? `~${block.digestMinutes} DK` : 'İŞLE'}</div><h2>${esc(block.title)}</h2><p>Kendi cevabını yaz. Örneği açıp karşılaştırabilir, sonra hatırlama durumunu işaretleyebilirsin.</p></div></div><div class="digest-note"><strong>P · A · C · E · R</strong><span>Görev türü, kullanacağın işlemi belirtir. P/A/C/E/R sırası zorunlu bir liste değildir.</span></div>${taskStep}<div class="phase-footer"><span>${remaining ? `${remaining} görev işlenmedi; bloğu sonraya bırakabilirsin.` : 'Bloktaki görevler işlendi.'}</span><button class="btn ${canComplete ? '' : 'ghost'}" data-action="${canComplete ? 'next-block' : 'leave-block'}">${canComplete ? (activeBlock === course.blocks.length - 1 ? 'Bloğu bitir ve oturum sonuna geç →' : 'Bloğu tamamla →') : 'Sonraki bloğa geç →'}</button></div></section>`;
+  }
+  return `<div class="study-heading"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · BLOK ${activeBlock + 1} / ${course.blocks.length}</div><h1>${esc(course.title)}</h1><p>${esc(block.title)}</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>${phaseTabs}${workspace}${navigation}`;
 }
 
 function bionic(text, strength = state.preferences.boldPercent) {
@@ -318,6 +337,7 @@ function renderWordContext(words, start, active, count = 1) {
 }
 
 function renderWordPlayer(course, block, blockIndex) {
+  const prefs = state.preferences;
   const words = splitWords(block);
   const position = lessonProgress(course.id).reader?.[String(blockIndex)] ?? 0;
   wordIndex = Math.max(0, Math.min(position, Math.max(0, words.length - 1)));
@@ -325,7 +345,7 @@ function renderWordPlayer(course, block, blockIndex) {
   const context = renderWordContext(words, contextStart, wordIndex, Math.max(1, Number(state.preferences.groupWords) || 1));
   const current = words[wordIndex] || 'Bu blokta kelime bulunamadı';
   const speed = state.preferences.wpm;
-  return `${block.readInstruction ? `<div class="read-direction"><span>BU BLOKTA OKU</span><p>${esc(block.readInstruction)}</p></div>` : ''}<div class="word-player" id="word-player" data-word-count="${words.length}"><p class="player-context">${esc(context)}</p><div class="player-word" id="player-word">${bionic(current)}</div><div class="player-word-counter"><span id="word-current">${words.length ? wordIndex + 1 : 0}</span> / ${words.length} kelime</div><div class="player-controls"><button data-action="word-prev" aria-label="Önceki kelime">←</button><button class="play-button" data-action="word-play" id="word-play" aria-label="${playerRunning ? 'Durdur' : 'Oynat'}">${playerRunning ? 'Ⅱ' : '▶'}</button><button data-action="word-next" aria-label="Sonraki kelime">→</button></div><input class="player-slider" type="range" min="0" max="${Math.max(words.length - 1, 0)}" value="${wordIndex}" data-word-slider aria-label="Metinde ilerle"><div class="player-options"><label>Hız <input type="number" min="60" max="1000" step="10" value="${speed}" data-setting-number="wpm" aria-label="Dakikadaki kelime hızı"> kelime / dk</label><label>Gösterim <select class="select-small" data-setting-select="groupWords"><option value="1" ${state.preferences.groupWords === 1 ? 'selected' : ''}>1 kelime</option><option value="2" ${state.preferences.groupWords === 2 ? 'selected' : ''}>2 kelime</option><option value="3" ${state.preferences.groupWords === 3 ? 'selected' : ''}>3 kelime</option></select></label><label>Duraklama <input type="number" min="0" max="2000" step="50" value="${state.preferences.punctuationPause}" data-setting-number="punctuationPause" aria-label="Noktalama duraklama süresi"> ms</label></div></div>`;
+  return `${block.readInstruction ? `<div class="read-direction"><span>BU BLOKTA OKU</span><p>${esc(block.readInstruction)}</p></div>` : ''}<div class="word-player" id="word-player" data-word-count="${words.length}"><p class="player-context">${context}</p><div class="player-word" id="player-word">${prefs.bionic ? bionic(current) : esc(current)}</div><div class="player-word-counter"><span id="word-current">${words.length ? wordIndex + 1 : 0}</span> / ${words.length} kelime</div><div class="player-controls"><button data-action="word-prev" aria-label="Önceki kelime">←</button><button class="play-button" data-action="word-play" id="word-play" aria-label="${playerRunning ? 'Durdur' : 'Oynat'}">${playerRunning ? 'Ⅱ' : '▶'}</button><button data-action="word-next" aria-label="Sonraki kelime">→</button></div><input class="player-slider" type="range" min="0" max="${Math.max(words.length - 1, 0)}" value="${wordIndex}" data-word-slider aria-label="Metinde ilerle"><div class="player-options"><label>Hız <input type="number" min="60" max="1000" step="10" value="${speed}" data-setting-number="wpm" aria-label="Dakikadaki kelime hızı"> kelime / dk</label><label>Gösterim <select class="select-small" data-setting-select="groupWords"><option value="1" ${state.preferences.groupWords === 1 ? 'selected' : ''}>1 kelime</option><option value="2" ${state.preferences.groupWords === 2 ? 'selected' : ''}>2 kelime</option><option value="3" ${state.preferences.groupWords === 3 ? 'selected' : ''}>3 kelime</option></select></label><label>Duraklama <input type="number" min="0" max="2000" step="50" value="${state.preferences.punctuationPause}" data-setting-number="punctuationPause" aria-label="Noktalama duraklama süresi"> ms</label></div></div>`;
 }
 
 function taskKey(block, task) { return `${block.number}:${task.id}`; }
@@ -340,8 +360,10 @@ function renderTask(course, block, task) {
   const saved = lessonProgress(course.id).tasks[key] || {};
   const revealed = !!saved.revealed;
   const answer = task.answer || 'Bu görev için cevap anahtarında ayrı bir örnek yanıt yok. Önce kendi çözümünü yazıp dersin genel ölçütleriyle değerlendirebilirsin.';
+  const answerPlaceholder = task.expectedKind === 'E' ? 'Bu kanıt hangi kavramı somutlaştırıyor? Nasıl kullanırsın?' : task.expectedKind === 'R' ? 'Bu ayrıntıyı hatırladığın kadarıyla yaz…' : 'Düşünceni buraya yaz…';
   const due = state.review[`${course.id}:${key}`]?.due;
-  return `<article class="task-card" data-task-card="${esc(key)}"><div class="task-prompt"><span class="task-id">${esc(task.id)}</span>${esc(task.prompt)}</div><div class="task-answer"><div class="answer-toolbar"><label for="answer-${esc(task.id)}-${block.number}">Cevabın</label><div class="answer-actions"><button class="answer-button reveal" data-task-action="reveal" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}">${revealed ? 'Cevabı gizle' : '? Cevabı göster'}</button><button class="answer-button ${saved.copied ? 'copied' : ''}" data-task-action="copy" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}">${saved.copied ? 'Kopyalandı ✓' : 'Cevabı kopyala'}</button></div></div><textarea id="answer-${esc(task.id)}-${block.number}" class="answer-text" data-answer="${esc(task.id)}" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}" placeholder="Düşünceni buraya yaz…" spellcheck="true">${esc(saved.answer || '')}</textarea>${revealed ? `<div class="model-answer ${task.answer ? '' : 'no-key'}" data-model-answer="${esc(task.id)}">${esc(answer)}</div>` : ''}<div class="answer-footer"><span class="answer-hint">Yazdıkların otomatik kaydolur · Ctrl + Enter ile devam et</span><span class="save-status">${saved.updatedAt ? 'Kaydedildi ✓' : ''}${due ? ` · Tekrar: ${esc(due)}` : ''}</span></div></div></article>`;
+  const classification = task.expectedKind ? `<div class="knowledge-choice"><span>Bu bilgi türü:</span><button class="answer-button ${saved.kindChoice === 'E' ? 'selected' : ''}" data-kind-choice="E" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}">E · Kanıt</button><button class="answer-button ${saved.kindChoice === 'R' ? 'selected' : ''}" data-kind-choice="R" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}">R · Referans</button>${revealed ? `<small>${saved.kindChoice === task.expectedKind ? 'Doğru sınıflandırdın.' : `Kaynakta ${task.expectedKind} olarak işaretli.`}</small>` : ''}</div>` : '';
+  return `<article class="task-card" data-task-card="${esc(key)}"><div class="task-prompt"><span class="task-id">${esc(task.id)}</span>${esc(task.prompt || 'Bu görev için soru metni bulunamadı.')}</div>${classification}<div class="task-answer"><div class="answer-toolbar"><label for="answer-${esc(task.id)}-${block.number}">Cevabın</label><div class="answer-actions"><button class="answer-button reveal" data-task-action="reveal" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}">${revealed ? 'Cevabı gizle' : '? Cevabı göster'}</button><button class="answer-button ${saved.copied ? 'copied' : ''}" data-task-action="copy" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}">${saved.copied ? 'Kopyalandı ✓' : 'Cevabı kopyala'}</button></div></div><textarea id="answer-${esc(task.id)}-${block.number}" class="answer-text" data-answer="${esc(task.id)}" data-course-id="${esc(course.id)}" data-task-key="${esc(key)}" placeholder="${esc(answerPlaceholder)}" spellcheck="true">${esc(saved.answer || '')}</textarea>${revealed ? `<div class="model-answer ${task.answer ? '' : 'no-key'}" data-model-answer="${esc(task.id)}">${esc(answer)}</div>` : ''}<div class="answer-footer"><span class="answer-hint">Yazdıkların otomatik kaydolur · Ctrl + Enter ile devam et</span><span class="save-status">${saved.updatedAt ? 'Kaydedildi ✓' : ''}${due ? ` · Tekrar: ${esc(due)}` : ''}</span></div></div></article>`;
 }
 
 function renderWrapUp(course, progress) {
@@ -350,6 +372,12 @@ function renderWrapUp(course, progress) {
   const wrapGroups = course.wrapUp.length ? `<section class="study-card"><div class="study-card-head"><span class="step-badge">✦</span><div><h2>Kanıtları kullanarak prova et</h2><p>İddianı örnek, tarih veya sayıyla destekle. Cevap anahtarını açıp sonra yanıtını karşılaştır.</p></div></div><div class="tasks-stack">${course.wrapUp.map(task => renderTask(course, { number: 'son' }, task)).join('')}</div></section>` : '';
   return `<div class="lesson-head"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · OTURUM SONU</div><h1>${esc(course.title)}</h1><p class="page-subtitle">Bu oturumda ${progress.completedBlocks || 0} / ${course.blocks.length} blok işaretledin. Cevapların kaydedildi; şimdi ne kadar rahat hatırladığını işaretle.</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>
     ${wrapGroups}<section class="study-card"><div class="final-card"><div class="eyebrow">KISA ÖZ DEĞERLENDİRME</div><h2>${done ? 'Bu dersi tekrar açabilirsin.' : 'Nasıl hissettin?'}</h2><p>Bu seçim tamamlanma sayacından ayrı tutulur ve tekrar önerilerine yardımcı olur.</p><div class="rating-row">${[['confident','Rahat hatırlıyorum'],['review','Tekrar gerekli'],['difficult','Zorlandım']].map(([key,label]) => `<button class="rating-option ${rating === key ? 'active' : ''}" data-rating="${key}">${label}</button>`).join('')}</div><div class="finish-summary">${progress.completedBlocks || 0} blok tamamlandı · ${Object.values(progress.tasks).filter(task => task.answer?.trim()).length} cevap yazıldı · ${Object.values(progress.tasks).filter(task => task.revealed).length} örnek cevap görüldü</div><div class="lesson-actions"><button class="btn ghost small" data-action="prev-block">← Son bloğa dön</button><button class="btn" data-action="finish-course">${done ? 'Değerlendirmeyi güncelle' : 'Oturumu tamamla'}</button></div></div></section>`;
+}
+
+function renderSyncConflicts() {
+  const conflicts = (state.syncConflicts || []).map((item, index) => ({ ...item, index })).filter(item => !item.resolved);
+  if (!conflicts.length) return '';
+  return `<section class="setting-card sync-conflict-card"><h2>Eşitlemede farklı cevaplar var</h2><p>İki cihazda aynı alan kısa aralıkla değişmiş. Saklanacak metni seç.</p>${conflicts.map(conflict => `<article class="sync-conflict"><strong>${esc(conflict.path.at(-1) || 'Çalışma notu')}</strong><details><summary>Bu cihazdaki metin</summary><p>${esc(conflict.local)}</p><button class="answer-button" data-action="resolve-conflict" data-conflict-index="${conflict.index}" data-conflict-choice="local">Bunu sakla</button></details><details><summary>Diğer cihazdaki metin</summary><p>${esc(conflict.remote)}</p><button class="answer-button" data-action="resolve-conflict" data-conflict-index="${conflict.index}" data-conflict-choice="remote">Bunu sakla</button></details></article>`).join('')}</section>`;
 }
 
 function renderSettings() {
@@ -388,6 +416,7 @@ function renderSettings() {
           <form id="github-form" autocomplete="off"><div class="field"><label for="github-token">Fine-grained token</label><input id="github-token" type="password" placeholder="github_pat_…" autocomplete="new-password"></div><button type="submit" class="btn ghost small" data-action="connect-github">Token ile bağlan</button></form>
         </details>
       </section>
+      ${renderSyncConflicts()}
       <section class="setting-card"><h2>Kelime kelime oynatıcı</h2><p>Aktif ders ekranında boşluk çubuğuyla başlat/durdur; ok tuşlarıyla kelimeleri değiştir. Yalnızca oynatıcı açıksa klavye kısayolları çalışır.</p><div class="sync-status-box">Hız: ${p.wpm} kelime/dakika · Kelime grubu: ${p.groupWords} · Noktalama duraklaması: ${p.punctuationPause} ms<br>Oynatma konumun çalışma ilerlemenle birlikte saklanır.</div></section>
     </div>`;
 }
@@ -397,6 +426,21 @@ function renderStats() {
   const blocks = courses.reduce((sum, course) => sum + getCourseStats(course).completedBlocks, 0);
   const answers = Object.values(state.lessons).reduce((sum, lesson) => sum + Object.values(lesson.tasks || {}).filter(task => task.answer?.trim()).length, 0);
   const revealed = Object.values(state.lessons).reduce((sum, lesson) => sum + Object.values(lesson.tasks || {}).filter(task => task.revealed).length, 0);
+  const typeStats = { P: { total: 0, worked: 0 }, A: { total: 0, worked: 0 }, C: { total: 0, worked: 0 }, E: { total: 0, worked: 0 }, R: { total: 0, worked: 0 } };
+  for (const course of courses) for (const block of course.blocks) for (const section of block.sections) {
+    for (const task of section.tasks) {
+      const saved = lessonProgress(course.id).tasks[`${block.number}:${task.id}`];
+      if (section.type === 'ER') {
+        const type = task.expectedKind;
+        if (!['E', 'R'].includes(type)) continue;
+        typeStats[type].total++;
+        if (saved?.kindChoice === type) typeStats[type].worked++;
+      } else if (typeStats[section.type]) {
+        typeStats[section.type].total++;
+        if (['worked', 'again'].includes(saved?.status)) typeStats[section.type].worked++;
+      }
+    }
+  }
   const week = Array.from({ length: 7 }, (_, i) => {
     const day = new Date(); day.setDate(day.getDate() - (6 - i)); const key = dayKey(day.getTime());
     const seconds = state.activeDays[key] === true ? 1 : Number(state.activeDays[key] || 0);
@@ -412,19 +456,21 @@ function renderStats() {
   return `<div class="eyebrow">DÜZENLİ ÇALIŞMA İZLERİ</div><h1 class="page-title">İlerleme</h1><p class="page-subtitle">Bitirdiğin adımları, yazdığın cevapları ve kendi hatırlama değerlendirmeni ayrı ayrı gör.</p>
     <div class="stats-overview">${statCard('DERS TAMAMLANDI', `${done} / ${courses.length}`, 'Ders sonu değerlendirmesiyle')}${statCard('BLOK TAMAMLANDI', String(blocks), `${courses.reduce((s,c) => s+c.blocks.length,0)} blok içinde`)}${statCard('YAZILI CEVAP', String(answers), `${revealed} örnek cevap açıldı`)}</div>
     <div class="home-grid"><section class="chart-card"><div class="chart-title">Son 7 gün · etkin çalışma izi</div><div class="bar-chart">${week.map((day, i) => `<div class="bar-column"><div class="bar ${day.today ? 'today' : ''}" style="height:${day.seconds ? Math.max(9, day.seconds / max * 73) : 3}px" title="${day.seconds ? fmtTime(day.seconds) : 'Kayıt yok'}"></div><span class="bar-label">${esc(day.label)}</span></div>`).join('')}</div><p class="help-text">Süre, sayfa görünürken ve yakın zamanda etkileşim olduğunda sayılır.</p></section><section class="chart-card"><div class="chart-title">Cevap çalışma yaklaşımı</div><div class="chart-number">${answers ? Math.round(100 * Math.max(0, answers - revealed) / answers) : 0}%</div><div class="chart-sub">Yazdığın cevapların içinde örnek cevabı açmadıkların</div><div class="sync-status-box">Bu oran doğruluk puanı değildir; sadece kendin yazıp sonra karşılaştırabildiğin yanıtları gösterir.</div></section></div>
-    <div class="section-heading"><div><h2>Konu başlıklarına göre</h2><p>Tamamlanan bloklar</p></div></div>${categories.map(row => `<div class="category-row"><span>${esc(row.category)}</span><div class="progress-track"><div class="progress-fill" style="width:${row.percent}%"></div></div><small>${row.completed}/${row.total}</small></div>`).join('')}`;
+    <div class="section-heading"><div><h2>Bilgi türlerine göre çalışma</h2><p>İşlediğin görev sayısı</p></div></div>${Object.entries(typeStats).map(([type, stat]) => `<div class="category-row"><span>${type} · ${{ P: 'İşlemsel', A: 'Analojik', C: 'Kavramsal', E: 'Kanıt', R: 'Referans' }[type]}</span><div class="progress-track"><div class="progress-fill" style="width:${stat.total ? Math.round(100 * stat.worked / stat.total) : 0}%"></div></div><small>${stat.worked}/${stat.total}</small></div>`).join('')}<div class="section-heading"><div><h2>Konu başlıklarına göre</h2><p>Tamamlanan bloklar</p></div></div>${categories.map(row => `<div class="category-row"><span>${esc(row.category)}</span><div class="progress-track"><div class="progress-fill" style="width:${row.percent}%"></div></div><small>${row.completed}/${row.total}</small></div>`).join('')}`;
 }
 
 function renderReviews() {
   const due = getDueCards();
-  const byCourse = new Map();
-  for (const item of due) {
-    if (!byCourse.has(item.course.id)) byCourse.set(item.course.id, []);
-    byCourse.get(item.course.id).push(item);
-  }
-  return `<div class="eyebrow">GÜNLÜK VE HAFTALIK KISA TEKRAR</div><h1 class="page-title">Tekrarlar</h1><p class="page-subtitle">E / R görevlerinde sakladığın ayrıntılar burada zamanı geldiğinde görünür.</p>
-    <div class="section-heading"><div><h2>${due.length ? `${due.length} kart hazır` : 'Bugün bekleyen kart yok'}</h2><p>${due.length ? 'Yanıtı hatırlamaya çalış; emin olduktan sonra örnek cevabı aç.' : 'Derslerdeki E / R ayrımlarını tamamladıkça tekrarların takvime eklenir.'}</p></div></div>
-    ${due.length ? `<div class="review-list">${[...byCourse.entries()].map(([courseId, items]) => { const course = courses.find(c => c.id === courseId); return `<article class="review-course"><h3>${esc(course?.title || '')}</h3><p>${items.length} ayrıntı tekrar zamanı geldi.</p>${items.slice(0, 8).map(item => { const saved = taskProgress(item.course.id, item.key); return `<div class="task-card"><div class="task-prompt"><span class="task-id">${esc(item.task.id)}</span>${esc(item.task.prompt)}</div><textarea class="answer-text" data-answer="review" data-course-id="${esc(item.course.id)}" data-task-key="${esc(item.key)}" placeholder="Hatırladığın cevabı yaz…">${esc(saved.reviewAnswer || '')}</textarea><div class="answer-actions" style="margin-top:7px"><button class="answer-button reveal" data-review-action="show" data-course-id="${esc(item.course.id)}" data-task-key="${esc(item.key)}">${saved.reviewRevealed ? 'Cevabı gizle' : '? Cevabı göster'}</button><button class="answer-button" data-review-action="again" data-course-id="${esc(item.course.id)}" data-task-key="${esc(item.key)}">Yarın tekrar et</button><button class="answer-button" data-review-action="known" data-course-id="${esc(item.course.id)}" data-task-key="${esc(item.key)}">Hatırladım · 3 gün sonra</button></div>${saved.reviewRevealed ? `<div class="model-answer">${esc(item.task.answer)}</div>` : ''}</div>`; }).join('')}</article>`; }).join('')}</div>` : `<div class="empty-state">Bir derste E / R bölümünü aç, ayrıntıyı cevapla ve örnek yanıtı değerlendir. R (referans) olarak ayrılan bilgiler günlük kısa kartlarına eklenir.</div>`}`;
+  const selected = courses.find(course => course.id === activeReviewCourseId) || courses[0];
+  activeReviewCourseId = selected?.id || '';
+  const cardState = item => state.review[`${item.course.id}:${item.key}`] || {};
+  const dueMarkup = due.length ? `<div class="review-list">${due.map(item => { const saved = cardState(item); return `<article class="review-course"><div class="eyebrow">${esc(item.course.title)} · ${esc(item.card.id)}</div><h2 class="review-question">${esc(item.card.front)}</h2><label class="review-answer-label">Önce hatırladığını yaz<textarea class="answer-text" data-card-answer data-course-id="${esc(item.course.id)}" data-review-key="${esc(item.key)}" placeholder="Cevabı kendin hatırlamaya çalış…">${esc(saved.answer || '')}</textarea></label><div class="answer-actions"><button class="answer-button reveal" data-card-action="show" data-course-id="${esc(item.course.id)}" data-review-key="${esc(item.key)}">${saved.revealed ? 'Cevabı gizle' : '? Cevabı göster'}</button><button class="answer-button" data-card-action="again" data-course-id="${esc(item.course.id)}" data-review-key="${esc(item.key)}">Unuttum · yarın</button><button class="answer-button" data-card-action="known" data-course-id="${esc(item.course.id)}" data-review-key="${esc(item.key)}">Hatırladım</button></div>${saved.revealed ? `<div class="model-answer">${esc(item.card.back)}</div>` : ''}<small class="review-interval">${saved.interval ? `Şu anki aralık: ${saved.interval} gün` : 'Bugün tekrar'}</small></article>`; }).join('')}</div>` : '<div class="empty-state">Bugün için kart yok. Belgelerdeki hazır referans kartlarından çalışmak istediklerini aşağıdan sıraya ekleyebilirsin.</div>';
+  const cards = selected?.referenceCards || [];
+  const cardLibrary = cards.length ? `<details class="card-library"><summary>${esc(selected.title)} · ${cards.length} hazır referans kartı</summary><div class="card-library-list">${cards.map(card => { const key = `K:${card.id}`, saved = state.review[`${selected.id}:${key}`]; return `<div class="card-library-item"><span><strong>${esc(card.id)}</strong> ${esc(card.front)}</span><button class="answer-button" data-card-action="queue" data-course-id="${esc(selected.id)}" data-review-key="${esc(key)}">${saved ? 'Tekrar listesinde' : 'Bugün çalış'}</button></div>`; }).join('')}</div></details>` : '<div class="empty-state">Bu ders için kaynakta hazır kart bulunmuyor.</div>';
+  const proof = selected?.proofPractice?.tasks || [];
+  const savedEvidence = (selected?.evidenceBank || []).filter(item => item.expectedKind === 'E');
+  const proofMarkup = proof.length ? `<details class="proof-library"><summary>Gün sonu / hafta sonu kanıt provası · ${proof.length} görev</summary><p>${esc((selected.proofPractice.instructions || []).join(' '))}</p><div class="tasks-stack">${proof.map(task => renderTask(selected, { number: 'kanıt' }, task)).join('')}</div>${savedEvidence.length ? `<details class="evidence-library"><summary>${savedEvidence.length} saklanmış kanıtı aç</summary><ul>${savedEvidence.map(item => `<li><strong>${esc(item.id)}</strong> ${esc(item.text)} <small>${esc(item.sourceRefs.join(', '))}</small></li>`).join('')}</ul></details>` : ''}</details>` : '';
+  return `<div class="eyebrow">GÜNLÜK REFERANS · HAFTALIK KANIT PROVASI</div><h1 class="page-title">Tekrarlar</h1><p class="page-subtitle">Kaynak belgelerdeki hazır kartları sıraya ekle. Hatırladığını yazıp cevabı açtıktan sonra tekrar aralığını seç.</p><div class="section-heading"><div><h2>${due.length ? `${due.length} kart hazır` : 'Bugün bekleyen kart yok'}</h2><p>${due.length ? 'Önce kendin hatırla; cevap görünce kopyalamak öğrenme puanı sayılmaz.' : 'Çalışmak istediğin referans kartlarını ders havuzundan seç.'}</p></div></div>${dueMarkup}<section class="study-card reference-pool"><div class="study-card-head"><span class="step-badge">R</span><div><h2>Hazır referans kartları</h2><p>Kaynak çalışma kâğıdındaki soru ve cevapları seçerek günlük sıraya ekle.</p></div><select class="select-small" data-card-course aria-label="Kart dersi">${courses.map(course => `<option value="${esc(course.id)}" ${course.id === selected?.id ? 'selected' : ''}>${esc(course.title)}</option>`).join('')}</select></div>${cardLibrary}</section>${proofMarkup}`;
 }
 
 function applyReadingSettings() {
@@ -464,16 +510,31 @@ function saveAnswer(courseId, key, answer, reveal = undefined) {
   p.answer = answer;
   if (reveal !== undefined) p.revealed = reveal;
   p.updatedAt = Date.now();
-  const [blockNo, id] = key.split(':');
-  const match = getAllTasks().find(x => x.course.id === courseId && `${x.block.number}:${x.task.id}` === key);
-  if (match?.section.type === 'ER' && answer.trim() && match.task.answer) {
-    const classification = (match.task.answer.split('→')[1] || match.task.answer).trim().toLocaleLowerCase('tr');
-    const ref = /^(?:r\b|referans\b)/.test(classification);
-    const reviewKey = `${courseId}:${key}`;
-    if (!state.review[reviewKey]) state.review[reviewKey] = { due: dayKey(Date.now() + (ref ? DAY : 7 * DAY)), interval: ref ? 1 : 7, updatedAt: Date.now() };
-  }
+  const [blockNo] = key.split(':');
   const nextBlock = Number(blockNo);
   changeLesson(courseId, { activeBlock: Number.isFinite(nextBlock) ? nextBlock - 1 : lessonProgress(courseId).activeBlock }, 15_000);
+}
+
+function setTaskReveal(card, task, saved, courseId, key) {
+  const button = card?.querySelector('[data-task-action="reveal"], [data-task-action="copy"]');
+  const text = task?.answer || 'Bu görev için cevap anahtarında ayrı bir örnek yanıt yok.';
+  let answer = card?.querySelector('[data-model-answer]');
+  if (saved.revealed) {
+    if (!answer) {
+      answer = document.createElement('div');
+      answer.className = `model-answer ${task?.answer ? '' : 'no-key'}`;
+      answer.dataset.modelAnswer = task?.id || '';
+      card.querySelector('.task-answer textarea')?.after(answer);
+    }
+    if (answer) answer.textContent = text;
+  } else answer?.remove();
+  if (button?.dataset.taskAction === 'reveal') button.textContent = saved.revealed ? 'Cevabı gizle' : '? Cevabı göster';
+  const kindLabel = card?.querySelector('.knowledge-choice small');
+  if (kindLabel) kindLabel.textContent = saved.kindChoice === task?.expectedKind ? 'Doğru sınıflandırdın.' : `Kaynakta ${task?.expectedKind} olarak işaretli.`;
+}
+
+function taskForKey(courseId, key) {
+  return getAllTasks().find(item => item.course.id === courseId && item.key === key)?.task;
 }
 
 function nextTaskField(current) {
@@ -500,11 +561,47 @@ function markBlockDone() {
   const course = currentCourse();
   const block = course?.blocks[activeBlock];
   if (!block) return;
+  const pending = progressBlockDone(course.id, block.number) ? [] : getBlockTasks(block).filter(({ task }) => !['worked', 'again'].includes(taskProgress(course.id, taskKey(block, task)).status));
+  if (pending.length) { showToast(`${pending.length} görev bekliyor. Bunları sonraya bırakıp ilerleyebilirsin.`); return; }
   const p = lessonProgress(course.id);
   p.blocks[block.number] = { completed: true, updatedAt: Date.now() };
   changeLesson(course.id, { activeBlock: activeBlock + 1 }, 1_500);
   activeBlock = Math.min(activeBlock + 1, course.blocks.length);
   stopPlayer();
+  render();
+  scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function leaveBlock() {
+  const course = currentCourse();
+  if (!course) return;
+  activeBlock = Math.min(activeBlock + 1, course.blocks.length);
+  changeLesson(course.id, { activeBlock }, 1_500);
+  stopPlayer();
+  render();
+  scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function moveDigestTask(delta) {
+  const course = currentCourse(); const block = course?.blocks[activeBlock];
+  if (!block) return;
+  const flow = blockFlow(course.id, block.number); const tasks = getBlockTasks(block);
+  const task = tasks[flow.taskIndex];
+  if (delta > 0 && task) {
+    const saved = taskProgress(course.id, taskKey(block, task));
+    if (saved.status === 'todo') saved.status = saved.answer?.trim() ? 'worked' : 'skipped';
+    saved.updatedAt = Date.now();
+  }
+  const pendingIndices = tasks.map(({ task }, i) => ['worked', 'again'].includes(taskProgress(course.id, taskKey(block, task)).status) ? -1 : i).filter(i => i >= 0);
+  if (delta > 0 && flow.taskIndex >= tasks.length - 1 && pendingIndices.length === 0) {
+    changeLesson(course.id, {}, 1_500);
+    markBlockDone();
+    return;
+  }
+  if (delta > 0 && flow.taskIndex >= tasks.length - 1 && pendingIndices.length) flow.taskIndex = pendingIndices[0];
+  else flow.taskIndex = Math.max(0, Math.min(Math.max(0, tasks.length - 1), flow.taskIndex + delta));
+  flow.phase = 'digest';
+  changeLesson(course.id, { flow: lessonProgress(course.id).flow }, 1_500);
   render();
   scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -566,10 +663,10 @@ function refreshPlayerDisplay() {
   const words = splitWords(block);
   const count = Math.max(1, Number(state.preferences.groupWords) || 1);
   const word = words.slice(wordIndex, wordIndex + count).join(' ') || 'Blok tamamlandı';
-  const wordNode = $('#player-word'); if (wordNode) wordNode.innerHTML = bionic(word);
+  const wordNode = $('#player-word'); if (wordNode) wordNode.innerHTML = state.preferences.bionic ? bionic(word) : esc(word);
   const counter = $('#word-current'); if (counter) counter.textContent = String(words.length ? wordIndex + 1 : 0);
   const slider = $('[data-word-slider]'); if (slider) slider.value = String(wordIndex);
-  const context = $('#word-player .player-context'); if (context) context.textContent = words.slice(Math.max(0, wordIndex - 8), wordIndex + 10).join(' ');
+  const context = $('#word-player .player-context'); if (context) context.innerHTML = renderWordContext(words, Math.max(0, wordIndex - 8), wordIndex, count);
   const button = $('#word-play'); if (button) { button.textContent = playerRunning ? 'Ⅱ' : '▶'; button.setAttribute('aria-label', playerRunning ? 'Durdur' : 'Oynat'); }
 }
 
@@ -614,20 +711,61 @@ function togglePlayer() {
   refreshPlayerDisplay();
 }
 
-function mergeNode(local, remote, key = '', localUpdatedAt = 0, remoteUpdatedAt = 0) {
+function mergeNode(local, remote, key = '', localUpdatedAt = 0, remoteUpdatedAt = 0, path = []) {
   if (local == null) return remote;
   if (remote == null) return local;
+  if (key === 'syncConflicts' && Array.isArray(local) && Array.isArray(remote)) {
+    const merged = new Map();
+    for (const item of [...local, ...remote]) {
+      const id = JSON.stringify({ path: item.path, local: item.local, remote: item.remote });
+      if (!merged.has(id) || item.resolved) merged.set(id, item);
+    }
+    return [...merged.values()];
+  }
   const leftObject = local && typeof local === 'object' && !Array.isArray(local);
   const rightObject = remote && typeof remote === 'object' && !Array.isArray(remote);
-  if (!leftObject || !rightObject) return localUpdatedAt >= remoteUpdatedAt ? local : remote;
+  if (!leftObject || !rightObject) {
+    const isEditableText = ['answer', 'mapNotes', 'analogyNotes'].includes(key);
+    if (isEditableText && typeof local === 'string' && typeof remote === 'string' && local !== remote && Math.abs(localUpdatedAt - remoteUpdatedAt) <= 5_000) {
+      const conflict = { path, local, remote, updatedAt: Date.now() };
+      if (!mergeConflicts.some(item => JSON.stringify({ path: item.path, local: item.local, remote: item.remote }) === JSON.stringify({ path, local, remote }))) mergeConflicts.push(conflict);
+    }
+    return localUpdatedAt >= remoteUpdatedAt ? local : remote;
+  }
   const leftTime = Number(local.updatedAt ?? localUpdatedAt);
   const rightTime = Number(remote.updatedAt ?? remoteUpdatedAt);
   if (key === 'preferences' && leftTime !== rightTime) return leftTime > rightTime ? local : remote;
   const merged = {};
   for (const childKey of new Set([...Object.keys(local), ...Object.keys(remote)])) {
-    merged[childKey] = mergeNode(local[childKey], remote[childKey], childKey, leftTime, rightTime);
+    merged[childKey] = mergeNode(local[childKey], remote[childKey], childKey, leftTime, rightTime, [...path, childKey]);
   }
   return merged;
+}
+
+function mergeWithConflicts(remote) {
+  mergeConflicts = [];
+  const merged = mergeNode(state, remote);
+  if (mergeConflicts.length) {
+    const known = new Set((merged.syncConflicts || []).map(item => JSON.stringify({ path: item.path, local: item.local, remote: item.remote })));
+    merged.syncConflicts = [...(merged.syncConflicts || []), ...mergeConflicts.filter(item => {
+      const key = JSON.stringify({ path: item.path, local: item.local, remote: item.remote });
+      if (known.has(key)) return false;
+      known.add(key); return true;
+    })];
+  }
+  mergeConflicts = [];
+  state = merged;
+}
+
+function resolveSyncConflict(index, choice) {
+  const conflict = state.syncConflicts?.[index];
+  if (!conflict) return;
+  let target = state;
+  for (const segment of conflict.path.slice(0, -1)) target = target?.[segment];
+  if (target) target[conflict.path.at(-1)] = conflict[choice];
+  conflict.resolved = true;
+  touchState(1_000);
+  render();
 }
 
 function githubPath() { return `https://api.github.com/repos/${encodeURIComponent(github.owner)}/${encodeURIComponent(github.repo)}/contents/study-progress.json`; }
@@ -681,7 +819,7 @@ async function writeRemote() {
   } catch (error) {
     if (!/409|422|update|sha|conflict/i.test(error.message)) throw error;
     const remote = await readRemote();
-    if (remote) state = mergeNode(state, remote);
+    if (remote) mergeWithConflicts(remote);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     const retryBody = { message: `Merge study progress (${new Date().toISOString().slice(0, 10)})`, content: textToBase64(JSON.stringify(state)), ...(github.sha ? { sha: github.sha } : {}) };
     const result = await githubRequest(githubPath(), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(retryBody) });
@@ -707,7 +845,7 @@ async function syncNow() {
     setSyncLabel('GitHub ile eşitleniyor…', 'busy');
     try {
       const remote = await readRemote();
-      if (remote) state = mergeNode(state, remote);
+      if (remote) mergeWithConflicts(remote);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       const remoteText = JSON.stringify(remote || {});
       if (!remote || JSON.stringify(state) !== remoteText) await writeRemote();
@@ -745,7 +883,7 @@ async function connectGithubWithToken(owner, repo, token, clientId = github.clie
     const info = await githubRequest(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
     if (!info.private) throw new Error('İlerleme bilgileri için bu deponun GitHub’da özel (private) olması gerekiyor.');
     const remote = await readRemote();
-    if (remote) state = mergeNode(state, remote);
+    if (remote) mergeWithConflicts(remote);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     if (!remote || JSON.stringify(state) !== JSON.stringify(remote)) await writeRemote();
     persistGithub();
@@ -852,7 +990,7 @@ async function importState(file) {
     const data = JSON.parse(await file.text());
     const imported = data.progress || data;
     if (imported.version !== 1 || !imported.lessons) throw new Error('Bu dosya geçerli bir çalışma yedeği değil.');
-    state = mergeNode(state, imported);
+    mergeWithConflicts(imported);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     scheduleSync(1500);
     render();
@@ -875,6 +1013,22 @@ function updateReview(courseId, key, action) {
   render();
 }
 
+function updateCardReview(courseId, key, action) {
+  const reviewKey = `${courseId}:${key}`;
+  const saved = state.review[reviewKey];
+  if (!saved) return;
+  if (action === 'again') { saved.streak = 0; saved.interval = 1; saved.due = dayKey(Date.now() + DAY); }
+  if (action === 'known') {
+    saved.streak = (saved.streak || 0) + 1;
+    const schedule = [1, 1, 1, 3, 7, 14, 30];
+    saved.interval = schedule[Math.min(saved.streak - 1, schedule.length - 1)];
+    saved.due = dayKey(Date.now() + saved.interval * DAY);
+  }
+  saved.updatedAt = Date.now();
+  touchState(1_500);
+  render();
+}
+
 document.addEventListener('click', async event => {
   markActivity();
   const viewButton = event.target.closest('[data-view]');
@@ -888,8 +1042,28 @@ document.addEventListener('click', async event => {
   const settingToggle = event.target.closest('[data-setting-toggle]');
   if (settingToggle) { const key = settingToggle.dataset.settingToggle; updateReadingSetting(key, !state.preferences[key]); render(); return; }
   const action = event.target.closest('[data-action]')?.dataset.action;
+  if (action === 'resolve-conflict') {
+    const button = event.target.closest('[data-action="resolve-conflict"]');
+    resolveSyncConflict(Number(button.dataset.conflictIndex), button.dataset.conflictChoice); return;
+  }
   if (action === 'continue') { const course = continueTarget(); if (course) startCourse(course); return; }
   if (action === 'next-block') { markBlockDone(); return; }
+  if (action === 'leave-block') { leaveBlock(); return; }
+  if (action === 'phase-consume' || action === 'phase-digest' || action === 'consume-done') {
+    const course = currentCourse(), block = course?.blocks[activeBlock];
+    if (!course || !block) return;
+    const flow = blockFlow(course.id, block.number);
+    flow.phase = action === 'phase-consume' ? 'consume' : 'digest';
+    if (action === 'consume-done') flow.readComplete = true;
+    changeLesson(course.id, { flow: lessonProgress(course.id).flow }, 1_500);
+    render(); scrollTo({ top: 0, behavior: 'smooth' }); return;
+  }
+  if (action === 'task-next' || action === 'task-prev') { moveDigestTask(action === 'task-next' ? 1 : -1); return; }
+  if (action === 'task-status') {
+    const saved = taskProgress(event.target.closest('[data-course-id]').dataset.courseId, event.target.closest('[data-task-key]').dataset.taskKey);
+    saved.status = event.target.dataset.status; saved.updatedAt = Date.now();
+    touchState(1_500); render(); return;
+  }
   if (action === 'prev-block') { changeBlock(-1); return; }
   if (action === 'word-play') { togglePlayer(); return; }
   if (action === 'word-prev') { advanceWord(-1); return; }
@@ -907,14 +1081,48 @@ document.addEventListener('click', async event => {
   if (taskAction) {
     const courseId = taskAction.dataset.courseId, key = taskAction.dataset.taskKey;
     const p = taskProgress(courseId, key);
-    if (taskAction.dataset.taskAction === 'reveal') { p.revealed = !p.revealed; p.updatedAt = Date.now(); touchState(5000); render(); }
+    const card = taskAction.closest('.task-card'); const task = taskForKey(courseId, key);
+    if (taskAction.dataset.taskAction === 'reveal') { p.revealed = !p.revealed; p.updatedAt = Date.now(); touchState(5000); setTaskReveal(card, task, p, courseId, key); }
     if (taskAction.dataset.taskAction === 'copy') {
-      const [blockNo, id] = key.split(':');
-      const item = getAllTasks().find(x => x.course.id === courseId && x.task.id === id && String(x.block.number) === blockNo);
-      const text = item?.task.answer || 'Bu görev için ayrıca örnek cevap yok.';
-      try { await navigator.clipboard.writeText(text); p.copied = true; p.revealed = true; p.updatedAt = Date.now(); touchState(5000); showToast('Örnek cevap panoya kopyalandı.'); render(); }
+      const text = task?.answer || 'Bu görev için ayrıca örnek cevap yok.';
+      try { await navigator.clipboard.writeText(text); p.copied = true; p.revealed = true; p.updatedAt = Date.now(); touchState(5000); setTaskReveal(card, task, p, courseId, key); taskAction.textContent = 'Kopyalandı ✓'; taskAction.classList.add('copied'); showToast('Örnek cevap panoya kopyalandı.'); }
       catch { showToast('Pano izni alınamadı. Cevabı açıp metni seçerek kopyalayabilirsin.'); }
     }
+    return;
+  }
+  const cardAction = event.target.closest('[data-card-action]');
+  if (cardAction) {
+    const { courseId, reviewKey } = cardAction.dataset;
+    const reviewId = `${courseId}:${reviewKey}`;
+    if (cardAction.dataset.cardAction === 'queue') {
+      if (!state.review[reviewId]) state.review[reviewId] = { interval: 1, streak: 0, due: dayKey(), revealed: false, updatedAt: Date.now() };
+      touchState(1_500); render(); return;
+    }
+    if (cardAction.dataset.cardAction === 'show') {
+      const saved = state.review[reviewId]; if (!saved) return;
+      saved.revealed = !saved.revealed; saved.updatedAt = Date.now(); touchState(1_500);
+      const item = getDueCards().find(card => card.course.id === courseId && card.key === reviewKey);
+      let model = cardAction.closest('.review-course')?.querySelector('.model-answer');
+      if (saved.revealed) {
+        if (!model) { model = document.createElement('div'); model.className = 'model-answer'; cardAction.closest('.review-course')?.append(model); }
+        if (model) model.textContent = item?.card.back || '';
+        cardAction.textContent = 'Cevabı gizle';
+      } else { model?.remove(); cardAction.textContent = '? Cevabı göster'; }
+      return;
+    }
+    updateCardReview(courseId, reviewKey, cardAction.dataset.cardAction); return;
+  }
+  const kindChoice = event.target.closest('[data-kind-choice]');
+  if (kindChoice) {
+    const { courseId, taskKey } = kindChoice.dataset; const saved = taskProgress(courseId, taskKey);
+    saved.kindChoice = kindChoice.dataset.kindChoice; saved.updatedAt = Date.now(); touchState(1_500);
+    const task = taskForKey(courseId, taskKey);
+    const reviewKey = `${courseId}:R:${taskKey}`;
+    if (saved.kindChoice === 'R' && task?.expectedKind === 'R' && !state.review[reviewKey]) {
+      state.review[reviewKey] = { interval: 1, streak: 0, due: dayKey(), revealed: false, updatedAt: Date.now() };
+      touchState(1_500);
+    } else if (saved.kindChoice !== 'R') delete state.review[reviewKey];
+    kindChoice.parentElement.querySelectorAll('[data-kind-choice]').forEach(button => button.classList.toggle('selected', button === kindChoice));
     return;
   }
   const reviewAction = event.target.closest('[data-review-action]');
@@ -941,6 +1149,19 @@ document.addEventListener('input', event => {
     const status = input.closest('.task-answer')?.querySelector('.save-status'); if (status) status.textContent = 'Kaydedildi ✓';
     return;
   }
+  if (input.matches('[data-flow-field]')) {
+    const courseId = input.dataset.courseId, blockNumber = input.dataset.blockNumber, progress = lessonProgress(courseId);
+    if (input.dataset.flowField === 'mapNotes') progress.mapNotes = input.value;
+    else blockFlow(courseId, blockNumber)[input.dataset.flowField] = input.value;
+    changeLesson(courseId, { flow: progress.flow, mapNotes: progress.mapNotes }, 10_000);
+    return;
+  }
+  if (input.matches('[data-card-answer]')) {
+    const key = `${input.dataset.courseId}:${input.dataset.reviewKey}`;
+    const saved = state.review[key]; if (!saved) return;
+    saved.answer = input.value; saved.updatedAt = Date.now(); touchState(10_000);
+    return;
+  }
   if (input.matches('[data-setting-range]')) { updateReadingSetting(input.dataset.settingRange, input.value); return; }
   if (input.matches('[data-setting-number]')) { updateReadingSetting(input.dataset.settingNumber, input.value); return; }
   if (input.matches('[data-word-slider]')) { wordIndex = Number(input.value); saveWordPosition(); }
@@ -951,6 +1172,7 @@ document.addEventListener('change', event => {
   if (input.matches('#reading-mode')) { stopPlayer(); updateReadingSetting('readingMode', input.value); return; }
   if (input.matches('[data-pref]')) { updateReadingSetting(input.dataset.pref, input.value); return; }
   if (input.matches('[data-setting-select]')) { updateReadingSetting(input.dataset.settingSelect, input.value); return; }
+  if (input.matches('[data-card-course]')) { activeReviewCourseId = input.value; render(); return; }
   if (input.matches('#import-file') && input.files[0]) { importState(input.files[0]); input.value = ''; }
 });
 
@@ -999,6 +1221,11 @@ setInterval(() => {
   activeSecondsRemainder += 10;
   state.activitySeconds += 10;
   state.activeDays[dayKey()] = Number(state.activeDays[dayKey()] || 0) + 10;
+  if (view === 'study' && currentCourse() && activeBlock < currentCourse().blocks.length) {
+    const block = currentCourse().blocks[activeBlock]; const flow = blockFlow(currentCourse().id, block.number);
+    flow.seconds ||= { consume: 0, digest: 0 };
+    flow.seconds[flow.phase] = (flow.seconds[flow.phase] || 0) + 10;
+  }
   if (activeSecondsRemainder >= 60) { activeSecondsRemainder = 0; touchState(15_000); }
 }, 10_000);
 
