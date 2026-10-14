@@ -172,7 +172,7 @@ Uygulanan bölüm: **1, 2, ana çalışma akışının 3. aşaması ve tekrar/pr
 
 - Harita önizlemesi basit ve satır tabanlı; serbest sürükleme, otomatik düzen ve kaynak paragrafına göre etiketleme sonraki iş.
 - Süre kaydı sekme görünürlüğü ve yakın etkileşim koşuluna dayanıyor; kesin odak süresi sayılmaz.
-- İki ayrı cihazda gerçek GitHub App yetkilendirmesi ve eşitleme doğrulaması yapılmadı. Pages iş akışı yalnızca `master` dalını yayımlar; geliştirme dalı için paralel deploy işi açılmaz.
+- İki ayrı cihazda gerçek GitHub App yetkilendirmesi ve eşitleme doğrulaması yapılmadı. Pages iş akışı depo ortamında izinli olan `codex/study-app` dalını yayımlar; `master` dalı koruma kuralıyla reddediliyor.
 - Mobil, klavye, yakınlaştırma ve canlı site kabul senaryoları bu uygulama adımında tarayıcıyla doğrulanmadı.
 
 ## 9. Son kabul senaryosu

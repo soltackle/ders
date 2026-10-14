@@ -3,7 +3,7 @@ name: Build and publish Maliye çalışma masası
 on:
   push:
     branches:
-      - master
+      - codex/study-app
     paths:
       - "maliye/**"
       - "site/**"

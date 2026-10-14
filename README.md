@@ -34,7 +34,7 @@ Betik Python standart kütüphanesini kullanır; uygulama paketleri yüklenmez.
 
 ## GitHub Pages
 
-`master` veya `codex/study-app` dalına ders, site ya da içerik betiği değişikliği geldiğinde `.github/workflows/publish-pages.yml` siteyi üretip GitHub Pages'e yayımlar. Depoda **Settings → Pages → Build and deployment → Source: GitHub Actions** ayarı seçili olmalıdır. Yayın adresi GitHub Actions tamamlandığında iş akışındaki deployment çıktısında görünür.
+`codex/study-app` dalına ders, site ya da içerik betiği değişikliği geldiğinde `.github/workflows/publish-pages.yml` siteyi üretip GitHub Pages'e yayımlar. Bu depo için Pages ortamı bu dalı kabul ediyor. Depoda **Settings → Pages → Build and deployment → Source: GitHub Actions** ayarı seçili olmalıdır. Yayın adresi GitHub Actions tamamlandığında iş akışındaki deployment çıktısında görünür.
 
 ## Kişisel ilerlemeyi GitHub'da saklama
 
