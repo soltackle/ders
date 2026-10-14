@@ -32,6 +32,20 @@ jobs:
           python-version: "3.12"
       - name: P.A.C.E.R. çalışma içeriklerini oluştur
         run: python scripts/build_content.py
+      - name: Yayımdaki dosyaları önbellekten ayır
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          index = Path("site/index.html")
+          html = index.read_text()
+          version = os.environ["RELEASE_SHA"][:12]
+          for asset in ("styles.css", "app.js"):
+              html = html.replace(f'./{asset}"', f'./{asset}?v={version}"')
+          index.write_text(html)
+          PY
       - name: GitHub Pages kullan
         uses: actions/configure-pages@v6
       - name: Site paketini hazırla
