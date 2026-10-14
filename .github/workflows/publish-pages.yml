@@ -26,17 +26,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Kaynakları al
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Python hazırla
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: P.A.C.E.R. çalışma içeriklerini oluştur
         run: python scripts/build_content.py
       - name: GitHub Pages kullan
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Site paketini hazırla
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
@@ -49,4 +49,4 @@ jobs:
     steps:
       - name: Siteyi yayımla
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
