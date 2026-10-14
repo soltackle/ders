@@ -2,6 +2,32 @@
 
 Durum: temel uygulama ve ek çalışma paketi `codex/study-app` dalında. Oturum/mola sayacı, tarihli görev erteleme, kaynak paragrafı etiketli düzenlenebilir kavram bağlantıları ve Chromium tarayıcı kontrolleri eklendi. Gerçek iki cihaz eşitlemesi, GitHub App yetkilendirmesi gerektirdiği için kullanıcı tarayıcılarında ayrıca doğrulanmalı; serbest sürüklemeli grafik sonraki geliştirme olarak duruyor.
 
+### 14 Ekim 2026 — okuma ve hazır harita ek paketi
+
+- Normal metin görünümüne oynat/durdur ve hız kontrolü eklendi. Kelime arka
+  planı metin içinde ilerliyor; kelimeye tıklama, konum sürgüsü, önceki/sonraki
+  kelime ve paragraf kontrolleri aynı okuma konumunu kullanıyor. Ortada kelime
+  gösterimi ile metin görünümü arasında konum korunuyor.
+- Otomatik kaydırma ve hareket azaltma tercihlerine Ayarlar'dan erişiliyor.
+  Bionik görünüm, kelime vurgusu, hız, kelime grubu ve noktalama beklemesi
+  iki görünümde de uygulanıyor. Okumayı oynatmak bloğu otomatik tamamlamıyor.
+- 31 ders için kaynak Y cevap anahtarları esas alınarak 93 hazır kavram
+  haritası eklendi. Kavramlar ve adlandırılmış ilişkiler otomatik yerleştiriliyor.
+  Haritalar okuma, sindirme ve oturum sonu ekranlarında açılıyor; kaynak
+  açıklaması ve metin biçimindeki bağlantı listesi doğrudan erişilebilir.
+  Kişisel bağlantılar ve eski notlar ayrıca korunuyor.
+- İçerik üretimi, harita ile cevap anahtarının sürümünün uyuşmasını,
+  bağlantıların bütünlüğünü ve okların yönünü denetliyor. Ders JSON'u da
+  yayın sürümüne bağlandı; yeni haritalar eski ders verisiyle yüklenmiyor.
+- Chromium'da oynat/durdur, hız, konum seçme, görünüm değişimi, otomatik
+  kaydırma, tercihler ve yenileme sonrası devam kontrol edildi. 93 haritada
+  düğüm/etiket çakışması, 360/768/1280 px taşma ve eski kayıtların korunması
+  kontrolleri geçti. Dallanan 16 mobil harita senaryosu ayrıca doğrulandı.
+
+Serbest sürükleme ve aşağıda sonraki paket olarak belirtilen özellikler bu
+ek paketle tamamlanmış sayılmıyor. İki cihazla gerçek Supabase eşitleme
+kontrolü de ayrı bekliyor.
+
 ## 1. Hedef ve temel kararlar
 
 İş yerindeki kısa çalışma aralarında açıldığında, kaldığın dersin tam aşamasından devam ettiren; okumayı, bilgiyi işlemeyi ve daha sonra hatırlamayı ayrı ayrı takip eden kişisel bir çalışma alanı kuracağız.

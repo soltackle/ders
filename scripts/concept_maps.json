@@ -1,0 +1,2595 @@
+{
+  "1": {
+    "Y1": [
+      [
+        "Toplumsal ihtiyaç",
+        "siyasal süreçte seçilir",
+        "Kamusal ihtiyaç"
+      ],
+      [
+        "Kamusal ihtiyaç",
+        "siyasal süreçte maliyeye yön verir",
+        "Kamu maliyesi"
+      ],
+      [
+        "Kamu maliyesi",
+        "en geniş uygulama alanıdır",
+        "Karma ekonomi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Değer yargısı",
+        "amaç belirlemeye dayanak olur",
+        "Normatif yaklaşım"
+      ],
+      [
+        "Normatif yaklaşım",
+        "politika önerir",
+        "Maliye politikası"
+      ],
+      [
+        "Maliye politikası",
+        "amaçları için kullanır",
+        "Kamu harcaması"
+      ]
+    ],
+    "Y3": [
+      [
+        "Verginin kanuniliği",
+        "kanuna bağlar",
+        "Kamu gelirleri"
+      ],
+      [
+        "Kamu maliyesi",
+        "birlikte inceler",
+        "Kamu gelirleri"
+      ],
+      [
+        "Kamu maliyesi",
+        "gidere göre geliri belirler",
+        "Kamusal ihtiyaçlar"
+      ],
+      [
+        "Özel maliye",
+        "gönüllü gelirine göre karşılar",
+        "Özel harcamalar"
+      ],
+      [
+        "Özel maliye",
+        "gelir/gider yaklaşımı tersidir",
+        "Kamu maliyesi"
+      ]
+    ],
+    "_source": {
+      "Y1": "a49d3a1e6286afd6ac6d7a7ec45dba5f67b3e71548dda6768a6c560266b8d7d6",
+      "Y2": "87376f51c1d6eb9f7838ed2caa5b3fe94e5f94c81b08b81437a2b598b695f714",
+      "Y3": "162b6909842c5a7903da46890bfd25abf0988ffe68be2acedaa0d0b6e8c5c394"
+    }
+  },
+  "2": {
+    "Y1": [
+      [
+        "Değerli maden stoku",
+        "zenginlik ölçüsüdür",
+        "Merkantilizm"
+      ],
+      [
+        "Merkantilizm",
+        "dış ticaret fazlası için savunur",
+        "Devlet müdahalesi"
+      ],
+      [
+        "Devlet müdahalesi",
+        "1970 sonrası sorgulanır",
+        "Devlet başarısızlığı"
+      ],
+      [
+        "Devlet başarısızlığı",
+        "sınırlama önerisini doğurur",
+        "Mali kurallar"
+      ]
+    ],
+    "Y2": [
+      [
+        "Say Yasası",
+        "kendiliğinden ulaşılacağını varsayar",
+        "Tam istihdam"
+      ],
+      [
+        "Efektif talep yetersizliği",
+        "Say varsayımını reddeder",
+        "Modern maliye"
+      ],
+      [
+        "Modern maliye",
+        "olağan araç sayar",
+        "Kamu borçlanması"
+      ],
+      [
+        "Kamu borçlanması",
+        "parasalcılara göre yaratır",
+        "Dışlama etkisi"
+      ],
+      [
+        "Efektif talep yetersizliği",
+        "tam istihdam varsayımını reddeder",
+        "Say Yasası"
+      ]
+    ],
+    "Y3": [
+      [
+        "Toplum sözleşmesi",
+        "temellendirir",
+        "Mekanik yaklaşım"
+      ],
+      [
+        "Mekanik yaklaşım",
+        "dar ucundadır",
+        "Liberteryen görüş"
+      ],
+      [
+        "Liberteryen görüş",
+        "savunur",
+        "Minimal devlet"
+      ],
+      [
+        "Minimal devlet",
+        "klasik maliyedeki rolüdür",
+        "Jandarma devlet"
+      ]
+    ],
+    "_source": {
+      "Y1": "e01ef8605a69609482a620b3c8c7e1eadf1f76b68ac56891408640a925244b70",
+      "Y2": "ec168c0009c345393c9476ab8881ad3c64c8033bbf0e54c50c35d13a803b201d",
+      "Y3": "106124c60b0dceba09d46251bd5ca5e9c75999580e50cef6cc50f43089c8447c"
+    }
+  },
+  "3": {
+    "Y1": [
+      [
+        "Götürü vergi",
+        "aşırı yük yaratmaz",
+        "Pareto etkinliği"
+      ],
+      [
+        "Piyasa başarısızlığı",
+        "ulaşılamamasıdır",
+        "Pareto etkinliği"
+      ],
+      [
+        "Dışlanamama",
+        "doğurur",
+        "Bedavacılık"
+      ],
+      [
+        "Bedavacılık",
+        "kamusal maldaki kaynaktır",
+        "Piyasa başarısızlığı"
+      ]
+    ],
+    "Y2": [
+      [
+        "Yarı kamusal mal",
+        "yaratır",
+        "Olumlu dışsallık"
+      ],
+      [
+        "Olumlu dışsallık",
+        "piyasada neden olur",
+        "Eksik üretim"
+      ],
+      [
+        "Pigou sübvansiyonu",
+        "dışsal faydayı hesaba katarak artırır",
+        "Üretim"
+      ],
+      [
+        "Üretim",
+        "tahsis yoluyla yaklaştırılır",
+        "Pareto etkinliği"
+      ],
+      [
+        "Pigou sübvansiyonu",
+        "dışsal faydayı hesaba katar",
+        "Olumlu dışsallık"
+      ]
+    ],
+    "Y3": [
+      [
+        "Doğal tekel",
+        "bir biçimidir",
+        "Eksik rekabet"
+      ],
+      [
+        "Eksik rekabet",
+        "varsayımları bozarak doğurur",
+        "Piyasa başarısızlığı"
+      ],
+      [
+        "Piyasa başarısızlığı",
+        "engeller",
+        "Pareto etkinliği"
+      ],
+      [
+        "Tekel fiyatı > marjinal maliyet",
+        "üretimi azaltarak doğurur",
+        "Refah kaybı"
+      ],
+      [
+        "Refah kaybı",
+        "kullanılmamış olanağı gösterir",
+        "Pareto iyileşmesi"
+      ],
+      [
+        "Doğal tekel",
+        "az üretimle birlikte görülür",
+        "Tekel fiyatı > marjinal maliyet"
+      ]
+    ],
+    "_source": {
+      "Y1": "f8edb91357cd97fe137d971a827d36988b4d1462235734cd1d3ac1f712a955fa",
+      "Y2": "70721662a5e328cf95a2829c9ee925decac3e3cc47df5840064d7c50dde38178",
+      "Y3": "8cb9f5cb80475c013d82d3d854d9ea7da809e07e1e1d79f7e4d76b9f65043889"
+    }
+  },
+  "4": {
+    "Y1": [
+      [
+        "Vergi payı",
+        "Lindahl'da düşürülmek istenir",
+        "Tercih gizleme"
+      ],
+      [
+        "Tercih gizleme",
+        "talep açıklanmadığı için zayıflatır",
+        "Bowen modeli"
+      ],
+      [
+        "Bowen modeli",
+        "eşit maliyet ve simetride kullanır",
+        "Çoğunluk oylaması"
+      ],
+      [
+        "Çoğunluk oylaması",
+        "bu koşullarda optimumu verir",
+        "Medyan seçmen"
+      ]
+    ],
+    "Y2": [
+      [
+        "Oy ticareti",
+        "kabulüne yol açabilir",
+        "Domuz fıçısı projeleri"
+      ],
+      [
+        "Domuz fıçısı projeleri",
+        "kamu tercihine göre örnektir",
+        "Devlet başarısızlığı"
+      ],
+      [
+        "Devlet başarısızlığı",
+        "harcama büyümesine karşı önerilir",
+        "Anayasal mali kurallar"
+      ]
+    ],
+    "Y3": [
+      [
+        "Çok tepeli tercih",
+        "doğurur",
+        "Oylama paradoksu"
+      ],
+      [
+        "Oylama paradoksu",
+        "özel örneğidir",
+        "Arrow imkânsızlık teoremi"
+      ],
+      [
+        "Borda sayımı",
+        "puanlayarak üretir",
+        "Oylama sonucu"
+      ],
+      [
+        "Borda sayımı",
+        "ihlal eder",
+        "İlgisiz seçeneklerden bağımsızlık"
+      ],
+      [
+        "Borda sayımı",
+        "beş koşulun tümünü sağlayamaz",
+        "Arrow imkânsızlık teoremi"
+      ]
+    ],
+    "_source": {
+      "Y1": "9e75ad3dce15a5a4b0c47905f09fd3ff8748f9601b1f3589446a6c9bd8702f46",
+      "Y2": "f40f6d2512c4179937b78ab5ad2723040c182bfc2927c849d3dfcd2b12066c18",
+      "Y3": "659ed5049062ebf284913d996b9699952bc053722eda5df04ca452d833c0eeb9"
+    }
+  },
+  "5": {
+    "Y1": [
+      [
+        "Bütçe hakkı",
+        "dayanağıdır",
+        "Ödenek"
+      ],
+      [
+        "Ödenek",
+        "yetki ve üst sınır verir",
+        "Kamu harcaması"
+      ],
+      [
+        "Kamu harcaması",
+        "aracıdır",
+        "Maliye politikası"
+      ],
+      [
+        "Bütçe katılığı",
+        "esnekliğini azaltır",
+        "Maliye politikası"
+      ]
+    ],
+    "Y2": [
+      [
+        "Olağanüstü harcama",
+        "karşılanabilir",
+        "Borçlanma ve emisyon"
+      ],
+      [
+        "Borçlanma ve emisyon",
+        "borç kısmı faiz doğurur",
+        "Mali transfer"
+      ],
+      [
+        "Mali transfer",
+        "türüdür",
+        "Transfer harcaması"
+      ],
+      [
+        "Transfer harcaması",
+        "asıl etkiler",
+        "Gelir dağılımı"
+      ]
+    ],
+    "Y3": [
+      [
+        "Vergi harcaması",
+        "devleti küçük gösterir",
+        "Harcama/GSYH oranı"
+      ],
+      [
+        "Transfer harcaması",
+        "dahil edilince devleti büyük gösterir",
+        "Harcama/GSYH oranı"
+      ],
+      [
+        "Transfer harcaması",
+        "harcama çarpanından küçüktür",
+        "Çarpan: c/(1−c)"
+      ]
+    ],
+    "_source": {
+      "Y1": "6271460620293b16d8299687f5b61026dd5d40d9ebb542a3f61c1c158a1d789a",
+      "Y2": "6773a8229e689946093101c94ec5fd5b561be51c38d19cbd535553fb7f78c561",
+      "Y3": "5a1766c383cd4b4044c2cd943ce802041809703b7adb01e4bcc85311eee9069a"
+    }
+  },
+  "6": {
+    "Y1": [
+      [
+        "Milli gelir",
+        "artınca daha hızlı artırır: Wagner",
+        "Kamu harcamalarının artışı"
+      ],
+      [
+        "Maliyet hastalığı (Baumol)",
+        "arz yönünden açıklar",
+        "Kamu harcamalarının artışı"
+      ],
+      [
+        "Maliyet hastalığı (Baumol)",
+        "her yıl yükseltir",
+        "Bütçe maliyeti"
+      ]
+    ],
+    "Y2": [
+      [
+        "Olağanüstü dönem",
+        "gizli sorunları görünür kılar",
+        "Denetim etkisi"
+      ],
+      [
+        "Denetim etkisi",
+        "etkisidir",
+        "Peacock–Wiseman hipotezi"
+      ],
+      [
+        "Yoğunlaşma etkisi",
+        "etkisidir",
+        "Peacock–Wiseman hipotezi"
+      ],
+      [
+        "Popitz Kanunu",
+        "benzer ama sürekli eğilimdir",
+        "Yoğunlaşma etkisi"
+      ]
+    ],
+    "Y3": [
+      [
+        "Borçlanma",
+        "yükü erteleyerek yaratır",
+        "Mali yanılsama"
+      ],
+      [
+        "Borçlanma",
+        "faiz ve dışlamayla ekler",
+        "Toplumsal maliyet"
+      ],
+      [
+        "Bütçe maliyeti",
+        "bir bileşenidir",
+        "Toplumsal maliyet"
+      ],
+      [
+        "Gelir garantisi",
+        "ileriki yıllarda yük ekler",
+        "Bütçe maliyeti"
+      ]
+    ],
+    "_source": {
+      "Y1": "7dba80332196f44236c02d083297f3390756f55cf82aeba33114f0d042338898",
+      "Y2": "9ed6764309a16afc37eb750d5d0db8c7340a7513b48b0a6494cc017f510c5316",
+      "Y3": "dbbaad463a5bc9e86ef7f733d48371fb93a51b7c92c64b9f5194e7b2a5b6036f"
+    }
+  },
+  "7": {
+    "Y1": [
+      [
+        "Egemenlik gücü",
+        "doğurur",
+        "Kamu hukuku geliri"
+      ],
+      [
+        "Vergi",
+        "türüdür",
+        "Kamu hukuku geliri"
+      ],
+      [
+        "Vergi",
+        "bağlıdır",
+        "Kanunilik ilkesi"
+      ],
+      [
+        "Para basma yetkisi",
+        "kanunla konmadan doğurur",
+        "Enflasyon vergisi"
+      ],
+      [
+        "Egemenlik gücü",
+        "para basma yetkisini de içerir",
+        "Para basma yetkisi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Rıza (sözleşme)",
+        "doğurur",
+        "Özel hukuk geliri"
+      ],
+      [
+        "Mülk ve teşebbüs gelirleri",
+        "türüdür",
+        "Özel hukuk geliri"
+      ],
+      [
+        "Siyasi fiyat",
+        "farkı vergiyle kapatılır",
+        "Vergi ihtiyacı"
+      ],
+      [
+        "Borçlanma",
+        "bugünkü harcamayı yükler",
+        "Gelecekteki vergiler"
+      ],
+      [
+        "Mülk ve teşebbüs gelirleri",
+        "maliyetin altında fiyatlanırsa",
+        "Siyasi fiyat"
+      ],
+      [
+        "Vergi ihtiyacı",
+        "bugün yerine geleceğe aktarılabilir",
+        "Borçlanma"
+      ]
+    ],
+    "Y3": [
+      [
+        "Harç",
+        "kısmi karşılığıdır",
+        "Belirli kamu hizmeti"
+      ],
+      [
+        "Harç",
+        "türüdür",
+        "Kamu hukuku geliri"
+      ],
+      [
+        "Para cezaları",
+        "hizmet karşılığı olmadan türüdür",
+        "Kamu hukuku geliri"
+      ],
+      [
+        "Para cezaları",
+        "asıl amacıdır",
+        "Caydırıcılık"
+      ]
+    ],
+    "_source": {
+      "Y1": "e8e5744cd4485c391401bdc1d766b6ae673738972ed929f3039013a929cd1eee",
+      "Y2": "b9a6f250aff3bcb5d56ccb78f81ce076537150040ff18dbb1a9f43b90ab583c8",
+      "Y3": "cb403129285ed9298ab96956ece0e9efb3c28978ec0f08cada4e12fcc46a8f0c"
+    }
+  },
+  "8": {
+    "Y1": [
+      [
+        "Ekonomik yapı",
+        "biçimlendirir",
+        "Vergi sistemi"
+      ],
+      [
+        "Vergi sistemi",
+        "çok vergili sistemde vergilendirir",
+        "Gelir, servet, harcama"
+      ],
+      [
+        "Ödeme gücü ilkesi",
+        "gösterge olarak ölçü alır",
+        "Gelir, servet, harcama"
+      ],
+      [
+        "Yararlanma ilkesi",
+        "alternatifidir",
+        "Ödeme gücü ilkesi"
+      ],
+      [
+        "Bedavacılık",
+        "zayıflatır",
+        "Yararlanma ilkesi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Kanunilik ilkesi",
+        "kanunda belirlenmesini gerektirir",
+        "Vergiyi doğuran olay"
+      ],
+      [
+        "Vergiyi doğuran olay",
+        "gerçekleşince doğurur",
+        "Vergi borcu"
+      ],
+      [
+        "Mükellef",
+        "hukuki yükümlüsüdür",
+        "Vergi borcu"
+      ],
+      [
+        "Mükellef",
+        "ekonomik yükü aktarabilir",
+        "Vergi taşıyıcısı"
+      ]
+    ],
+    "Y3": [
+      [
+        "Ters esneklik kuralı",
+        "düşük esneklikte yüksek vergi önerir",
+        "Etkinlik"
+      ],
+      [
+        "Ters esneklik kuralı",
+        "çatışabilir",
+        "Eşitlik ilkesi"
+      ],
+      [
+        "Eşitlik ilkesi",
+        "ölçüsünü alır",
+        "Ödeme gücü ilkesi"
+      ],
+      [
+        "Ödeme gücü ilkesi",
+        "göstergeleridir",
+        "Gelir, servet, harcama"
+      ]
+    ],
+    "_source": {
+      "Y1": "1ca4bb6dc4b86f7e4ff442ec775561e43620058e6183262e0a844df0c648af1f",
+      "Y2": "1fce020f3f32a91142d1574d29381b92804612b7379793c3ad0fbb8ef9f04a1a",
+      "Y3": "e9bf4015e81f71999ed96ef9bfd23c3596d62f4eac8c0c548be544d35d1ba62a"
+    }
+  },
+  "9": {
+    "Y1": [
+      [
+        "Azalan marjinal fayda",
+        "varsayımıdır",
+        "Fedakârlık teorileri"
+      ],
+      [
+        "Fedakârlık teorileri",
+        "gerekçelendirir",
+        "Artan oranlı tarife"
+      ],
+      [
+        "Artan oranlı tarife",
+        "uygulanır",
+        "Tarh"
+      ],
+      [
+        "Tarh",
+        "kaynakta uygulama yöntemiyle bağlanır",
+        "Stopaj"
+      ],
+      [
+        "Stopaj",
+        "yükü hissettirmeden yaratır",
+        "Mali anestezi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Sübjektif ödeme gücü",
+        "yaklaşmak için yapılır",
+        "Verginin sübjektifleştirilmesi"
+      ],
+      [
+        "Verginin sübjektifleştirilmesi",
+        "araçlarıdır",
+        "Muafiyet ve istisna"
+      ],
+      [
+        "Muafiyet ve istisna",
+        "vazgeçilen gelirdir",
+        "Vergi harcaması"
+      ]
+    ],
+    "Y3": [
+      [
+        "Tebliğ",
+        "mükellefe yazıyla bildirir",
+        "Tarh"
+      ],
+      [
+        "Tarh",
+        "uygular",
+        "Artan oranlı tarife"
+      ],
+      [
+        "Artan oranlı tarife",
+        "enflasyonda dilimler güncellenmezse",
+        "Soğuk ilerleme"
+      ],
+      [
+        "Dilimlerin yeniden değerlenmesi",
+        "önlemidir",
+        "Soğuk ilerleme"
+      ]
+    ],
+    "_source": {
+      "Y1": "c25949a1cc79b37974ab77f5450c8706003dc63aced6e75e0ff613ca3285019b",
+      "Y2": "6b2c6ac6a41247e0e46d3f8e4c8da48cbb3975285c8ff7d8e63d2782267e8e5f",
+      "Y3": "abe300b2b548ba4b679969bdb622777761d5c50ff6e6975be17e54db87e74bb4"
+    }
+  },
+  "10": {
+    "Y1": [
+      [
+        "Götürü vergi",
+        "eşit tutar nedeniyle yaratır",
+        "Regresif etki"
+      ],
+      [
+        "Dolaylı vergiler",
+        "başlıca kaynağıdır",
+        "Regresif etki"
+      ],
+      [
+        "Dolaylı vergiler",
+        "fiyata gizlenerek yaratır",
+        "Mali anestezi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Laffer eğrisi",
+        "oran–hasılat ilişkisiyle tartışır",
+        "Vergi yükü"
+      ],
+      [
+        "Aşırı yük",
+        "hasılatın ötesindeki refah kaybıdır",
+        "Vergi yükü"
+      ],
+      [
+        "Esneklik",
+        "arttıkça büyütür",
+        "Aşırı yük"
+      ],
+      [
+        "Esneklik",
+        "yükün kimde kaldığını belirler",
+        "İnsidans"
+      ],
+      [
+        "İnsidans",
+        "fiyatlarla ekonomiye yayılır",
+        "Vergi yayılması"
+      ]
+    ],
+    "Y3": [
+      [
+        "Vergi amortismanı",
+        "yük o anki malikte kalır",
+        "Varlığın değer kaybı"
+      ],
+      [
+        "Vergi yansıması",
+        "yükü fiyatla aktarır",
+        "Vergi taşıyıcısı"
+      ],
+      [
+        "Dolaylı vergiler",
+        "yansımayı kolay yaşar",
+        "Vergi yansıması"
+      ],
+      [
+        "Katma değer vergisi",
+        "başlıca örneğidir",
+        "Dolaylı vergiler"
+      ],
+      [
+        "Vergi amortismanı",
+        "fiyat aktarımı olmamasıyla ayrılır",
+        "Vergi yansıması"
+      ]
+    ],
+    "_source": {
+      "Y1": "181671708fafc26bff1720c1229af3a1d26886780e99806b15ab644030ec488f",
+      "Y2": "e8904383fe06539a211c2aa0deede66d54d31eb274658f931784fac167e771d8",
+      "Y3": "a4157447daf102d95fea314a645cc8a90c0e5b8bc62904cace2ed9d8a12f2d63"
+    }
+  },
+  "11": {
+    "Y1": [
+      [
+        "İtfa",
+        "anaparanın geri ödenmesidir",
+        "Geçici ve karşılıklı gelir"
+      ],
+      [
+        "Borçlanma",
+        "bu niteliği taşır",
+        "Geçici ve karşılıklı gelir"
+      ],
+      [
+        "Borçlanma",
+        "geri ödeme ve faizle yükler",
+        "Gelecekteki vergiler"
+      ],
+      [
+        "Gelecekteki vergiler",
+        "borcun niteliğini açıklar",
+        "Ertelenmiş vergi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Atıl tasarruflar",
+        "Keynesyenlerde harekete geçirilir",
+        "Borçla kamu harcaması"
+      ],
+      [
+        "Borçla kamu harcaması",
+        "çarpanla artırır",
+        "Talep ve gelir"
+      ],
+      [
+        "Borçla vergi indirimi",
+        "Barro'da beklenti doğurur",
+        "Gelecekteki vergi"
+      ],
+      [
+        "Gelecekteki vergi",
+        "tam öngörü altında artırır",
+        "Tasarruf artışı"
+      ],
+      [
+        "Borçla kamu harcaması",
+        "Keynesyen–Barro karşılaştırması",
+        "Borçla vergi indirimi"
+      ]
+    ],
+    "Y3": [
+      [
+        "Monetizasyon",
+        "para basılarak borç karşılanır",
+        "Para arzı artışı"
+      ],
+      [
+        "Para arzı artışı",
+        "yol açar",
+        "Enflasyon"
+      ],
+      [
+        "Borç hasılatını harcamamak",
+        "satın alma gücünü çekerek kısar",
+        "Toplam talep"
+      ],
+      [
+        "Merkez Bankası'na borç ödemek",
+        "monetizasyonun tersine sağlar",
+        "Para arzı daralması"
+      ],
+      [
+        "Merkez Bankası'na borç ödemek",
+        "para arzında ters etki yaratır",
+        "Monetizasyon"
+      ],
+      [
+        "Merkez Bankası'na borç ödemek",
+        "hasılatı kullanmanın bir yoludur",
+        "Borç hasılatını harcamamak"
+      ]
+    ],
+    "_source": {
+      "Y1": "680e62acc4f695371f9a25d80c014e8fe535c5ebf9d79506f7d0ad8ab2799f31",
+      "Y2": "a4e62d6614a5ddd6d4e85813a7be06dc6b71c7ae69afb048cbde20f52cde0081",
+      "Y3": "f7403e36ba54e0c22ef444f760393c7552a653367024dce6b1d07f7a86246c3f"
+    }
+  },
+  "12": {
+    "Y1": [
+      [
+        "Piyasa faizi artışı",
+        "düşürür",
+        "Sabit faizli tahvil fiyatı"
+      ],
+      [
+        "Uzun vadeli tahvil riski",
+        "Hazine'yi yöneltebilir",
+        "Kısa vadeli borç"
+      ],
+      [
+        "Kısa vadeli borç",
+        "paraya yakınlığıyla artırır",
+        "Likidite"
+      ],
+      [
+        "Likidite",
+        "besleyebilir",
+        "Enflasyonist etki"
+      ],
+      [
+        "Sabit faizli tahvil fiyatı",
+        "fiyat düşüşüyle riskli görünür",
+        "Uzun vadeli tahvil riski"
+      ]
+    ],
+    "Y2": [
+      [
+        "Endeksleme",
+        "yatırımcıya sağlar",
+        "Güvenlik"
+      ],
+      [
+        "Dövize endeksli borç",
+        "devlet için taşır",
+        "Kur riski"
+      ],
+      [
+        "Ulusal paranın değer kaybı",
+        "kur riski yoluyla büyütür",
+        "Borç stokunun TL karşılığı"
+      ],
+      [
+        "Dövize endeksli borç",
+        "türüdür",
+        "Endeksleme"
+      ],
+      [
+        "Ulusal paranın değer kaybı",
+        "borçtaki riski gerçekleştirir",
+        "Kur riski"
+      ]
+    ],
+    "Y3": [
+      [
+        "Özel tertip DİBS",
+        "nakit girmeden büyütür",
+        "Borç stoku"
+      ],
+      [
+        "Şarta bağlı yükümlülük",
+        "asıl borçlu ödemezse dönüşür",
+        "Hazine üstlenimi"
+      ],
+      [
+        "Hazine üstlenimi",
+        "eklenir",
+        "Borç stoku"
+      ]
+    ],
+    "_source": {
+      "Y1": "e50dd92e2e541f53bfeeff058a65b450e7e9c249672665133fdde42e1196d83f",
+      "Y2": "437db27b05d39a02610ef87eb5c1446558e1d1ac9eedf140b4af3d6185694f5d",
+      "Y3": "ba756d4f6ff2ee166d346751506f44494614f0d399ce729d9a275db044ee4f84"
+    }
+  },
+  "13": {
+    "Y1": [
+      [
+        "Durgunluk",
+        "önerilir",
+        "Kısa vadeli borçlanma"
+      ],
+      [
+        "Kısa vadeli borçlanma",
+        "büyütür",
+        "Yeniden finansman riski"
+      ],
+      [
+        "Yeniden finansman riski",
+        "güven bunalımında artırır",
+        "Faiz ve risk primi"
+      ],
+      [
+        "Faiz ve risk primi",
+        "büyütür",
+        "Kartopu etkisi"
+      ],
+      [
+        "Kartopu etkisi",
+        "faiz için borçlanmayla sürerse",
+        "Borç tuzağı"
+      ]
+    ],
+    "Y2": [
+      [
+        "Zorunlu konversiyon",
+        "kısmi ret sayılarak yaratır",
+        "İtibar kaybı"
+      ],
+      [
+        "İtibar kaybı",
+        "sonraki borçlanmada artırır",
+        "Risk primi ve faiz"
+      ],
+      [
+        "Risk primi ve faiz",
+        "reel faizi yükselterek büyütür",
+        "Kartopu etkisi: (r−g) × b"
+      ]
+    ],
+    "Y3": [
+      [
+        "Enflasyon",
+        "sabit faizli TL borçta eritir",
+        "Reel borç yükü"
+      ],
+      [
+        "Nominal büyüme artışı",
+        "Domar'da düşürür",
+        "Borç/GSYH: d/g"
+      ],
+      [
+        "Maastricht kriterleri",
+        "%3 açık ve %60 borç sınırlar",
+        "Borç/GSYH: d/g"
+      ],
+      [
+        "Maastricht enflasyon kriteri",
+        "bu yola sınır koyar",
+        "Borcu enflasyonla eritme"
+      ],
+      [
+        "Enflasyon",
+        "nominal yazımda artırır",
+        "Nominal büyüme artışı"
+      ],
+      [
+        "Enflasyon",
+        "sabit faizli TL borçtaki yoludur",
+        "Borcu enflasyonla eritme"
+      ]
+    ],
+    "_source": {
+      "Y1": "cd609617339afe7e07ea614c2d14b3ba09d596f602d5f477c22cc13bd9dc7f64",
+      "Y2": "060ef47e86c14681180a33eef3de1119e68f5c1e22a003f41529ee2c10772cfb",
+      "Y3": "7229a2128de74603f488107e1b42ceb1e6d6f6035181c2f5225068488a03e61d"
+    }
+  },
+  "15": {
+    "Y1": [
+      [
+        "Vergiye rıza",
+        "gelir iznidir",
+        "Gelirlerin kanunla toplanması"
+      ],
+      [
+        "Gelirlerin kanunla toplanması",
+        "bütçe rakamını sınır yapmaz",
+        "Gelir tahmini"
+      ],
+      [
+        "Gelir tahmini",
+        "aykırılık sayılmaz",
+        "Tahminden fazla tahsilat"
+      ]
+    ],
+    "Y2": [
+      [
+        "Halk",
+        "sahibidir",
+        "Bütçe hakkı"
+      ],
+      [
+        "TBMM",
+        "kullanır",
+        "Bütçe hakkı"
+      ],
+      [
+        "TBMM",
+        "izin verir",
+        "Bütçe kanunu"
+      ],
+      [
+        "Bütçe kanunu",
+        "yalnızca bütçeyle ilgili hükümler taşır",
+        "Anayasal sınır"
+      ],
+      [
+        "Anayasa Mahkemesi",
+        "sınırı aşan hükmü iptal eder",
+        "Bütçe kanunu"
+      ]
+    ],
+    "Y3": [
+      [
+        "Reddetme gücü",
+        "parçasıdır",
+        "Bütçe hakkı"
+      ],
+      [
+        "Bütçe hakkı",
+        "ikinci halkasıdır",
+        "Harcamaya izin"
+      ],
+      [
+        "Harcamaya izin",
+        "gider sınırıyla somutlaşır",
+        "Ödenek"
+      ],
+      [
+        "Yeniden değerlemeyle uygulama",
+        "bir görüşe göre zayıflatır",
+        "Reddetme gücü"
+      ]
+    ],
+    "_source": {
+      "Y1": "c14760cd4a7b07622ddda38d9c1d8283b2c168325b10a14eb785c8bf2eaf8e7d",
+      "Y2": "59ef5bf377d66860a4c92d8ea607fbcddd77dab1c980078baedd229a56a9b472",
+      "Y3": "bf42abf31f769a2005433cf0bebe87e18aff85722427f09442863506b93d3bf9"
+    }
+  },
+  "16": {
+    "Y1": [
+      [
+        "Tahsis etmeme",
+        "geliri belirli gidere bağlamaz",
+        "Gelir tarafı"
+      ],
+      [
+        "Ayrıntılılık ilkesi",
+        "ödenek kalemlerini düzenler",
+        "Gider tarafı"
+      ],
+      [
+        "Ayrıntılılık ilkesi",
+        "artması denetimi kolaylaştırır",
+        "Parlamento denetimi"
+      ],
+      [
+        "Ayrıntılılık ilkesi",
+        "artması esnekliği azaltır",
+        "Yürütmenin esnekliği"
+      ],
+      [
+        "Smith'in takdir yetkisi",
+        "geniş ödeneklerle artırmak ister",
+        "Yürütmenin esnekliği"
+      ],
+      [
+        "Tahsis etmeme",
+        "gelir/gider tarafı ayrımı",
+        "Ayrıntılılık ilkesi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Klasik ilkeler",
+        "kolaylaştırmayı amaçlar",
+        "Parlamento denetimi"
+      ],
+      [
+        "Denklik ilkesi",
+        "klasik ilkelerden biridir",
+        "Parlamento denetimi"
+      ],
+      [
+        "Keynesyen politikada siyasal asimetri",
+        "Buchanan–Wagner'e göre doğurur",
+        "Kalıcı bütçe açığı"
+      ],
+      [
+        "Kalıcı bütçe açığı",
+        "çözüm olarak önerilir",
+        "Anayasal mali kurallar"
+      ],
+      [
+        "Klasik ilkeler",
+        "ilkelerinden biridir",
+        "Denklik ilkesi"
+      ],
+      [
+        "Denklik ilkesi",
+        "Keynesyen bütçe açığı tartışması",
+        "Keynesyen politikada siyasal asimetri"
+      ]
+    ],
+    "Y3": [
+      [
+        "Say Yasası",
+        "kendiliğinden sağlanır varsayımı",
+        "Tam istihdam"
+      ],
+      [
+        "Tam istihdam",
+        "klasiklerin bütçe yaklaşımı",
+        "Yıllık denk bütçe"
+      ],
+      [
+        "Keynesyen eksik istihdam dengesi",
+        "farklı bütçe yaklaşımı doğurur",
+        "Tam istihdam bütçesi"
+      ],
+      [
+        "Tam istihdam bütçesi",
+        "bugünkü mirasıdır",
+        "Yapısal bütçe dengesi"
+      ],
+      [
+        "Yıllık denk bütçe",
+        "Buhran sonrası karşı yaklaşım",
+        "Keynesyen eksik istihdam dengesi"
+      ]
+    ],
+    "_source": {
+      "Y1": "805b6d6d4e1bede928aed8ac3d52029051554061ed81db7905c49e697eb84b09",
+      "Y2": "1e67cf0db313512ec6b49c021db6e8ef9e11e990148a6154b82cc5e170290d15",
+      "Y3": "a918df50b0f96c113940f3bddae1c4ed1179dda305e9802726d9b4074d99bbc9"
+    }
+  },
+  "17": {
+    "Y1": [
+      [
+        "Klasik (kalem) bütçe",
+        "girdiden faaliyete geçiş",
+        "Performans bütçe"
+      ],
+      [
+        "Performans bütçe",
+        "amaç ve programla genişler",
+        "PPBS"
+      ],
+      [
+        "PPBS",
+        "sonuç ve hesap verme odağı",
+        "Yeni performans bütçe"
+      ],
+      [
+        "Yeni performans bütçe",
+        "2021'de hedefle bütçeyi bağlar",
+        "Program bazlı performans bütçe"
+      ]
+    ],
+    "Y2": [
+      [
+        "Birim maliyet",
+        "aracıdır",
+        "Performans bütçe"
+      ],
+      [
+        "Performans bütçe",
+        "ölçer",
+        "Çıktı"
+      ],
+      [
+        "Yeni performans bütçe",
+        "sonucu da ölçer",
+        "Sonuç"
+      ],
+      [
+        "Yeni performans bütçe",
+        "esnekliğin karşılığını ister",
+        "Hesap verebilirlik"
+      ],
+      [
+        "Performans bütçe",
+        "sonuç ölçümüyle genişler",
+        "Yeni performans bütçe"
+      ]
+    ],
+    "Y3": [
+      [
+        "Ek bütçe",
+        "kanunla ödenek ekler",
+        "Merkezi yönetim bütçesi"
+      ],
+      [
+        "Merkezi yönetim bütçesi",
+        "ilk grubudur",
+        "Genel yönetim bütçeleri"
+      ],
+      [
+        "Analitik bütçe sınıflandırması",
+        "5018 ile yaygınlaştırılır",
+        "Genel yönetim bütçeleri"
+      ],
+      [
+        "Analitik bütçe sınıflandırması",
+        "ödeneği dört boyutta kodlar",
+        "Kurumsal, fonksiyonel, finansman, ekonomik"
+      ]
+    ],
+    "_source": {
+      "Y1": "1b0c980ea6566bc82b56686339ad68b4b3a0edb34fc1af0722d03773ce480337",
+      "Y2": "cabc7400e713279a3c45b421e589e2f69e81b1f8beee9cba654f6ddf39539dab",
+      "Y3": "31b4b296d20c26b9142e8ddf1e67bc4bebcbc396b69cc5b290ff5fc5c59a5196"
+    }
+  },
+  "18": {
+    "Y1": [
+      [
+        "Kalkınma planı",
+        "çerçeve çizer",
+        "OVP"
+      ],
+      [
+        "OVP",
+        "başlatır ve tavan belirler",
+        "Kurum teklifleri"
+      ],
+      [
+        "Kurum teklifleri",
+        "75 gün kuralıyla sunulur",
+        "TBMM"
+      ],
+      [
+        "TBMM",
+        "önce 55 gün görüşülür",
+        "Bütçe komisyonu"
+      ],
+      [
+        "Bütçe komisyonu",
+        "sonra yılbaşına kadar görüşülür",
+        "Genel Kurul"
+      ],
+      [
+        "Genel Kurul",
+        "onay ve yayım sonrası",
+        "1 Ocak'ta yürürlük"
+      ],
+      [
+        "1 Ocak'ta yürürlük",
+        "15 gün içinde çıkarılır",
+        "Yatırım programı"
+      ]
+    ],
+    "Y2": [
+      [
+        "Cumhurbaşkanlığı (SBB)",
+        "hazırlar ve koordine eder",
+        "Bütçe teklifi"
+      ],
+      [
+        "Cumhurbaşkanı",
+        "TBMM'ye sunar",
+        "Bütçe teklifi"
+      ],
+      [
+        "Bütçe teklifi",
+        "ödenek değişikliği önerilebilir",
+        "Bütçe komisyonu"
+      ],
+      [
+        "Bütçe komisyonu",
+        "sonraki aşamadır",
+        "Genel Kurul"
+      ],
+      [
+        "Genel Kurul",
+        "gider artırma ve gelir azaltma önerisi",
+        "Öneri yasağı"
+      ]
+    ],
+    "Y3": [
+      [
+        "OVMP",
+        "2021'de içeriği taşındı",
+        "OVP"
+      ],
+      [
+        "OVP",
+        "başlatır",
+        "Bütçe hazırlığı"
+      ],
+      [
+        "Bütçe hazırlığı",
+        "izleyen aşama",
+        "Görüşme ve onay"
+      ],
+      [
+        "Görüşme ve onay",
+        "kanun yetişmezse",
+        "Geçici bütçe"
+      ],
+      [
+        "Geçici bütçe",
+        "bu da çıkarılamazsa",
+        "Yeniden değerlemeyle uygulama"
+      ]
+    ],
+    "_source": {
+      "Y1": "62077e79927743ce94f3ee9e7518d6981aec2824ce71f51709ae182ae83157f1",
+      "Y2": "f1d2299534993bd9fae5039a9aaa92bf87fa7a3b3b2d2dca131bc70af410206c",
+      "Y3": "3874d7b4c08991568929a9be7e17c77ee7eb68c3cbc3c42e1ea7a0b28b607855"
+    }
+  },
+  "19": {
+    "Y1": [
+      [
+        "Harcama yetkilisi",
+        "talimat verir ve imzalar",
+        "Ödeme emri belgesi"
+      ],
+      [
+        "Muhasebe yetkilisi",
+        "yalnızca şekli kontrol yapar",
+        "Ödeme emri belgesi"
+      ],
+      [
+        "Ödeme emri belgesi",
+        "aykırı işlem ve kaynak eksilmesi varsa",
+        "Kamu zararı"
+      ],
+      [
+        "Sayıştay",
+        "hesap yargılamasıyla kesinleştirir",
+        "Kamu zararı"
+      ]
+    ],
+    "Y2": [
+      [
+        "Yedek ödenek",
+        "Cumhurbaşkanı yıl içinde aktarır",
+        "Ödenek aktarması"
+      ],
+      [
+        "Yılın kapanması",
+        "HMB hazırlar, Haziran sonu sunulur",
+        "Kesin hesap teklifi"
+      ],
+      [
+        "Kesin hesap teklifi",
+        "Sayıştay en geç 75 günde sunar",
+        "Genel uygunluk bildirimi"
+      ],
+      [
+        "Genel uygunluk bildirimi",
+        "kesin hesapla birlikte görüşülür",
+        "Yeni yıl bütçesi"
+      ],
+      [
+        "Ödenek aktarması",
+        "yıl sonu hesabına yansır",
+        "Yılın kapanması"
+      ]
+    ],
+    "Y3": [
+      [
+        "Ön mali kontrol",
+        "işlemden önce, idare içinde",
+        "İç kontrol"
+      ],
+      [
+        "İç denetim",
+        "sonradan ve üst yöneticiye",
+        "İç kontrol"
+      ],
+      [
+        "Sayıştay",
+        "TBMM adına dışarıdan denetler",
+        "Dış denetim"
+      ],
+      [
+        "TBMM",
+        "kesin hesapla sağlar",
+        "Yasama denetimi"
+      ],
+      [
+        "Mali saydamlık",
+        "en dış katmanı mümkün kılar",
+        "Kamuoyu denetimi"
+      ],
+      [
+        "İç kontrol",
+        "idare dışındaki katman",
+        "Dış denetim"
+      ],
+      [
+        "Dış denetim",
+        "kesin hesapla onay katmanı",
+        "Yasama denetimi"
+      ],
+      [
+        "Yasama denetimi",
+        "en dış denetim katmanı",
+        "Kamuoyu denetimi"
+      ]
+    ],
+    "_source": {
+      "Y1": "fec4c99b1e7fc6c49011ca31f07e6d5aac10aaf80d9cd333e453bca658276a02",
+      "Y2": "6f6e68545ed185ec8d8dfc2739dae53f04359e028a3216b9d6ae65aaeffd7d8b",
+      "Y3": "1b7c772b4ecc76ce6d1f221e45db6c15749a909d427b247464451044bf1122e0"
+    }
+  },
+  "20": {
+    "Y1": [
+      [
+        "Kanunilik ilkesi",
+        "AY md. 73'te birlikte düzenlenir",
+        "Mali güce göre vergileme"
+      ],
+      [
+        "Mali güce göre vergileme",
+        "GV'deki aracıdır",
+        "Artan oranlı tarife"
+      ],
+      [
+        "Artan oranlı tarife",
+        "Türkiye'de uygulanır",
+        "Dilim usulü"
+      ],
+      [
+        "Dilim usulü",
+        "tutarları her yıl güncellenir",
+        "Yeniden değerleme oranı"
+      ]
+    ],
+    "Y2": [
+      [
+        "Dolaylı vergi",
+        "fiyatın içinden alınır",
+        "Mali gücü dikkate almama"
+      ],
+      [
+        "Gelir vergisi",
+        "şahsi ve dolaysızdır",
+        "Mali gücü dikkate alma"
+      ],
+      [
+        "Mali gücü dikkate alma",
+        "vergi dışında bırakma aracıdır",
+        "Muafiyet"
+      ],
+      [
+        "Dolaylı vergi",
+        "dolaysız şahsi vergiyle karşılaştırılır",
+        "Gelir vergisi"
+      ]
+    ],
+    "Y3": [
+      [
+        "Tahsil esası",
+        "ücret, SMK ve iratlarda ölçüdür",
+        "Gelirin elde edilmesi"
+      ],
+      [
+        "Gelirin elde edilmesi",
+        "gelir vergisinde doğurur",
+        "Vergiyi doğuran olay"
+      ],
+      [
+        "Dar mükellefiyet",
+        "yalnızca vergilendirir",
+        "Türkiye'de elde edilen gelir"
+      ],
+      [
+        "Türkiye'de elde edilen gelir",
+        "iki koşul sorgulanır",
+        "Türkiye'de doğma ve elde etme"
+      ],
+      [
+        "Vergiyi doğuran olay",
+        "dar mükellefte kapsam koşulu",
+        "Türkiye'de elde edilen gelir"
+      ]
+    ],
+    "_source": {
+      "Y1": "4b52bb842d55a068bb89eeb2eb041b49cafb4518f8dc77098fdeac0d8894ded5",
+      "Y2": "2258a888998a90b7da34ad13372f2c7f186fcf3becbbc0d9d873e97671f3b62f",
+      "Y3": "47048a0b5c153a43453d9e3465cbbdf364b8e0502aa5a1850c0b813c5942fb69"
+    }
+  },
+  "21": {
+    "Y1": [
+      [
+        "Çekim gücü",
+        "işletmedeki her geliri çeker",
+        "Ticari kazanç"
+      ],
+      [
+        "Zirai faaliyet",
+        "ticari işletme içindeyse",
+        "Ticari kazanç"
+      ],
+      [
+        "Zirai faaliyet",
+        "işletme dışında ve sınır altındaysa",
+        "Küçük çiftçi"
+      ],
+      [
+        "Küçük çiftçi",
+        "ürünü alan keser",
+        "Stopaj"
+      ],
+      [
+        "Stopaj",
+        "küçük çiftçide niteliğidir",
+        "Nihai vergi"
+      ]
+    ],
+    "Y2": [
+      [
+        "Azalan bakiyeler",
+        "yalnızca bu defter esasını kullanır",
+        "Bilanço esası"
+      ],
+      [
+        "Bilanço esası",
+        "gerçek usuldeki yöntemi",
+        "Birinci sınıf tacir"
+      ],
+      [
+        "Birinci sınıf tacir",
+        "kazanç türüdür",
+        "Ticari kazanç"
+      ],
+      [
+        "Ticari kazanç",
+        "şartıdır",
+        "Devamlılık"
+      ],
+      [
+        "Devamlılık",
+        "yoksa işlem bir defalıktır",
+        "Arızi kazanç"
+      ]
+    ],
+    "Y3": [
+      [
+        "Tüccarın kendine veya eşine maaşı",
+        "sayıldığı kategori",
+        "Kabul edilmeyen gider"
+      ],
+      [
+        "İşverene bağımlı çalışma",
+        "doğurur",
+        "Ücret"
+      ],
+      [
+        "Brüt ücret",
+        "SGK, aidat ve diğer indirimler düşülür",
+        "Safi ücret"
+      ],
+      [
+        "Safi ücret",
+        "işverenin vergi kestiği tutardır",
+        "Ücret stopajı"
+      ],
+      [
+        "Kabul edilmeyen gider",
+        "kendinin işvereni olamaz; ücretin koşulu",
+        "İşverene bağımlı çalışma"
+      ],
+      [
+        "Ücret",
+        "indirim öncesi tutarı",
+        "Brüt ücret"
+      ]
+    ],
+    "_source": {
+      "Y1": "65ce11bc25a6a3fe41f8ddf36d357a64504f438b6fa109ac500382000d05a151",
+      "Y2": "af417b9a0a4585050659c10648a6ca27105a890479e805209b150636414e35ef",
+      "Y3": "6bb63504f5851cdddbc93b6bdc2beffe56db7eba463984158c0aafaf17df77b6"
+    }
+  },
+  "22": {
+    "Y1": [
+      [
+        "Emsal kira bedeli",
+        "vergiye esas tutara taban koyar",
+        "GMSİ"
+      ],
+      [
+        "İşyeri kirası",
+        "kiracı tarafından kesilir",
+        "%20 stopaj"
+      ],
+      [
+        "İşyeri kirası",
+        "stopajlı tutar 2. dilimi aşarsa",
+        "Yıllık beyan"
+      ],
+      [
+        "Yıllık beyan",
+        "kesilen vergiyi indirir",
+        "Mahsup"
+      ],
+      [
+        "GMSİ",
+        "bir örneğidir",
+        "İşyeri kirası"
+      ]
+    ],
+    "Y2": [
+      [
+        "Kurum kârı ve kâr payının vergilenmesi",
+        "oluşturur",
+        "Ekonomik çifte vergilendirme"
+      ],
+      [
+        "%50 kâr payı istisnası",
+        "hafifletir",
+        "Ekonomik çifte vergilendirme"
+      ],
+      [
+        "Kâr dağıtımı",
+        "kurum tarafından kesilir",
+        "%15 stopaj"
+      ],
+      [
+        "İstisna sonrası tutar sınırı aşmazsa",
+        "beyan edilmez; stopajın niteliği",
+        "Nihai stopaj"
+      ],
+      [
+        "Kâr dağıtımı",
+        "KV sonrası yeniden vergileme",
+        "Kurum kârı ve kâr payının vergilenmesi"
+      ],
+      [
+        "Kâr dağıtımı",
+        "istisna sonrası beyan koşulu",
+        "İstisna sonrası tutar sınırı aşmazsa"
+      ]
+    ],
+    "Y3": [
+      [
+        "İşyerini şirkete kiraya verme",
+        "doğurur",
+        "GMSİ"
+      ],
+      [
+        "Kiracı şirket",
+        "kiradan %20 keser",
+        "Vergi sorumlusu"
+      ],
+      [
+        "Vergi sorumlusu",
+        "kesilen vergiyi bildirir",
+        "Muhtasar ve prim hizmet beyannamesi"
+      ],
+      [
+        "Muhtasar ve prim hizmet beyannamesi",
+        "izleyen ayın 26'sına kadar",
+        "Ödeme"
+      ],
+      [
+        "GMSİ",
+        "işyeri kirasında kesintiyi yapan",
+        "Kiracı şirket"
+      ]
+    ],
+    "_source": {
+      "Y1": "e6189607efcd341c115daca43db2d18acd4f8fe7d523569420b659c1c5b6e397",
+      "Y2": "f812b724860367acaeab43ae1d18892b2b3d99f8068bb8e4f64fef0370e666dc",
+      "Y3": "ede4db9c86eede7b2c8050a07ca06c45d28efde53fc62f2c82f82a2dd8e548b7"
+    }
+  },
+  "23": {
+    "Y1": [
+      [
+        "Kanuni veya iş merkezi Türkiye'de",
+        "kurumu belirler",
+        "Tam mükellef kurum"
+      ],
+      [
+        "Tam mükellef kurum",
+        "başka tam mükelleften kâr payı alırsa",
+        "İştirak kazançları istisnası"
+      ],
+      [
+        "Tam mükellef kuruma dağıtım",
+        "uygulanmaz",
+        "Kâr dağıtımı stopajı"
+      ],
+      [
+        "Gerçek kişi veya dar mükellefe dağıtım",
+        "%15 uygulanır",
+        "Kâr dağıtımı stopajı"
+      ],
+      [
+        "Tam mükellef kurum",
+        "kârını bu alıcıya dağıtabilir",
+        "Tam mükellef kuruma dağıtım"
+      ]
+    ],
+    "Y2": [
+      [
+        "Emsale aykırı transfer fiyatlandırması",
+        "kazancı örtülü dağıtır",
+        "Örtülü kazanç dağıtımı"
+      ],
+      [
+        "Örtülü kazanç dağıtımı",
+        "sayılır",
+        "Kanunen kabul edilmeyen gider"
+      ],
+      [
+        "Kanunen kabul edilmeyen gider",
+        "ilgili KDV'nin sonucu",
+        "İndirilemeyecek KDV"
+      ]
+    ],
+    "Y3": [
+      [
+        "Nihai tüketici",
+        "KDV yükünü taşır",
+        "Tüketimin vergilenmesi"
+      ],
+      [
+        "Varış ülkesi ilkesi",
+        "tüketildiği ülkede gerektirir",
+        "Tüketimin vergilenmesi"
+      ],
+      [
+        "Varış ülkesi ilkesi",
+        "ihracatta doğurur",
+        "Tam istisna"
+      ],
+      [
+        "Tam istisna",
+        "alış KDV'si indirilebilir",
+        "KDV indirimi"
+      ],
+      [
+        "KDV indirimi",
+        "indirilemeyen kısım şartlara göre",
+        "İade"
+      ]
+    ],
+    "_source": {
+      "Y1": "350fcccf8d4d0e94eeafd1ed34a569b643c39ae2b3044ffd80ed61e3fc26d737",
+      "Y2": "be841f23c1a82550ba78181e5f7a4ca062c8ff91ee770ea2b71b4aa56e030e67",
+      "Y3": "429f7c97d26363d4f6baf96f1252be1fb73fcf7a9cd45838ff60b9c1c798521f"
+    }
+  },
+  "24": {
+    "Y1": [
+      [
+        "Kâğıt esası",
+        "imzayla doğurur",
+        "Damga vergisi"
+      ],
+      [
+        "Kayıt (sicil) esası",
+        "sicile kayıtla doğurur",
+        "Motorlu taşıtlar vergisi"
+      ],
+      [
+        "Damga vergisi",
+        "geliri gider",
+        "Genel bütçe"
+      ],
+      [
+        "Motorlu taşıtlar vergisi",
+        "geliri gider",
+        "Genel bütçe"
+      ]
+    ],
+    "Y2": [
+      [
+        "Seçici harcama vergisi",
+        "örneğidir",
+        "ÖTV"
+      ],
+      [
+        "ÖTV",
+        "listedeki mal alınırken bir kez",
+        "Otomobilin vergilenmesi"
+      ],
+      [
+        "MTV",
+        "kayıt sonrası her yıl",
+        "Otomobilin vergilenmesi"
+      ],
+      [
+        "MTV",
+        "türüdür",
+        "Servet vergisi"
+      ]
+    ],
+    "Y3": [
+      [
+        "Belediye harçları",
+        "geliri gider",
+        "Belediye bütçesi"
+      ],
+      [
+        "Emlak vergisi",
+        "geliri gider",
+        "Belediye bütçesi"
+      ],
+      [
+        "Değerli konut vergisi",
+        "emlak vergisiyle düzenlenir",
+        "1319 sayılı Kanun"
+      ],
+      [
+        "Değerli konut vergisi",
+        "geliri gider",
+        "Genel bütçe"
+      ],
+      [
+        "Emlak vergisi",
+        "düzenlendiği kanundur",
+        "1319 sayılı Kanun"
+      ]
+    ],
+    "_source": {
+      "Y1": "f578a1fdb6bf2122ee5ebf1be566cb322adf25402d0f2c05953879f6ad0810a1",
+      "Y2": "43b8850b37a1695b55980a907228c665624f172468bc0dd3418af6e4fa3ab227",
+      "Y3": "8d25beeb1cef29ee86b0dc73f0b5a5848553e6bdfa8c6c1a85e9a684965c4c64"
+    }
+  },
+  "25": {
+    "Y1": [
+      [
+        "İç gecikme",
+        "politika geç etki ederse doğurabilir",
+        "İstikrarsızlaştırıcı etki"
+      ],
+      [
+        "İstikrarsızlaştırıcı etki",
+        "monetaristlerin gerekçesidir",
+        "Takdir yerine kural"
+      ],
+      [
+        "Zaman tutarsızlığı ve siyasi istismar",
+        "savunulmasına dayanak olur",
+        "Takdir yerine kural"
+      ],
+      [
+        "Takdir yerine kural",
+        "yaklaşımın adıdır",
+        "Kurala dayalı politika"
+      ]
+    ],
+    "Y2": [
+      [
+        "Say Yasası",
+        "klasiklerin tercihi",
+        "Yıllık denk bütçe"
+      ],
+      [
+        "Yıllık denk bütçe",
+        "durgunlukta yaratabilir",
+        "Prosiklik etki"
+      ],
+      [
+        "Keynesyen talep yetersizliği",
+        "bütçeyi araç yapar",
+        "Fonksiyonel maliye"
+      ],
+      [
+        "Fonksiyonel maliye",
+        "denklik devreye yayılır",
+        "Tam istihdam bütçesi"
+      ],
+      [
+        "Tam istihdam bütçesi",
+        "bugünkü mirasıdır",
+        "Yapısal bütçe dengesi"
+      ],
+      [
+        "Prosiklik etki",
+        "talep yetersizliğiyle karşı yaklaşım",
+        "Keynesyen talep yetersizliği"
+      ]
+    ],
+    "Y3": [
+      [
+        "Likidite tuzağı",
+        "para politikasını etkisiz kılar",
+        "Maliye politikasıyla talep yönetimi"
+      ],
+      [
+        "Stagflasyon",
+        "talep politikalarını sorgulatır",
+        "Arz yönlü iktisat"
+      ],
+      [
+        "Arz yönlü iktisat",
+        "önerir",
+        "Marjinal vergi oranı indirimi"
+      ],
+      [
+        "Laffer eğrisi",
+        "yasak bölgede dayanak olur",
+        "Marjinal vergi oranı indirimi"
+      ],
+      [
+        "Maliye politikasıyla talep yönetimi",
+        "1970'lerde başarısız kaldığı sorun",
+        "Stagflasyon"
+      ]
+    ],
+    "_source": {
+      "Y1": "1888687a21337bfc8f8ecf6b99a4fc4e2f25d79a9cbc4f3ca73e70b83162c320",
+      "Y2": "7d2d2455d49f9958d3cd505988d0ab15350056d149b456d7d9e77a57546ce204",
+      "Y3": "bb5f959cec4e1d0677404ed82e34cf4685a018c73627d3c148143cbb576a46ee"
+    }
+  },
+  "26": {
+    "Y1": [
+      [
+        "Phillips eğrisi",
+        "amaçlar arası ters ilişki",
+        "İstihdam–fiyat istikrarı çatışması"
+      ],
+      [
+        "Genişletici politika",
+        "enflasyonla artırabilir",
+        "İstihdam–fiyat istikrarı çatışması"
+      ],
+      [
+        "Haavelmo",
+        "eşit harcama ve vergi artışı",
+        "Denk bütçe çarpanı = 1"
+      ],
+      [
+        "Denk bütçe çarpanı = 1",
+        "talep arttığı için sürer",
+        "Enflasyon riski"
+      ],
+      [
+        "Haavelmo",
+        "açık vermeden genişletme yoludur",
+        "Genişletici politika"
+      ]
+    ],
+    "Y2": [
+      [
+        "Seküler durgunluk",
+        "kalıcı sorunudur",
+        "Talep yetersizliği"
+      ],
+      [
+        "Telafi edici kamu harcaması",
+        "Hansen'in karşılığıdır",
+        "Talep yetersizliği"
+      ],
+      [
+        "Maliye politikası",
+        "talep yönünde etkilidir",
+        "Konjonktürel işsizlik"
+      ],
+      [
+        "Yapısal işsizlik",
+        "talep artışından farklı çözüm ister",
+        "Eğitim ve bölgesel teşvik"
+      ],
+      [
+        "Talep yetersizliği",
+        "kaynağıdır",
+        "Konjonktürel işsizlik"
+      ],
+      [
+        "Konjonktürel işsizlik",
+        "beceri uyumsuzluğu kaynağıyla ayrılır",
+        "Yapısal işsizlik"
+      ]
+    ],
+    "Y3": [
+      [
+        "Mundell'in sınıflandırması",
+        "sabit kurda maliyeyi atar",
+        "İç denge"
+      ],
+      [
+        "İç dengede maliyenin gücü",
+        "bağlıdır",
+        "Dışlama etkisi"
+      ],
+      [
+        "Para talebinin faiz esnekliği yüksek",
+        "LM yatay; dışlama yok",
+        "Maliye politikası tam etkin"
+      ],
+      [
+        "Para talebinin faiz esnekliği düşük",
+        "LM dikey; tam dışlama",
+        "Maliye politikası etkisiz"
+      ],
+      [
+        "İç denge",
+        "maliye aracının etkinliği",
+        "İç dengede maliyenin gücü"
+      ],
+      [
+        "Para talebinin faiz esnekliği yüksek",
+        "ortadan kaldırır",
+        "Dışlama etkisi"
+      ],
+      [
+        "Para talebinin faiz esnekliği düşük",
+        "tam dışlama yaratır",
+        "Dışlama etkisi"
+      ]
+    ],
+    "_source": {
+      "Y1": "6fd4f8d6b0608c9aedea2024e406292d69b6139d41cdb478c300eca818ed9ad4",
+      "Y2": "91a1846d9dde675f2cfff40d1a3d358a89ad83362bee19e3cabdcfd28fa251f0",
+      "Y3": "7b2c34ad975a6ee1cb8e4433129b1410fd5af158449ecb86555077a41d5cb86b"
+    }
+  },
+  "27": {
+    "Y1": [
+      [
+        "Politik konjonktür dalgalanmaları",
+        "iradi politikayı açar",
+        "Siyasi istismar"
+      ],
+      [
+        "Otomatik istikrar sağlayıcılar",
+        "karar gerektirmeyerek sınırlar",
+        "Siyasi istismar"
+      ],
+      [
+        "Önceden belirlenmiş kural",
+        "tepkiyi otomatikleştirir",
+        "Formül esnekliği"
+      ],
+      [
+        "Formül esnekliği",
+        "daha güçlü olabilir",
+        "Telafi edici etki"
+      ],
+      [
+        "Otomatik istikrar sağlayıcılar",
+        "daha güçlü otomatik tepki yaklaşımı",
+        "Formül esnekliği"
+      ]
+    ],
+    "Y2": [
+      [
+        "Borçla finanse edilen vergi indirimi",
+        "Ricardo denkliğinde beklenti",
+        "Gelecekteki vergi artışı"
+      ],
+      [
+        "Gelecekteki vergi artışı",
+        "indirimi yöneltir",
+        "Tasarruf"
+      ],
+      [
+        "Büyüyen ekonomi",
+        "gelirleri kendiliğinden artırır",
+        "Mali sürükleme"
+      ],
+      [
+        "Mali sürükleme",
+        "ek gelirin adıdır",
+        "Mali temettü"
+      ],
+      [
+        "Mali temettü",
+        "borçlanmadan finanse edebilir",
+        "Vergi indirimi"
+      ],
+      [
+        "Vergi indirimi",
+        "borçsuz finansmanla karşılaştırılır",
+        "Borçla finanse edilen vergi indirimi"
+      ]
+    ],
+    "Y3": [
+      [
+        "Mali baskınlık",
+        "maliyeye bağımlı kılar",
+        "Para politikası"
+      ],
+      [
+        "Para politikası",
+        "parasal finansmanda riskini büyütür",
+        "Enflasyon"
+      ],
+      [
+        "Enflasyon",
+        "artırır",
+        "Nominal gelirler"
+      ],
+      [
+        "Nominal gelirler",
+        "artan oranlı tarifede kaydırır",
+        "Üst vergi dilimleri"
+      ],
+      [
+        "Üst vergi dilimleri",
+        "reel gelir değişmeden yük artışı",
+        "Soğuk ilerleme"
+      ]
+    ],
+    "_source": {
+      "Y1": "5a38eb75f047f3f16f80ed271dedaff87ec93a5fb233d79171a435eb0059b138",
+      "Y2": "109bef677e27681bd5a49ab79f3925f1459dc68b603477411f173b2a21b3f87e",
+      "Y3": "a507796e1a917b0998fa99f2a28e50dfc5b10df036e89074f2c02b967649bc1e"
+    }
+  },
+  "28": {
+    "Y1": [
+      [
+        "Zaman tutarsızlığı",
+        "bozar",
+        "Politikanın güvenilirliği"
+      ],
+      [
+        "Güvenilirlik kaybı",
+        "geçmişe bağlı davranışı sürdürür",
+        "Fiyat ve ücret endekslemesi"
+      ],
+      [
+        "Fiyat ve ücret endekslemesi",
+        "doğurur",
+        "Enflasyon ataleti"
+      ],
+      [
+        "Heterodoks gelir politikası",
+        "kırmaya çalışır",
+        "Enflasyon ataleti"
+      ],
+      [
+        "Mali kurallar",
+        "güçlendirmeyi amaçlar",
+        "Politikanın güvenilirliği"
+      ],
+      [
+        "Politikanın güvenilirliği",
+        "zayıflarsa oluşur",
+        "Güvenilirlik kaybı"
+      ]
+    ],
+    "Y2": [
+      [
+        "4651 sayılı Kanun",
+        "Hazine'ye avansı yasaklar",
+        "Avans yasağı"
+      ],
+      [
+        "Avans yasağı",
+        "açığın borçla finansmanına yöneltir",
+        "İç ve dış borçlanma"
+      ],
+      [
+        "İç ve dış borçlanma",
+        "büyütür",
+        "Borç stoku ve faiz yükü"
+      ],
+      [
+        "Faiz–büyüme farkı: r−g",
+        "borç oranının seyrini belirler",
+        "Borç stoku ve faiz yükü"
+      ],
+      [
+        "r > g",
+        "gerektirir",
+        "Faiz dışı fazla"
+      ],
+      [
+        "Faiz–büyüme farkı: r−g",
+        "faiz büyümeyi aşarsa",
+        "r > g"
+      ]
+    ],
+    "Y3": [
+      [
+        "Altın kural",
+        "bağlar",
+        "Borçla yatırım finansmanı"
+      ],
+      [
+        "Altın kural",
+        "vergiyle karşılanmasını ister",
+        "Cari harcama"
+      ],
+      [
+        "Cari harcamanın parasal finansmanı",
+        "yaratır",
+        "Enflasyon vergisi"
+      ],
+      [
+        "Enflasyon vergisi",
+        "yükü aktarır",
+        "Sabit ve dar gelirliler"
+      ],
+      [
+        "Cari harcama",
+        "vergi yerine para basılırsa",
+        "Cari harcamanın parasal finansmanı"
+      ]
+    ],
+    "_source": {
+      "Y1": "ee55505341b3ffd4153d21a434312cc8f4546ff0a4dfd548f21964d9a5b5cdfa",
+      "Y2": "c91221660aba6eebcb2ab72358634cc27fceacc49a59c615cd34bae34fee0dad",
+      "Y3": "422bd0626676d6ff2fb8f417f42efd5e31058cd08849e5133d2b9a37001fe5ca"
+    }
+  },
+  "29": {
+    "Y1": [
+      [
+        "Kamu gücü",
+        "tarafları eşitsiz kılar",
+        "Vergi borcunun kanundan doğması"
+      ],
+      [
+        "Vergi borcunun kanundan doğması",
+        "ilkesidir",
+        "Kanunilik"
+      ],
+      [
+        "Kanunilik",
+        "kanunsuz vergilendirmeyi engeller",
+        "Kıyas yasağı"
+      ]
+    ],
+    "Y2": [
+      [
+        "Tebliğ",
+        "aracıdır",
+        "İdari yorum"
+      ],
+      [
+        "İdari yorum",
+        "yorum yöntemlerinden biriyle bağlanır",
+        "Ekonomik yaklaşım"
+      ],
+      [
+        "Ekonomik yaklaşım",
+        "esasıdır",
+        "Gerçek mahiyet"
+      ],
+      [
+        "Gerçek mahiyet",
+        "olağan dışı olduğunu iddia edene",
+        "İspat yükü"
+      ]
+    ],
+    "Y3": [
+      [
+        "Maddi vergi hukuku",
+        "belirler",
+        "Vergi borcunun unsurları"
+      ],
+      [
+        "Vergi borcunun unsurları",
+        "kanunda gösterilmesini gerektirir",
+        "Kanunilik"
+      ],
+      [
+        "Cumhurbaşkanı kararı",
+        "kanuni sınırda değiştirebilir",
+        "Oran, muafiyet, istisna, indirim"
+      ],
+      [
+        "Konu, mükellef ve matrah",
+        "kanunda kalır",
+        "Kanunilik"
+      ],
+      [
+        "Kanunilik",
+        "sınırlı değiştirme yetkisi tanır",
+        "Cumhurbaşkanı kararı"
+      ]
+    ],
+    "_source": {
+      "Y1": "0b5979478d35b9339f9941859ceacf5816ba451b4597555aac74c97ee0b69a6f",
+      "Y2": "d32a2399691ca27aa0436d9045807cc6d553825db3ee703c1caac7cff60a1cab",
+      "Y3": "ed3c582051f9f14f812906afb1eb126103c0d2dc8b1db64619c31ba09443827f"
+    }
+  },
+  "30": {
+    "Y1": [
+      [
+        "Vergiyi doğuran olay",
+        "doğurur",
+        "Vergi alacağı"
+      ],
+      [
+        "Vergi alacağı",
+        "tutarı tespit edilir",
+        "Tarh"
+      ],
+      [
+        "Tarh",
+        "mükellefe bildirilir",
+        "Tebliğ"
+      ],
+      [
+        "Tebliğ",
+        "itirazsız süre sonrasında",
+        "Tahakkuk"
+      ],
+      [
+        "Tahakkuk",
+        "vadesinde ödenirse",
+        "Tahsil"
+      ],
+      [
+        "Tahakkuk",
+        "vadesinde ödenmezse ödeme emriyle",
+        "Cebren tahsil"
+      ]
+    ],
+    "Y2": [
+      [
+        "Muafiyet",
+        "kanunen mükellef olacak kişiyi",
+        "Vergi dışında bırakma"
+      ],
+      [
+        "Muaf olmayan mükellef",
+        "bildirir",
+        "Matrah beyanı"
+      ],
+      [
+        "Matrahın defterle saptanamaması",
+        "matrahı belirlemesine yol açar",
+        "Takdir komisyonu"
+      ],
+      [
+        "Takdir komisyonu",
+        "matrah takdiriyle yapılır",
+        "Re'sen tarh"
+      ],
+      [
+        "Muafiyet",
+        "bu kapsamda olmayan borçludur",
+        "Muaf olmayan mükellef"
+      ],
+      [
+        "Matrah beyanı",
+        "beyan veya kayıt yoksa",
+        "Matrahın defterle saptanamaması"
+      ]
+    ],
+    "Y3": [
+      [
+        "Tevkifat",
+        "ödemeyi yapanın kaynakta kesmesi",
+        "Vergi sorumlusu"
+      ],
+      [
+        "Vergi sorumlusu",
+        "daireye karşı adına muhataptır",
+        "Mükellef"
+      ],
+      [
+        "Mükellef",
+        "dolaylı vergide fiyatla yansıtır",
+        "Nihai tüketici"
+      ],
+      [
+        "Nihai tüketici",
+        "ekonomik yükü taşıyan kişidir",
+        "Vergi taşıyıcısı"
+      ]
+    ],
+    "_source": {
+      "Y1": "537658094db60399d56f6c1c238b010b04f86bc475b86bc10828aed145d569cf",
+      "Y2": "767a1dd39994f7e553a68ec0606b602623bcf631618b771d737928bca7a46e13",
+      "Y3": "4da2f6c92ccb4b1d6dde4b97962eb6a56d4df55f42981e67c48a989b3f44d7ae"
+    }
+  },
+  "31": {
+    "Y1": [
+      [
+        "Kast",
+        "adli vergi cezasında aranır",
+        "Kaçakçılık"
+      ],
+      [
+        "Kaçakçılık",
+        "üç kat uygulanmasına yol açar",
+        "Üç kat vergi ziyaı cezası"
+      ],
+      [
+        "Üç kat vergi ziyaı cezası",
+        "kapsamı dışındadır",
+        "Uzlaşma"
+      ]
+    ],
+    "Y2": [
+      [
+        "Vergi hatası",
+        "giderilir",
+        "Düzeltme"
+      ],
+      [
+        "Düzeltme",
+        "bu süre içinde yapılır",
+        "Tarh zamanaşımı"
+      ],
+      [
+        "Takdir komisyonuna başvuru",
+        "en fazla 1 yıl durdurur",
+        "Tarh zamanaşımı"
+      ],
+      [
+        "Durma",
+        "süre sonrasında kaldığı yerden",
+        "Zamanaşımının devamı"
+      ],
+      [
+        "Tarh zamanaşımı",
+        "takdir komisyonuna başvuruyla",
+        "Durma"
+      ]
+    ],
+    "Y3": [
+      [
+        "Mahsup",
+        "sona erdirir",
+        "Vergi aslı"
+      ],
+      [
+        "Ölüm",
+        "mirasçıya geçirir",
+        "Vergi aslı"
+      ],
+      [
+        "Ölüm",
+        "düşürür",
+        "Vergi cezası"
+      ],
+      [
+        "Cezada indirim",
+        "idari cezayı yarıya indirir",
+        "Vergi cezası"
+      ]
+    ],
+    "_source": {
+      "Y1": "ec544e4ada2f28735e8b0a0f0483505377fa2047624d51127cae2e1dfbe66161",
+      "Y2": "74a8d0d37f39f08fc475cb43cc223cd5dc4c57055b99e41d9bda21f47130273a",
+      "Y3": "8e3534fde4359e3e84ee01a87de12e25ae80a3303fc3507326ae752358f6e463"
+    }
+  },
+  "32": {
+    "Y1": [
+      [
+        "Sulh ceza hâkimi kararı",
+        "şartıdır",
+        "Arama"
+      ],
+      [
+        "Arama",
+        "defter ve belgeyle delil sağlar",
+        "Vergi incelemesi"
+      ],
+      [
+        "Vergi incelemesi",
+        "doğruluğunu araştırır",
+        "Vergi alacağı"
+      ],
+      [
+        "Matrah",
+        "tutarını belirler",
+        "Vergi alacağı"
+      ],
+      [
+        "Değerleme",
+        "belirler",
+        "Matrah"
+      ]
+    ],
+    "Y2": [
+      [
+        "Gider pusulası",
+        "düzenleyen taraftır",
+        "Alıcı"
+      ],
+      [
+        "Belge",
+        "ispatlar",
+        "Defter kayıtları"
+      ],
+      [
+        "Vergi incelemesi",
+        "üzerinde yapılır",
+        "Defter kayıtları"
+      ],
+      [
+        "Vergi incelemesi",
+        "daha kapsamlıdır",
+        "Yoklama"
+      ],
+      [
+        "Yoklama",
+        "yerinde tespit eder",
+        "Mevcut durum"
+      ],
+      [
+        "Gider pusulası",
+        "türüdür",
+        "Belge"
+      ]
+    ],
+    "Y3": [
+      [
+        "Tecil faizi",
+        "tecilde yerini alır",
+        "Gecikme zammı"
+      ],
+      [
+        "Gecikme zammı",
+        "vadeden sonra değerini korur",
+        "Vergi alacağı"
+      ],
+      [
+        "Matrah",
+        "tutarını belirler",
+        "Vergi alacağı"
+      ],
+      [
+        "Değerleme",
+        "belirler",
+        "Matrah"
+      ],
+      [
+        "Maliyet bedeli",
+        "temel ölçüsüdür",
+        "Değerleme"
+      ],
+      [
+        "Amortisman",
+        "faydalı ömre yayar",
+        "Maliyet bedeli"
+      ]
+    ],
+    "_source": {
+      "Y1": "a411d83fb5283ac2bebaa06d14a491a6e51e1fc40d02c766ae9ff6828c28feaf",
+      "Y2": "bf3b7a04a3ff25f1df86cfbe1b8d4a55012986b51562257d9eadb1333f012177",
+      "Y3": "5d7d6f4efacdaadf3d208ee3994693c762c45dc5408b951aaf4fe34b9af48efd"
+    }
+  }
+}

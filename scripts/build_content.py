@@ -2,6 +2,7 @@
 """Build a small public course index from the repository's source DOCX files."""
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import zipfile
@@ -11,6 +12,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 COURSES = ROOT / "maliye"
 OUTPUT = ROOT / "site" / "data" / "courses.json"
+MAP_DEFINITIONS = json.loads((ROOT / "scripts" / "concept_maps.json").read_text(encoding="utf-8"))
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 TASK_ID = re.compile(r"^([PCAERDGY]\d+)\s*(.*)$")
 BLOCK = re.compile(r"^BLOK\s+(\d+)\b", re.IGNORECASE)
@@ -56,6 +58,46 @@ def read_docx_tables(path: Path) -> list[list[str]]:
 
 def tidy_key(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.casefold()).strip("-")
+
+
+def build_answer_maps(path: Path, tasks: list[dict]) -> list[dict]:
+    """Attach concept links reviewed against each document's Y answer keys."""
+    number = re.match(r"\d+", path.name).group()
+    definitions = MAP_DEFINITIONS.get(number, {})
+    hashes = definitions.get("_source", {})
+    maps = []
+    for task in tasks:
+        if not task["answer"]:
+            continue
+        links = definitions.get(task["id"])
+        checksum = hashlib.sha256(task["answer"].encode("utf-8")).hexdigest()
+        if not links or hashes.get(task["id"]) != checksum:
+            raise ValueError(f"Review concept map {path.name} {task['id']}: answer key is new or changed.")
+        if any(not isinstance(link, list) or len(link) != 3 or any(not isinstance(text, str) or not text.strip() for text in link) or link[0] == link[2] for link in links):
+            raise ValueError(f"Invalid concept links: {path.name} {task['id']}")
+        names = list(dict.fromkeys(name for start, _, end in links for name in (start, end)))
+        incoming = {name: sum(end == name for _, _, end in links) for name in names}
+        queue = [name for name in names if not incoming[name]]
+        for start in queue:
+            for source, _, end in links:
+                if source == start:
+                    incoming[end] -= 1
+                    if incoming[end] == 0:
+                        queue.append(end)
+        if len(queue) != len(names):
+            raise ValueError(f"Cyclic concept links: {path.name} {task['id']}")
+        connected = {names[0]}
+        pending = [names[0]]
+        for name in pending:
+            for start, _, end in links:
+                neighbor = end if start == name else start if end == name else None
+                if neighbor is not None and neighbor not in connected:
+                    connected.add(neighbor)
+                    pending.append(neighbor)
+        if len(connected) != len(names):
+            raise ValueError(f"Disconnected concept links: {path.name} {task['id']}")
+        maps.append({"id": task["id"], "links": links})
+    return maps
 
 
 def extract_course(path: Path) -> dict:
@@ -406,6 +448,7 @@ def extract_course(path: Path) -> dict:
         "blocks": blocks,
         "wrapUp": wrap_up,
         "mapWalks": wrap_up,
+        "answerMaps": build_answer_maps(path, wrap_up),
         "reflectionQuestions": reflection_questions,
         "studyGuide": study_guide,
         "knowledgeProfile": knowledge_profile,

@@ -13,7 +13,7 @@ const DAY = 86_400_000;
 const ICONS = ['◌', '↗', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
   readingMode: 'page', bionic: true, highlightWord: true, boldPercent: 38, wpm: 220, groupWords: 1,
-  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, theme: 'light', sessionMinutes: 20, breakMinutes: 5,
+  punctuationPause: 320, fontSize: 19, lineHeight: 1.85, focusParagraph: false, autoScroll: true, reduceMotion: false, theme: 'light', sessionMinutes: 20, breakMinutes: 5,
 };
 
 let courses = [];
@@ -37,6 +37,8 @@ let githubDeviceFlowActive = false;
 let toastTimer = 0;
 let lastTouch = Date.now();
 let activeSecondsRemainder = 0;
+let activeMapRouteId = '';
+let mapResizeObserver = null;
 
 function freshState() {
   return { version: 1, updatedAt: 0, lastCourseId: '', preferences: { ...DEFAULTS, updatedAt: 0 }, lessons: {}, review: {}, activeDays: {}, activitySeconds: 0, syncConflicts: [], session: null };
@@ -220,6 +222,7 @@ function continueTarget() {
 }
 
 function startCourse(course, block = null) {
+  stopPlayer();
   activeCourseId = course.id;
   state.lastCourseId = course.id;
   const p = lessonProgress(course.id);
@@ -257,7 +260,8 @@ function render() {
   else if (view === 'reviews') app.innerHTML = renderReviews();
   $('#breadcrumb').textContent = view === 'study' ? `Dersler  /  ${currentCourse()?.title || 'Çalışma'}` : view === 'home' ? 'Kişisel çalışma alanın' : ({ courses: 'Derslerin', reviews: 'Günlük tekrarların', stats: 'Çalışma istatistikleri', settings: 'Kişisel ayarların' })[view];
   applyReadingSettings();
-  if (view === 'study' && activeBlock < (currentCourse()?.blocks.length || 0) && state.preferences.readingMode === 'word') refreshPlayerDisplay();
+  if (view === 'study' && activeBlock < (currentCourse()?.blocks.length || 0)) refreshPlayerDisplay();
+  observeAnswerMap();
 }
 
 function renderHome() {
@@ -318,6 +322,10 @@ function renderStudy() {
   const block = course.blocks[activeBlock];
   const prefs = state.preferences;
   const flow = blockFlow(course.id, block.number);
+  if (flow.phase === 'consume') {
+    const words = splitWords(block);
+    wordIndex = Math.max(0, Math.min(Number(progress.reader?.[String(activeBlock)]) || 0, Math.max(0, words.length - 1)));
+  }
   const tasks = getBlockTasks(block);
   const current = tasks[Math.min(flow.taskIndex || 0, Math.max(0, tasks.length - 1))];
   const statuses = tasks.map(({ task }) => progress.blocks[block.number]?.completed ? 'worked' : taskProgress(course.id, taskKey(block, task)).status);
@@ -328,9 +336,9 @@ function renderStudy() {
   let workspace = '';
   if (flow.phase === 'consume') {
     workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">1</span><div><div class="eyebrow">TÜKET · ${block.readMinutes ? `~${block.readMinutes} DK` : 'OKU'}</div><h2>${esc(block.title)}</h2><p>${esc(block.readInstruction || 'Metni kendi hızında oku. Kavram haritanı veya analoji notunu istediğin anda ekleyebilirsin.')}</p></div></div>${course.studyGuide?.length ? `<details class="pacer-guide"><summary>P.A.C.E.R. çalışma rehberi</summary><ol>${course.studyGuide.filter(line => /^\d+[.)]/.test(line)).map(line => `<li>${esc(line.replace(/^\d+[.)]\s*/, ''))}</li>`).join('')}</ol></details>` : ''}
-      <div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metni oku</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></label><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime arka planı ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Okuma ayarları →</button></div>
+      <div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metinde kelime takibi</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Ortada kelime göster</option></select></label><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime arka planı ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-action="show-answer-map">Kavram haritası ↓</button><button class="text-button" data-view="settings">Okuma ayarları →</button></div>
       ${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}
-        <details class="quick-workbench"><summary>Okurken çalış · P / A / C</summary><div class="map-editor"><div><label><span>C · Kaynaklı kavram bağlantısı ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span></label><div class="map-link-form"><input data-map-from placeholder="Kavram" aria-label="Başlangıç kavramı"><input data-map-relation placeholder="İlişki (oluşturur, etkiler…)" aria-label="İlişki"><input data-map-to placeholder="Bağlı kavram" aria-label="Hedef kavram"><select data-map-source aria-label="Kaynak paragrafı"><option value="">Kaynak paragrafı seç (isteğe bağlı)</option>${block.reading.map((para, i) => `<option value="${block.number}:${i + 1}">Blok ${block.number} · ¶${i + 1} · ${esc(shorten(para.text, 54))}</option>`).join('')}</select><button class="btn small" data-action="map-add">Bağlantı ekle</button></div><label class="map-notes-label"><span>Bağlantıları düzenle</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki → kavram | B1 ¶2">${esc(progress.mapNotes || '')}</textarea></label></div><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
+        <details class="quick-workbench"><summary>Kendi notların · Kavram bağlantısı / analoji</summary><div class="map-editor"><div><label><span>C · Kendi kavram bağlantın ${course.mapSetup?.starter ? `· başlangıç: ${esc(course.mapSetup.starter)}` : ''}</span></label><div class="map-link-form"><input data-map-from placeholder="Kavram" aria-label="Başlangıç kavramı"><input data-map-relation placeholder="İlişki (oluşturur, etkiler…)" aria-label="İlişki"><input data-map-to placeholder="Bağlı kavram" aria-label="Hedef kavram"><select data-map-source aria-label="Kaynak paragrafı"><option value="">Kaynak paragrafı seç (isteğe bağlı)</option>${block.reading.map((para, i) => `<option value="${block.number}:${i + 1}">Blok ${block.number} · ¶${i + 1} · ${esc(shorten(para.text, 54))}</option>`).join('')}</select><button class="btn small" data-action="map-add">Bağlantı ekle</button></div><label class="map-notes-label"><span>Bağlantıları düzenle</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki → kavram | B1 ¶2">${esc(progress.mapNotes || '')}</textarea></label></div><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div><label><span>A · Analoji notu</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>
       ${course.knowledgeProfile?.length ? `<details class="knowledge-profile"><summary>Bu derste hangi tür bilgi var?</summary><div class="knowledge-profile-list">${course.knowledgeProfile.map(item => `<article><strong>${esc(item.type)} · ${esc(item.label)}</strong><span>${esc(item.weight)}</span><p>${esc(item.description)}</p></article>`).join('')}</div></details>` : ''}
       <div class="phase-footer"><span>Bu notlar ve okuma konumun otomatik kaydolur.</span><button class="btn" data-action="consume-done">Okudum, sindirmeye geç →</button></div></section>`;
   } else {
@@ -342,7 +350,7 @@ function renderStudy() {
     const canComplete = remaining === 0;
     workspace = `<section class="study-card phase-card"><div class="phase-title"><span class="step-badge">2</span><div><div class="eyebrow">SİNDİR · ${block.digestMinutes ? `~${block.digestMinutes} DK` : 'İŞLE'}</div><h2>${esc(block.title)}</h2><p>Kendi cevabını yaz. Örneği açıp karşılaştırabilir, sonra hatırlama durumunu işaretleyebilirsin.</p></div></div><div class="digest-note"><strong>P · A · C · E · R</strong><span>Görev türü, kullanacağın işlemi belirtir. P/A/C/E/R sırası zorunlu bir liste değildir.</span></div>${taskStep}<div class="phase-footer"><span>${remaining ? `${remaining} görev işlenmedi; bloğu sonraya bırakabilirsin.` : 'Bloktaki görevler işlendi.'}</span><button class="btn ${canComplete ? '' : 'ghost'}" data-action="${canComplete ? 'next-block' : 'leave-block'}">${canComplete ? (activeBlock === course.blocks.length - 1 ? 'Bloğu bitir ve oturum sonuna geç →' : 'Bloğu tamamla →') : 'Sonraki bloğa geç →'}</button></div></section>`;
   }
-  return `<div class="study-heading"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · BLOK ${activeBlock + 1} / ${course.blocks.length}</div><h1>${esc(course.title)}</h1><p>${esc(block.title)}</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>${phaseTabs}${workspace}${navigation}`;
+  return `<div class="study-heading"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · BLOK ${activeBlock + 1} / ${course.blocks.length}</div><h1>${esc(course.title)}</h1><p>${esc(block.title)}</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>${phaseTabs}${workspace}${renderAnswerMap(course)}${navigation}`;
 }
 
 function bionic(text, strength = state.preferences.boldPercent) {
@@ -361,8 +369,80 @@ function renderReadingPanel(block) {
   const direction = block.readInstruction ? `<div class="read-direction"><span>BU BLOKTA OKU</span><p>${esc(block.readInstruction)}</p></div>` : '';
   if (!block.reading.length) return `${direction}<div class="reading-panel"><p class="reader-empty">Bu blok için ayrıca kaynak paragrafı ayrılmamış. Görevlerini aşağıdan açıp çalışabilirsin.</p></div>`;
   const prefs = state.preferences;
-  const body = block.reading.map((para, i) => `<p class="reading-paragraph ${prefs.focusParagraph && i === 0 ? 'current' : ''}" data-reading-paragraph="${i}">${prefs.bionic ? bionic(para.text) : esc(para.text)}</p>`).join('');
-  return `${direction}<div class="reading-panel ${prefs.focusParagraph ? 'focus-mode' : ''}" id="reading-panel">${body}</div><div class="paragraph-focus"><button class="answer-button" data-action="reading-prev">↑ Önceki paragraf</button><button class="answer-button" data-action="reading-next">Sonraki paragraf ↓</button><span class="reading-mode-line" id="reading-position">${block.reading.length} kaynak paragrafı</span></div>`;
+  let index = 0;
+  const body = block.reading.map((para, i) => {
+    const text = String(para.text).split(/(\s+)/u).map(piece => {
+      if (!piece.trim()) return piece;
+      return `<span class="reading-word" data-reader-word="${index++}">${prefs.bionic ? bionic(piece) : esc(piece)}</span>`;
+    }).join('');
+    return `<p class="reading-paragraph" data-reading-paragraph="${i}">${text}</p>`;
+  }).join('');
+  return `${direction}${renderReaderControls(splitWords(block).length)}<div aria-live="off" class="reading-panel ${prefs.focusParagraph ? 'focus-mode' : ''}" id="reading-panel">${body}</div><div class="paragraph-focus"><button class="answer-button" data-action="reading-prev">↑ Önceki paragraf</button><button class="answer-button" data-action="reading-next">Sonraki paragraf ↓</button><span class="reading-mode-line" id="reading-position">${block.reading.length} kaynak paragrafı</span></div>`;
+}
+
+function renderReaderControls(wordCount) {
+  const prefs = state.preferences;
+  return `<div class="reader-controls" aria-live="off" aria-label="Kelime takibi kontrolleri"><div class="reader-control-row"><div class="reader-transport"><button class="answer-button" data-action="word-prev" aria-label="Önceki kelime" ${wordCount ? '' : 'disabled'}>←</button><button class="btn reader-play" data-action="word-play" id="word-play" aria-label="${playerRunning ? 'Durdur' : 'Oynat'}" ${wordCount ? '' : 'disabled'}>${playerRunning ? 'Ⅱ Durdur' : '▶ Oynat'}</button><button class="answer-button" data-action="word-next" aria-label="Sonraki kelime" ${wordCount ? '' : 'disabled'}>→</button></div><label class="reader-speed">Hız <input type="number" min="60" max="1000" step="10" value="${prefs.wpm}" data-setting-number="wpm" aria-label="Dakikadaki kelime hızı"><span>kelime/dk</span></label><span class="reader-counter"><span id="word-current">${wordCount ? wordIndex + 1 : 0}</span> / ${wordCount}</span></div><input class="reader-slider" type="range" min="0" max="${Math.max(wordCount - 1, 0)}" value="${wordIndex}" data-word-slider aria-label="Metinde ilerle" ${wordCount ? '' : 'disabled'}><p class="reader-tip">${prefs.readingMode === 'page' ? "Oynat’a bas: vurgu kelime kelime ilerler. Kelimeye tıklayıp oradan devam et." : "Oynat’a bas: kelimeler sırayla ortada gösterilir. Oklarla veya sürgüyle konum seç."}</p></div>`;
+}
+
+function renderAnswerMap(course) {
+  const maps = course.answerMaps || [];
+  if (!maps.length) return '';
+  const route = maps.find(map => map.id === activeMapRouteId) || maps[0];
+  const task = course.mapWalks.find(item => item.id === route.id);
+  const names = [...new Set(route.links.flatMap(([from, , to]) => [from, to]))];
+  return `<section class="study-card answer-map-card" id="answer-map-card"><details open class="answer-map-details"><summary><span class="type-tag c">C</span><span>Kaynaklı kavram haritası<small>Cevap anahtarına göre hazır çizildi</small></span></summary><div class="answer-map-tabs" aria-label="Kavram bağlantı yolları">${maps.map(map => {
+    const item = course.mapWalks.find(value => value.id === map.id);
+    return `<button class="answer-map-tab ${map.id === route.id ? 'active' : ''}" data-action="map-route" data-map-route="${esc(map.id)}" aria-pressed="${map.id === route.id}">${esc(map.id)} · ${esc(item?.prompt.replace(/\s*→\s*…\s*→\s*/u, ' → ') || map.id)}</button>`;
+  }).join('')}</div><div class="answer-map-scroll" tabindex="0" aria-label="Kavram haritası; büyük haritalarda kaydırarak ilerle"><div class="answer-map-board" data-answer-map="${esc(route.id)}"><svg class="answer-map-connections" aria-hidden="true"></svg>${names.map((name, index) => `<div class="answer-map-node" data-map-node="${index}">${esc(name)}</div>`).join('')}</div></div><p class="answer-map-hint">Büyük haritaları yana ve aşağı kaydırarak inceleyebilirsin.</p><div class="answer-map-source">Kaynak: ${esc(course.title)} · Cevap anahtarı ${esc(route.id)}</div><details class="answer-map-key"><summary>Cevap anahtarındaki açıklamayı oku</summary><p>${esc(task?.answer || '')}</p></details><details class="answer-map-text"><summary>Bağlantıları liste olarak gör</summary><ul>${route.links.map(([from, relation, to]) => `<li><strong>${esc(from)}</strong> → ${esc(relation)} → <strong>${esc(to)}</strong></li>`).join('')}</ul></details></details></section>`;
+}
+
+function drawAnswerMap() {
+  const board = $('[data-answer-map]');
+  const svg = $('.answer-map-connections', board || document);
+  const route = currentCourse()?.answerMaps?.find(map => map.id === board?.dataset.answerMap);
+  if (!board || !svg || !route || !board.parentElement.offsetWidth) return;
+  const names = [...new Set(route.links.flatMap(([from, , to]) => [from, to]))];
+  const graph = new window.dagre.graphlib.Graph({ multigraph: true }).setGraph({ rankdir: 'TB', nodesep: 28, edgesep: 18, ranksep: 38, marginx: 20, marginy: 16 });
+  const nodeWidth = board.parentElement.clientWidth < 450 ? 150 : 200;
+  for (let index = 0; index < names.length; index++) {
+    const node = $(`[data-map-node="${index}"]`, board);
+    node.style.width = `${nodeWidth}px`;
+    graph.setNode(String(index), { width: nodeWidth, height: node.offsetHeight });
+  }
+  route.links.forEach(([from, relation, to], index) => {
+    const label = document.createElement('div');
+    label.className = 'answer-map-relation';
+    label.textContent = relation;
+    Object.assign(label.style, { width: '142px', visibility: 'hidden', position: 'absolute' });
+    board.append(label);
+    const height = label.offsetHeight;
+    label.remove();
+    graph.setEdge(String(names.indexOf(from)), String(names.indexOf(to)), { width: 142, height, labelpos: 'c', relation }, String(index));
+  });
+  window.dagre.layout(graph);
+  const { width, height } = graph.graph();
+  board.style.width = `${Math.ceil(width)}px`;
+  board.style.height = `${Math.ceil(height)}px`;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  names.forEach((name, index) => {
+    const node = graph.node(String(index));
+    Object.assign($(`[data-map-node="${index}"]`, board).style, { left: `${node.x - node.width / 2}px`, top: `${node.y - node.height / 2}px` });
+  });
+  svg.innerHTML = `<defs><marker id="answer-map-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1 1 L8 5 L1 9"/></marker></defs>` + graph.edges().map(edgeId => {
+    const edge = graph.edge(edgeId);
+    const path = edge.points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ');
+    return `<path class="answer-map-arrow" d="${path}" marker-end="url(#answer-map-arrow)"/><foreignObject x="${edge.x - edge.width / 2}" y="${edge.y - edge.height / 2}" width="${edge.width}" height="${edge.height}"><div xmlns="http://www.w3.org/1999/xhtml" class="answer-map-relation">${esc(edge.relation)}</div></foreignObject>`;
+  }).join('');
+}
+
+function observeAnswerMap() {
+  mapResizeObserver?.disconnect();
+  const board = $('[data-answer-map]');
+  if (!board) return;
+  mapResizeObserver = new ResizeObserver(drawAnswerMap);
+  mapResizeObserver.observe(board.parentElement);
+  requestAnimationFrame(drawAnswerMap);
 }
 
 function renderMapPreview(raw) {
@@ -403,8 +483,7 @@ function renderWordPlayer(course, block, blockIndex) {
   const contextStart = Math.max(0, wordIndex - 9);
   const context = renderWordContext(words, contextStart, wordIndex, Math.max(1, Number(state.preferences.groupWords) || 1));
   const current = words[wordIndex] || 'Bu blokta kelime bulunamadı';
-  const speed = state.preferences.wpm;
-  return `${block.readInstruction ? `<div class="read-direction"><span>BU BLOKTA OKU</span><p>${esc(block.readInstruction)}</p></div>` : ''}<div class="word-player" id="word-player" data-word-count="${words.length}"><p class="player-context">${context}</p><div class="player-word" id="player-word">${prefs.bionic ? bionic(current) : esc(current)}</div><div class="player-word-counter"><span id="word-current">${words.length ? wordIndex + 1 : 0}</span> / ${words.length} kelime</div><div class="player-controls"><button data-action="word-prev" aria-label="Önceki kelime">←</button><button class="play-button" data-action="word-play" id="word-play" aria-label="${playerRunning ? 'Durdur' : 'Oynat'}">${playerRunning ? 'Ⅱ' : '▶'}</button><button data-action="word-next" aria-label="Sonraki kelime">→</button></div><input class="player-slider" type="range" min="0" max="${Math.max(words.length - 1, 0)}" value="${wordIndex}" data-word-slider aria-label="Metinde ilerle"><div class="player-options"><label>Hız <input type="number" min="60" max="1000" step="10" value="${speed}" data-setting-number="wpm" aria-label="Dakikadaki kelime hızı"> kelime / dk</label><label>Gösterim <select class="select-small" data-setting-select="groupWords"><option value="1" ${state.preferences.groupWords === 1 ? 'selected' : ''}>1 kelime</option><option value="2" ${state.preferences.groupWords === 2 ? 'selected' : ''}>2 kelime</option><option value="3" ${state.preferences.groupWords === 3 ? 'selected' : ''}>3 kelime</option></select></label><label>Duraklama <input type="number" min="0" max="2000" step="50" value="${state.preferences.punctuationPause}" data-setting-number="punctuationPause" aria-label="Noktalama duraklama süresi"> ms</label></div></div>`;
+  return `${block.readInstruction ? `<div class="read-direction"><span>BU BLOKTA OKU</span><p>${esc(block.readInstruction)}</p></div>` : ''}${renderReaderControls(words.length)}<div class="word-player" aria-live="off" id="word-player" data-word-count="${words.length}"><p class="player-context">${context}</p><div class="player-word" id="player-word">${prefs.bionic ? bionic(current) : esc(current)}</div></div>`;
 }
 
 function taskKey(block, task) { return `${block.number}:${task.id}`; }
@@ -429,7 +508,7 @@ function renderWrapUp(course, progress) {
   const done = !!progress.completedAt;
   const rating = progress.rating || '';
   const mapWalks = course.mapWalks || course.wrapUp || [];
-  const wrapGroups = mapWalks.length ? `<section class="study-card"><div class="study-card-head"><span class="step-badge">C</span><div><h2>Haritada gezin</h2><p>Oturum sonunda kavram haritandaki bağlantıları kullanarak soruları yanıtla.</p></div></div><div class="tasks-stack">${mapWalks.map(task => renderTask(course, { number: 'son' }, task)).join('')}</div></section>` : '';
+  const wrapGroups = renderAnswerMap(course) + (mapWalks.length ? `<section class="study-card"><div class="study-card-head"><span class="step-badge">C</span><div><h2>Haritada gezin</h2><p>Oturum sonunda kavram haritandaki bağlantıları kullanarak soruları yanıtla.</p></div></div><div class="tasks-stack">${mapWalks.map(task => renderTask(course, { number: 'son' }, task)).join('')}</div></section>` : '');
   const reflections = course.reflectionQuestions?.length ? `<section class="study-card reflection-card"><div class="study-card-head"><span class="step-badge">↻</span><div><h2>Oturum sonu değerlendirmesi</h2><p>Yanıtların sonraki çalışma oturumunda neyi değiştireceğine yardımcı olur.</p></div></div>${course.reflectionQuestions.map((question, index) => `<label class="reflection-item"><span>${index + 1}. ${esc(question)}</span><textarea data-reflection="${index}" data-course-id="${esc(course.id)}" placeholder="Kısa notunu yaz…">${esc(progress.reflections?.[String(index)] || '')}</textarea></label>`).join('')}</section>` : '';
   return `<div class="lesson-head"><div><div class="eyebrow">${esc(course.category.toLocaleUpperCase('tr'))} · OTURUM SONU</div><h1>${esc(course.title)}</h1><p class="page-subtitle">Bu oturumda ${progress.completedBlocks || 0} / ${course.blocks.length} blok işaretledin. Cevapların kaydedildi; şimdi ne kadar rahat hatırladığını işaretle.</p></div><button class="btn ghost small" data-view="courses">Ders listesi</button></div>
     ${wrapGroups}${reflections}<section class="study-card"><div class="final-card"><div class="eyebrow">KISA ÖZ DEĞERLENDİRME</div><h2>${done ? 'Bu dersi tekrar açabilirsin.' : 'Nasıl hissettin?'}</h2><p>Bu seçim tamamlanma sayacından ayrı tutulur ve tekrar önerilerine yardımcı olur.</p><div class="rating-row">${[['confident','Rahat hatırlıyorum'],['review','Tekrar gerekli'],['difficult','Zorlandım']].map(([key,label]) => `<button class="rating-option ${rating === key ? 'active' : ''}" data-rating="${key}">${label}</button>`).join('')}</div><div class="finish-summary">${progress.completedBlocks || 0} blok tamamlandı · ${Object.values(progress.tasks).filter(task => task.answer?.trim()).length} cevap yazıldı · ${Object.values(progress.tasks).filter(task => task.revealed).length} örnek cevap görüldü</div><div class="lesson-actions"><button class="btn ghost small" data-action="prev-block">← Son bloğa dön</button><button class="btn" data-action="finish-course">${done ? 'Değerlendirmeyi güncelle' : 'Oturumu tamamla'}</button></div></div></section>`;
@@ -448,13 +527,15 @@ function renderSettings() {
   return `<div class="eyebrow">KİŞİSEL ÇALIŞMA ALANIN</div><h1 class="page-title">Ayarlar</h1><p class="page-subtitle">Okuma biçimini, görünümü ve cihazlar arası ilerleme kaydını buradan yönetebilirsin.</p>
     <div class="setting-grid">
       <section class="setting-card"><h2>Okuma tercihi</h2><p>Bionik vurgu ve kelime oynatıcısını sana göre ayarla.</p>
-        <div class="setting-row"><div><label for="pref-mode">Okuma biçimi</label><small>Metnin tamamı veya kelime kelime</small></div><select id="pref-mode" class="select-small setting-control" data-pref="readingMode"><option value="page" ${p.readingMode === 'page' ? 'selected' : ''}>Metin görünümü</option><option value="word" ${p.readingMode === 'word' ? 'selected' : ''}>Kelime kelime</option></select></div>
+        <div class="setting-row"><div><label for="pref-mode">Okuma biçimi</label><small>Metnin tamamı veya kelime kelime</small></div><select id="pref-mode" class="select-small setting-control" data-pref="readingMode"><option value="page" ${p.readingMode === 'page' ? 'selected' : ''}>Metinde kelime takibi</option><option value="word" ${p.readingMode === 'word' ? 'selected' : ''}>Ortada kelime göster</option></select></div>
         <div class="setting-row"><div><label>Bionik kelime vurgusu</label><small>Uzun kelimelerin başlangıcını belirginleştir</small></div><button class="toggle ${p.bionic ? 'active' : ''}" data-setting-toggle="bionic">${p.bionic ? 'Açık' : 'Kapalı'}</button></div>
-        <div class="setting-row"><div><label>Geçerli kelimeyi vurgula</label><small>Kelime kelime oynatıcıda sıradaki kelimenin arka planını boya</small></div><button class="toggle ${p.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">${p.highlightWord ? 'Açık' : 'Kapalı'}</button></div>
+        <div class="setting-row"><div><label>Geçerli kelimeyi vurgula</label><small>Her iki görünümde aktif kelimenin arka planını boya</small></div><button class="toggle ${p.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">${p.highlightWord ? 'Açık' : 'Kapalı'}</button></div>
         <div class="setting-row"><div><label for="bold-range">Kalın başlangıç miktarı</label><small>Kelimenin başlangıç bölümünün uzunluğu</small></div><span class="range-control"><input id="bold-range" type="range" min="15" max="60" step="5" value="${p.boldPercent}" data-setting-range="boldPercent"><span data-range-label="boldPercent">${p.boldPercent}%</span></span></div>
-        <div class="setting-row"><div><label for="wpm-pref">Kayma hızı</label><small>Dakikadaki kelime sayısı</small></div><span class="speed-control"><input id="wpm-range" type="range" min="60" max="1000" step="10" value="${p.wpm}" data-setting-range="wpm" aria-label="Kayma hızı"><input id="wpm-pref" class="field-input" type="number" min="60" max="1000" step="10" value="${p.wpm}" data-setting-number="wpm"><span data-range-label="wpm">${p.wpm} k/dk</span></span></div>
+        <div class="setting-row"><div><label for="wpm-pref">Okuma hızı</label><small>Dakikadaki kelime sayısı</small></div><span class="speed-control"><input id="wpm-range" type="range" min="60" max="1000" step="10" value="${p.wpm}" data-setting-range="wpm" aria-label="Okuma hızı"><input id="wpm-pref" class="field-input" type="number" min="60" max="1000" step="10" value="${p.wpm}" data-setting-number="wpm"><span data-range-label="wpm">${p.wpm} k/dk</span></span></div>
         <div class="setting-row"><div><label>Kelime grubu</label><small>Her adımda gösterilen kelime sayısı</small></div><select class="select-small setting-control" data-setting-select="groupWords"><option value="1" ${p.groupWords === 1 ? 'selected' : ''}>1 kelime</option><option value="2" ${p.groupWords === 2 ? 'selected' : ''}>2 kelime</option><option value="3" ${p.groupWords === 3 ? 'selected' : ''}>3 kelime</option></select></div>
         <div class="setting-row"><div><label>Noktalama duraklaması</label><small>Cümle sonlarında eklenecek bekleme</small></div><input class="setting-control field-input" type="number" min="0" max="2000" step="50" value="${p.punctuationPause}" data-setting-number="punctuationPause"></div>
+        <div class="setting-row"><div><label>Metni otomatik kaydır</label><small>Vurgu ekranın dışına geldiğinde metin onu takip eder</small></div><button class="toggle ${p.autoScroll ? 'active' : ''}" data-setting-toggle="autoScroll">${p.autoScroll ? 'Açık' : 'Kapalı'}</button></div>
+        <div class="setting-row"><div><label>Hareketi azalt</label><small>Kaydırmada geçiş animasyonunu kaldırır</small></div><button class="toggle ${p.reduceMotion ? 'active' : ''}" data-setting-toggle="reduceMotion">${p.reduceMotion ? 'Açık' : 'Kapalı'}</button></div>
         <div class="setting-row"><div><label>Paragraf takibi</label><small>Okurken bulunduğun paragrafı vurgula</small></div><button class="toggle ${p.focusParagraph ? 'active' : ''}" data-setting-toggle="focusParagraph">${p.focusParagraph ? 'Açık' : 'Kapalı'}</button></div>
       </section>
       <section class="setting-card"><h2>Ekran görünümü</h2><p>Yazıların rahat okunması için metin görünümünü değiştir.</p>
@@ -482,7 +563,7 @@ function renderSettings() {
         </details>
       </section>
       ${renderSyncConflicts()}
-      <section class="setting-card"><h2>Kelime kelime oynatıcı</h2><p>Aktif ders ekranında boşluk çubuğuyla başlat/durdur; ok tuşlarıyla kelimeleri değiştir. Yalnızca oynatıcı açıksa klavye kısayolları çalışır.</p><div class="sync-status-box">Hız: ${p.wpm} kelime/dakika · Kelime grubu: ${p.groupWords} · Noktalama duraklaması: ${p.punctuationPause} ms<br>Oynatma konumun çalışma ilerlemenle birlikte saklanır.</div></section>
+      <section class="setting-card"><h2>Kelime kelime oynatıcı</h2><p>Aktif ders ekranında boşluk çubuğuyla başlat/durdur; ok tuşlarıyla kelimeleri değiştir. Kısayollar metin ve ortada kelime gösteriminde çalışır; yazı yazarken devreye girmez.</p><div class="sync-status-box">Hız: ${p.wpm} kelime/dakika · Kelime grubu: ${p.groupWords} · Noktalama duraklaması: ${p.punctuationPause} ms<br>Oynatma konumun çalışma ilerlemenle birlikte saklanır.</div></section>
     </div>`;
 }
 
@@ -702,19 +783,25 @@ function updateReadingSetting(key, raw) {
   $$(`[data-range-label="${key}"]`).forEach(node => { node.textContent = key === 'wpm' ? `${value} k/dk` : `${value}%`; });
   $$(`[data-setting-range="${key}"]`).forEach(node => { if (node.value !== String(value)) node.value = String(value); });
   $$(`[data-setting-number="${key}"]`).forEach(node => { if (node.value !== String(value)) node.value = String(value); });
-  if (view === 'study' && key === 'boldPercent' && state.preferences.readingMode === 'page') {
-    const course = currentCourse(); if (course) { const block = course.blocks[activeBlock]; if (block) { const panel = $('#reading-panel'); if (panel) panel.innerHTML = renderReadingPanel(block).match(/<div class="reading-panel[\s\S]*?<\/div>/)?.[0] || panel.innerHTML; } }
+  if (['readingMode','groupWords','fontSize','focusParagraph','theme','bionic','highlightWord','boldPercent','autoScroll','reduceMotion'].includes(key)) {
+    const scroll = $('#reading-panel')?.scrollTop || 0;
+    render();
+    const panel = $('#reading-panel'); if (panel) panel.scrollTop = scroll;
   }
-  if (['readingMode','groupWords','fontSize','focusParagraph','theme','bionic','highlightWord'].includes(key)) render();
+  if (playerRunning && ['wpm','groupWords','punctuationPause'].includes(key)) {
+    clearTimeout(playerTimer); runPlayerStep();
+  }
 }
 
 function applyReaderPosition(delta) {
   const paragraphs = $$('.reading-paragraph', $('#reading-panel'));
   if (!paragraphs.length) return;
-  const current = paragraphs.findIndex(el => el.classList.contains('current'));
+  const currentParagraph = $(`[data-reader-word="${wordIndex}"]`)?.closest('.reading-paragraph');
+  const current = paragraphs.indexOf(currentParagraph);
   const target = Math.max(0, Math.min(paragraphs.length - 1, current + delta));
-  paragraphs.forEach((el, i) => el.classList.toggle('current', i === target));
-  paragraphs[target].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const first = $('[data-reader-word]', paragraphs[target]);
+  if (first) seekWord(Number(first.dataset.readerWord));
+  paragraphs[target].scrollIntoView({ behavior: readerScrollBehavior(), block: 'center' });
   const position = $('#reading-position'); if (position) position.textContent = `Paragraf ${target + 1} / ${paragraphs.length}`;
 }
 
@@ -729,8 +816,7 @@ function saveWordPosition() {
 }
 
 function refreshPlayerDisplay() {
-  const player = $('#word-player');
-  if (!player) return;
+  if (!$('#word-play')) return;
   const course = currentCourse(); const block = course?.blocks[activeBlock];
   if (!block) return;
   const words = splitWords(block);
@@ -740,47 +826,79 @@ function refreshPlayerDisplay() {
   const counter = $('#word-current'); if (counter) counter.textContent = String(words.length ? wordIndex + 1 : 0);
   const slider = $('[data-word-slider]'); if (slider) slider.value = String(wordIndex);
   const context = $('#word-player .player-context'); if (context) context.innerHTML = renderWordContext(words, Math.max(0, wordIndex - 8), wordIndex, count);
-  const button = $('#word-play'); if (button) { button.textContent = playerRunning ? 'Ⅱ' : '▶'; button.setAttribute('aria-label', playerRunning ? 'Durdur' : 'Oynat'); }
+  const button = $('#word-play');
+  if (button) { button.textContent = playerRunning ? 'Ⅱ Durdur' : '▶ Oynat'; button.setAttribute('aria-label', playerRunning ? 'Durdur' : 'Oynat'); }
+  $$('.reading-word.current').forEach(node => { node.classList.remove('current'); node.removeAttribute('aria-current'); });
+  const active = $(`[data-reader-word="${wordIndex}"]`);
+  if (state.preferences.highlightWord) for (let index = wordIndex; index < Math.min(words.length, wordIndex + count); index++) {
+    const node = $(`[data-reader-word="${index}"]`);
+    if (node) { node.classList.add('current'); node.setAttribute('aria-current', 'true'); }
+  }
+  const paragraph = active?.closest('[data-reading-paragraph]');
+  $$('.reading-paragraph').forEach(node => node.classList.toggle('current', state.preferences.focusParagraph && node === paragraph));
+  const position = $('#reading-position');
+  if (position && paragraph) position.textContent = `Paragraf ${Number(paragraph.dataset.readingParagraph) + 1} / ${block.reading.length}`;
+  const panel = $('#reading-panel');
+  if (active && panel && playerRunning && state.preferences.autoScroll) {
+    const rect = active.getBoundingClientRect(), bounds = panel.getBoundingClientRect();
+    if (rect.top < bounds.top + 24 || rect.bottom > bounds.bottom - 40) {
+      panel.scrollTo({ top: panel.scrollTop + rect.top - bounds.top - panel.clientHeight * .35, behavior: readerScrollBehavior() });
+    }
+  }
 }
 
-function wordDelay(word) {
-  const base = 60_000 / (state.preferences.wpm || 220);
+function readerScrollBehavior() {
+  return state.preferences.reduceMotion || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+}
+
+function wordDelay(word, count = 1) {
+  const base = count * 60_000 / (state.preferences.wpm || 220);
   const end = word.slice(-1);
   const extra = /[.!?…]/u.test(end) ? state.preferences.punctuationPause : /[,;:]/u.test(end) ? state.preferences.punctuationPause * .45 : 0;
   return base + extra;
 }
 
 function advanceWord(delta) {
+  seekWord(wordIndex + delta);
+}
+
+function seekWord(position) {
   const block = currentCourse()?.blocks[activeBlock];
   if (!block) return;
-  wordIndex = Math.max(0, Math.min(splitWords(block).length - 1, wordIndex + delta));
+  wordIndex = Math.max(0, Math.min(Math.max(0, splitWords(block).length - 1), position));
   saveWordPosition();
+  if (playerRunning) { clearTimeout(playerTimer); runPlayerStep(); }
 }
 
 function stopPlayer() {
   playerRunning = false;
   clearTimeout(playerTimer);
   playerTimer = 0;
+  refreshPlayerDisplay();
 }
 
 function runPlayerStep() {
   const block = currentCourse()?.blocks[activeBlock];
   const words = block ? splitWords(block) : [];
   if (!playerRunning || !words.length) return;
-  if (wordIndex >= words.length - 1) { stopPlayer(); refreshPlayerDisplay(); saveWordPosition(); return; }
+  const group = Math.min(Math.max(1, Number(state.preferences.groupWords) || 1), words.length - wordIndex);
   playerTimer = setTimeout(() => {
     if (!playerRunning) return;
-    const group = Math.max(1, Number(state.preferences.groupWords) || 1);
-    const last = words.slice(wordIndex, wordIndex + group).at(-1) || '';
-    wordIndex = Math.min(words.length - 1, wordIndex + group);
+    if (wordIndex + group >= words.length) { stopPlayer(); saveWordPosition(); return; }
+    wordIndex += group;
     saveWordPosition();
     runPlayerStep();
-  }, wordDelay(words[Math.min(wordIndex + Math.max(1, Number(state.preferences.groupWords)) - 1, words.length - 1)] || ''));
+  }, wordDelay(words[wordIndex + group - 1] || '', group));
 }
 
 function togglePlayer() {
   if (playerRunning) stopPlayer();
-  else { playerRunning = true; runPlayerStep(); }
+  else {
+    const words = currentCourse()?.blocks[activeBlock] ? splitWords(currentCourse().blocks[activeBlock]) : [];
+    if (!words.length) return;
+    if (wordIndex >= words.length - 1) { wordIndex = 0; saveWordPosition(); }
+    playerRunning = true; runPlayerStep();
+  }
   refreshPlayerDisplay();
 }
 
@@ -1205,6 +1323,8 @@ function updateCardReview(courseId, key, action) {
 
 document.addEventListener('click', async event => {
   markActivity();
+  const readingWord = event.target.closest('[data-reader-word]');
+  if (readingWord) { seekWord(Number(readingWord.dataset.readerWord)); return; }
   const viewButton = event.target.closest('[data-view]');
   if (viewButton) { navTo(viewButton.dataset.view); return; }
   const courseButton = event.target.closest('[data-course]');
@@ -1214,8 +1334,22 @@ document.addEventListener('click', async event => {
   const blockButton = event.target.closest('[data-block]');
   if (blockButton) { stopPlayer(); activeBlock = Number(blockButton.dataset.block); changeLesson(currentCourse().id, { activeBlock }, 1_500); render(); return; }
   const settingToggle = event.target.closest('[data-setting-toggle]');
-  if (settingToggle) { const key = settingToggle.dataset.settingToggle; updateReadingSetting(key, !state.preferences[key]); render(); return; }
+  if (settingToggle) { const key = settingToggle.dataset.settingToggle; updateReadingSetting(key, !state.preferences[key]); return; }
   const action = event.target.closest('[data-action]')?.dataset.action;
+  if (action === 'show-answer-map') {
+    stopPlayer();
+    const card = $('#answer-map-card');
+    const details = $('.answer-map-details', card || document);
+    if (details) details.open = true;
+    card?.scrollIntoView({ behavior: readerScrollBehavior(), block: 'start' });
+    return;
+  }
+  if (action === 'map-route') {
+    activeMapRouteId = event.target.closest('[data-map-route]').dataset.mapRoute;
+    const card = $('#answer-map-card');
+    if (card) { card.outerHTML = renderAnswerMap(currentCourse()); observeAnswerMap(); }
+    return;
+  }
   if (action === 'resolve-conflict') {
     const button = event.target.closest('[data-action="resolve-conflict"]');
     resolveSyncConflict(Number(button.dataset.conflictIndex), button.dataset.conflictChoice); return;
@@ -1271,6 +1405,7 @@ document.addEventListener('click', async event => {
   if (action === 'next-block') { markBlockDone(); return; }
   if (action === 'leave-block') { leaveBlock(); return; }
   if (action === 'phase-consume' || action === 'phase-digest' || action === 'consume-done') {
+    stopPlayer();
     const course = currentCourse(), block = course?.blocks[activeBlock];
     if (!course || !block) return;
     const flow = blockFlow(course.id, block.number);
@@ -1396,7 +1531,7 @@ document.addEventListener('input', event => {
   }
   if (input.matches('[data-setting-range]')) { updateReadingSetting(input.dataset.settingRange, input.value); return; }
   if (input.matches('[data-setting-number]')) { updateReadingSetting(input.dataset.settingNumber, input.value); return; }
-  if (input.matches('[data-word-slider]')) { wordIndex = Number(input.value); saveWordPosition(); }
+  if (input.matches('[data-word-slider]')) { seekWord(Number(input.value)); }
 });
 
 document.addEventListener('change', event => {
@@ -1429,7 +1564,7 @@ document.addEventListener('submit', event => {
 
 document.addEventListener('keydown', event => {
   markActivity();
-  if (view === 'study' && state.preferences.readingMode === 'word' && $('#word-player') && !['TEXTAREA','INPUT','SELECT'].includes(document.activeElement?.tagName)) {
+  if (view === 'study' && $('#word-play') && !document.activeElement?.closest('textarea, input, select, button, a, summary, [role="button"], [contenteditable]')) {
     if (event.code === 'Space') { event.preventDefault(); togglePlayer(); }
     if (event.key === 'ArrowLeft') { event.preventDefault(); advanceWord(-1); }
     if (event.key === 'ArrowRight') { event.preventDefault(); advanceWord(1); }
@@ -1454,6 +1589,7 @@ document.addEventListener('focusout', event => {
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    stopPlayer();
     touchState(15_000);
     if (activeSyncProvider()) syncNow();
   }
@@ -1495,7 +1631,9 @@ setInterval(() => {
 
 async function init() {
   try {
-    const response = await fetch(new URL('./data/courses.json', document.baseURI));
+    const contentURL = new URL('./data/courses.json', import.meta.url);
+    contentURL.search = new URL(import.meta.url).search;
+    const response = await fetch(contentURL);
     if (!response.ok) throw new Error(`Dersler yüklenemedi (${response.status}).`);
     courses = await response.json();
     if (!Array.isArray(courses) || !courses.length) throw new Error('Ders listesi boş. İçerik oluşturucusunu çalıştır.');

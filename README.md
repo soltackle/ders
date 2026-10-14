@@ -6,9 +6,11 @@ KPSS A Maliye çalışma kâğıtlarını adım adım kullanmak için GitHub Pag
 
 - 31 P.A.C.E.R. dersi, 129 çalışma bloğu, kaynak paragrafları ve belge cevap anahtarları
 - P / A / C / E / R görevlerine göre yapılandırılmış cevap alanları; örnek cevabı açma ve kopyalama
-- Bionik vurgu, paragraf odağı ve kelime kelime okuma; hız, kelime grubu, vurgu, boyut ve duraklama tercihleri
+- Metin üzerinde ilerleyen kelime vurgusu ve ortada kelime gösterimi; her iki görünümde oynat/durdur, hız, konum seçme ve kaldığın kelimeden devam
+- Bionik vurgu, paragraf odağı, otomatik kaydırma ve hareket azaltma; kelime grubu, yazı boyutu ve duraklama tercihleri
 - Otomatik cihaz kaydı, çalışma istatistikleri, ders sonu öz değerlendirme ve zamanlı tekrar kartları
-- Kaynak paragrafına bağlı, düzenlenebilir kavram bağlantıları; ders sonu kaynak soruları ve Tüket/Sindir süre özeti
+- 31 dersin Y cevap anahtarlarından hazırlanmış 93 otomatik kavram haritası; adlandırılmış ilişkiler, otomatik yerleşim ve kaynak açıklaması
+- Kaynak paragrafına bağlı kişisel kavram bağlantıları ve analoji notları; ders sonu kaynak soruları ve Tüket/Sindir süre özeti
 - 10/20/40 dakikalık veya özel çalışma oturumu, mola sayacı ve tarihli görev erteleme
 - Supabase e-posta hesabıyla cihazlar arası ilerleme eşitlemesi; GitHub özel depo eşitlemesi alternatif olarak durur
 
@@ -32,6 +34,28 @@ python3 scripts/build_content.py
 ```
 
 Betik Python standart kütüphanesini kullanır; uygulama paketleri yüklenmez.
+
+## Kavram haritaları ve kontroller
+
+`scripts/concept_maps.json`, DOCX belgelerindeki Y cevapları incelenerek
+hazırlanmış kavram ve ilişki etiketlerini içerir. Her yol kendi Y cevap
+kimliğine bağlıdır; kaynak cevap değişirse içerik üretimi durur. Böyle bir
+değişiklikte ilgili bağlantıları kaynak cevaba göre inceleyip `_source`
+SHA256 değerini gözden geçirilen cevapla güncelle. Cevabı bulunmayan
+açık uçlu Y görevleri için hazır harita üretilmez.
+
+Tarayıcı haritayı yerel Dagre dosyasıyla otomatik yerleştirir. Büyük haritalar
+kendi panelinde kaydırılabilir; kaynak açıklaması ve bağlantı listesi de
+haritanın altında bulunur. Kişisel harita notları ayrı saklanır.
+
+Kaynak eşleşmesi, ok yönleri, eksik bağlantılar ve döngüler:
+
+```bash
+python3 scripts/test_build_content.py
+```
+
+GitHub Pages yayını bu kontrolleri çalıştırır. Ders verisi, CSS, JavaScript
+ve grafik yerleşim dosyası aynı yayın sürümüyle yüklenir.
 
 ## GitHub Pages
 
