@@ -3,6 +3,8 @@ const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const STORAGE_KEY = 'ders-maliye-progress-v1';
 const SYNC_KEY = 'ders-maliye-github-v1';
 const DEFAULT_GITHUB_CLIENT_ID = 'Iv23liJeFWuLkdXEkG4K';
+const DEFAULT_GITHUB_OWNER = 'soltackle';
+const DEFAULT_GITHUB_REPO = 'ders-ilerlemem';
 const DAY = 86_400_000;
 const ICONS = ['◌', '↗', '▦', '◇', '◒', '▤', '◍', '⌁'];
 const DEFAULTS = {
@@ -44,8 +46,8 @@ function loadState() {
 function loadGithub() {
   try {
     const saved = JSON.parse(localStorage.getItem(SYNC_KEY) || 'null') || {};
-    return { owner: '', repo: '', token: '', sha: '', ...saved, clientId: saved.clientId || DEFAULT_GITHUB_CLIENT_ID };
-  } catch { return { clientId: DEFAULT_GITHUB_CLIENT_ID, owner: '', repo: '', token: '', sha: '' }; }
+    return { token: '', sha: '', ...saved, clientId: saved.clientId || DEFAULT_GITHUB_CLIENT_ID, owner: saved.owner || DEFAULT_GITHUB_OWNER, repo: saved.repo || DEFAULT_GITHUB_REPO };
+  } catch { return { clientId: DEFAULT_GITHUB_CLIENT_ID, owner: DEFAULT_GITHUB_OWNER, repo: DEFAULT_GITHUB_REPO, token: '', sha: '' }; }
 }
 
 function persistGithub() {
@@ -779,9 +781,11 @@ const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function authorizeGithubDevice() {
   if (githubDeviceFlowActive) return;
   const clientId = $('#github-client-id')?.value.trim();
-  const owner = $('#github-owner')?.value.trim();
-  const repo = $('#github-repo')?.value.trim();
-  if (!clientId || !owner || !repo) { setGithubAuthStatus('Client ID, depo sahibi ve depo adını doldur.'); return; }
+  const owner = $('#github-owner')?.value.trim() || DEFAULT_GITHUB_OWNER;
+  const repo = $('#github-repo')?.value.trim() || DEFAULT_GITHUB_REPO;
+  if ($('#github-owner')) $('#github-owner').value = owner;
+  if ($('#github-repo')) $('#github-repo').value = repo;
+  if (!clientId) { setGithubAuthStatus('GitHub App Client ID bulunamadı.'); return; }
   if (!validGithubTarget(owner, repo)) { setGithubAuthStatus('GitHub depo sahibi veya depo adını kontrol et.'); return; }
   githubDeviceFlowActive = true;
   github = { ...github, clientId, owner, repo };
