@@ -209,6 +209,7 @@ def extract_course(path: Path) -> dict:
                 seen_cards.add(key)
 
     analogy_answers = {}
+    analogy_by_topic = {}
     answer_block = None
     capturing_analogy = False
     for p in paras[answer_i + 1 :]:
@@ -217,9 +218,11 @@ def extract_course(path: Path) -> dict:
             answer_block = int(block_heading.group(1))
             capturing_analogy = False
             continue
-        if p.startswith("Analoji eleştirisi"):
+        if p.startswith(("Analoji eleştirisi", "PACER'in analojisi ve eleştirisi")):
             capturing_analogy = True
             analogy_answers[answer_block] = [p]
+            topic = re.split(r"\s*[—–]\s*", p, maxsplit=1)[-1].casefold()
+            analogy_by_topic[topic] = analogy_answers[answer_block]
             continue
         if capturing_analogy:
             if TASK_ID.match(p) or p.startswith(("Uzman gibi gez", "Kanıt provası", "Uzmanın ağı")):
@@ -315,7 +318,7 @@ def extract_course(path: Path) -> dict:
                             "answer": "\n".join(analogy_answers.get(block_number, [])),
                         }
                     )
-                elif p.startswith("Futbol benzetmen:") or p.startswith("Kendi benzetmeni kur:"):
+                elif p.startswith(("Futbol benzetmen:", "Kendi benzetmeni kur:", "Kendi analojin:")):
                     current["tasks"].append(
                         {
                             "id": f"A{block_number}own",
@@ -332,6 +335,17 @@ def extract_course(path: Path) -> dict:
                 current["instruction"] += "\n" + p
             elif current and p not in {"✓", "☐", "—"}:
                 current["guidance"].append(p)
+
+        # Some worksheets place an analogy in a different block than its answer key.
+        # Match the original topic before falling back to the block number.
+        for section in sections:
+            if section["type"] != "A":
+                continue
+            guidance = " ".join(section["guidance"]).casefold()
+            matches = [answer for topic, answer in analogy_by_topic.items() if topic in guidance]
+            if len(matches) == 1:
+                for task in section["tasks"]:
+                    task["answer"] = "\n".join(matches[0])
 
         # Add the original read direction even when a worksheet uses a label variation.
         read_instruction = next(

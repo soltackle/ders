@@ -21,6 +21,30 @@ class AnswerMapTests(unittest.TestCase):
             expected = {task["id"] for task in course["mapWalks"] if task["answer"]}
             self.assertEqual({diagram["id"] for diagram in course["answerMaps"]}, expected)
 
+    def test_every_concept_and_analogy_note_has_its_original_answer(self):
+        tasks = [task for course in self.courses for block in course["blocks"]
+                 for section in block["sections"] if section["type"] in {"C", "A"}
+                 for task in section["tasks"]]
+        self.assertEqual(len(tasks), 918)
+        self.assertTrue(all(task["answer"] for task in tasks))
+
+    def test_pacer_analogy_heading_and_own_note_are_extracted(self):
+        section = next(section for section in self.course["blocks"][0]["sections"]
+                       if section["type"] == "A")
+        own = next(task for task in section["tasks"] if task["id"] == "A1own")
+        self.assertTrue(own["prompt"].startswith("Kendi analojin:"))
+        self.assertIn("PACER'in analojisi ve eleştirisi", own["answer"])
+        self.assertIn("maaş tavanı", own["answer"])
+
+    def test_analogy_uses_topic_when_answer_key_is_in_another_block(self):
+        filename = "30-vergi-hukuku-2-temel-kavramlar-ve-surec-pacer.docx"
+        course = content.extract_course(content.COURSES / filename)
+        block = next(block for block in course["blocks"] if block["number"] == 4)
+        section = next(section for section in block["sections"] if section["type"] == "A")
+        for task in section["tasks"]:
+            self.assertIn("Tarh → tebliğ → tahakkuk → tahsil zinciri", task["answer"])
+            self.assertNotIn("Mükellef – vergi sorumlusu – vergi taşıyıcısı ayrımı", task["answer"])
+
     def test_left_arrow_in_original_answer_keeps_its_direction(self):
         task = next(task for task in self.course["mapWalks"] if task["id"] == "Y1")
         self.assertIn("Maliye politikası ← (esnekliğini azaltır) Bütçe katılığı", task["answer"])

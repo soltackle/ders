@@ -218,3 +218,29 @@ Bu senaryo doğrulanmadan yalnızca sayfa açılıyor diye sürüm tamamlanmış
 ## 10. Sonraki paketlere bırakılan fikirler
 
 Serbest sürüklemeli gelişmiş kavram haritası, metin seçimiyle ayrıntılı etiketleme, tarayıcı bildirimi, çevrimdışı uygulama kurulumu, sesli okuma ve sınav simülasyonu çekirdek akıştan sonra ele alınacak. Yapay zekâyla cevap puanlama ve belge dışında soru üretimi bu planın ilk sürüm kapsamına dahil değil.
+
+
+### Tek ekranda sıralı çalışma — 14 Ekim 2026
+
+Okuma, C/A not soruları, diğer blok soruları ve özet aynı çalışma alanında sırayla açılır.
+Sayfa yerine aktif panel kayar; geri/devam düğmeleri ekranda kalır. Kaynak metin ve
+hazır kavram haritası bu alanda açılır; kapatınca çalışılan soruya dönülür.
+Oturum sonu Y soruları, değerlendirme soruları ve öz değerlendirme de tek tek ilerler.
+
+C/A alanlarında belgedeki örnek cevap gösterilir ve kopyalanır; kendi cevap metni
+değişmez. Serbest kavram/analoji notları korunmuştur. Ayrıştırıcı artık farklı
+PACER analoji başlığını ve “Kendi analojin” görevini de okur; soru ile cevap anahtarı
+farklı bloklarda bulunduğunda özgün konu başlığıyla eşleştirir. 348 C ve 570 A
+görevinin kaynak cevabı vardır.
+
+Özet otomatik blok tamamlamaz. Eksik görevler listelenir; okuma ve görevler bitince
+blok tamamlanır, aksi halde sonraya bırakılabilir. Önceki görev kimlikleri, aktif
+görev indeksi, cevaplar, serbest notlar ve kelime konumu değişmeden korunur.
+
+
+Kontroller: 8 kaynak/içerik testi; 360×740, 768×900, 1280×900 ve yatay 844×390
+boyutlarında okuma, not cevaplarını açma/kopyalama, geri/ileri, Ctrl+Enter,
+yenileyip devam etme, blok özeti ve oturum sonu akışı. Ayrıca 320 px koyu tema,
+kelime görünümü, ileri tarihe erteleme ve eksik görev kontrolü; yeni eklenen
+analoji sorularında eski görev indeksinin korunması ve blok numarası sıralı
+olmayan belgelerde cevap kaydedip doğru bloktan devam etme doğrulandı.
