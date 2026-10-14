@@ -12,6 +12,7 @@ KPSS A Maliye çalışma kâğıtlarını adım adım kullanmak için GitHub Pag
 - Sıcak açık zemin ve dengeli koyu tema; derslerde varsayılan odak görünümü, açılır okuma seçenekleri ve rahat metin genişliği
 - Otomatik cihaz kaydı, çalışma istatistikleri, ders sonu öz değerlendirme ve zamanlı tekrar kartları
 - 31 dersin Y cevap anahtarlarından hazırlanmış 93 otomatik kavram haritası; adlandırılmış ilişkiler, otomatik yerleşim ve kaynak açıklaması
+- Serbest kavram/analoji notlarında da ? ile kaynak cevabını açma ve kopyalama; kavram notları için belgedeki özgün blok haritası
 - Kaynak paragrafına bağlı kişisel kavram bağlantıları ve analoji notları; ders sonu kaynak soruları ve Tüket/Sindir süre özeti
 - 10/20/40 dakikalık veya özel çalışma oturumu, mola sayacı ve tarihli görev erteleme
 - Supabase e-posta hesabıyla cihazlar arası ilerleme eşitlemesi; GitHub özel depo eşitlemesi alternatif olarak durur

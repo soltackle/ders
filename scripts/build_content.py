@@ -208,6 +208,7 @@ def extract_course(path: Path) -> dict:
                 )
                 seen_cards.add(key)
 
+    note_map_answers = {}
     analogy_answers = {}
     analogy_by_topic = {}
     answer_block = None
@@ -217,6 +218,9 @@ def extract_course(path: Path) -> dict:
         if block_heading:
             answer_block = int(block_heading.group(1))
             capturing_analogy = False
+            continue
+        if p.startswith("Harita:") and answer_block is not None:
+            note_map_answers[answer_block] = p
             continue
         if p.startswith(("Analoji eleştirisi", "PACER'in analojisi ve eleştirisi")):
             capturing_analogy = True
@@ -374,6 +378,7 @@ def extract_course(path: Path) -> dict:
                 "readInstruction": read_instruction,
                 "reading": reading,
                 "sections": sections,
+                "sourceMapAnswer": note_map_answers.get(block_number, ""),
             }
         )
 

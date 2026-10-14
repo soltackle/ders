@@ -244,3 +244,11 @@ yenileyip devam etme, blok özeti ve oturum sonu akışı. Ayrıca 320 px koyu t
 kelime görünümü, ileri tarihe erteleme ve eksik görev kontrolü; yeni eklenen
 analoji sorularında eski görev indeksinin korunması ve blok numarası sıralı
 olmayan belgelerde cevap kaydedip doğru bloktan devam etme doğrulandı.
+
+
+Serbest kavram ve analoji notlarına da ayrı “? Cevabı göster” ve kopyalama
+düğmeleri eklendi. 129 bloğun cevap anahtarındaki özgün “Harita:” metni
+kavram notlarında gösterilir; analoji örneği aynı not alanında açılır.
+Örneği açmak/kopyalamak yazılan notu veya görev tamamlama durumunu değiştirmez.
+360/1280 px ekranlarda göster/gizle, pano, not/imleç konumu ve yenileme sonrası
+notların korunması; 9 kaynak/içerik testi doğrulandı.

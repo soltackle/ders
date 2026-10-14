@@ -325,3 +325,13 @@ textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
   .workspace-reading .word-player { min-height: 140px; }
 }
 .workspace-task .model-answer:not(.no-key)::before { content: 'Belgedeki örnek cevap'; display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+
+.personal-note-answer { margin: 12px 0; }
+.personal-note-answer .answer-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.note-model-answer { margin-top: 12px; padding: 14px; background: var(--green-2); color: var(--ink); border-left: 2px solid #8c9c7f; border-radius: 8px; max-height: 45dvh; overflow: auto; scrollbar-width: thin; }
+.note-model-answer[hidden] { display: none; }
+.note-model-answer article + article { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 16px; }
+.note-model-answer strong { font-size: 12px; color: var(--muted); }
+.note-model-answer p { white-space: pre-wrap; line-height: 1.8; }
+.note-source-prompt { font-size: 13px; color: var(--muted); }
+.note-source-text { font-size: 15px; }

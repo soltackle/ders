@@ -28,6 +28,14 @@ class AnswerMapTests(unittest.TestCase):
         self.assertEqual(len(tasks), 918)
         self.assertTrue(all(task["answer"] for task in tasks))
 
+    def test_personal_map_note_uses_the_original_block_answer(self):
+        paragraphs = content.read_docx(self.path)
+        original = next(line for line in paragraphs if line.startswith("Harita:"))
+        self.assertEqual(self.course["blocks"][0]["sourceMapAnswer"], original)
+        for course in self.courses:
+            for block in course["blocks"]:
+                self.assertTrue(block["sourceMapAnswer"].startswith("Harita:"))
+
     def test_pacer_analogy_heading_and_own_note_are_extracted(self):
         section = next(section for section in self.course["blocks"][0]["sections"]
                        if section["type"] == "A")

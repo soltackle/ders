@@ -361,10 +361,26 @@ function renderStudyReading(course, block) {
   return `<div class="workspace-reading"><div class="reading-tools"><label class="tool-select">Gösterim <select id="reading-mode" class="select-small" aria-label="Okuma biçimi"><option value="page" ${prefs.readingMode === 'page' ? 'selected' : ''}>Metinde kelime takibi</option><option value="word" ${prefs.readingMode === 'word' ? 'selected' : ''}>Ortada kelime göster</option></select></label><details class="reader-preferences"><summary>Okuma seçenekleri</summary><div class="reader-preferences-body"><button class="toggle ${prefs.bionic ? 'active' : ''}" data-setting-toggle="bionic">Bionik ${prefs.bionic ? 'Açık' : 'Kapalı'}</button><button class="toggle ${prefs.highlightWord ? 'active' : ''}" data-setting-toggle="highlightWord">Kelime vurgusu ${prefs.highlightWord ? 'Açık' : 'Kapalı'}</button><button class="text-button" data-view="settings">Tüm okuma ayarları →</button></div></details></div>${prefs.readingMode === 'word' ? renderWordPlayer(course, block, activeBlock) : renderReadingPanel(block)}</div>`;
 }
 
+function noteSourceAnswers(course, block, kind) {
+  const tasks = getBlockTasks(block).filter(entry => entry.section.type === kind).map(entry => entry.task);
+  if (kind === 'C' && block.sourceMapAnswer) tasks.unshift({ id: `Blok ${block.number} · Harita`, prompt: 'Bu bloğun cevap anahtarındaki kavram bağlantıları', answer: block.sourceMapAnswer });
+  const seen = new Set();
+  return tasks.filter(task => {
+    if (!task.answer || seen.has(task.answer)) return false;
+    seen.add(task.answer); return true;
+  });
+}
+
+function renderNoteAnswerControls(course, block, kind) {
+  const answers = noteSourceAnswers(course, block, kind);
+  const id = `note-source-${block.number}-${kind}`;
+  return `<div class="personal-note-answer" data-note-source="${kind}" data-course-id="${esc(course.id)}" data-block-number="${block.number}"><div class="answer-actions"><button class="answer-button" data-note-answer-action="reveal" aria-expanded="false" aria-controls="${id}">? Cevabı göster</button><button class="answer-button" data-note-answer-action="copy" ${answers.length ? '' : 'disabled'}>Cevabı kopyala</button></div><div class="note-model-answer" id="${id}" hidden>${answers.length ? answers.map(task => `<article><strong>Cevap anahtarı · ${esc(task.id)}</strong><p class="note-source-prompt">${esc(task.prompt)}</p><p class="note-source-text">${esc(task.answer)}</p></article>`).join('') : '<p>Bu not için belgede ayrı bir örnek cevap bulunmuyor.</p>'}</div></div>`;
+}
+
 function renderPersonalNotes(course, block, kind) {
   const progress = lessonProgress(course.id), flow = blockFlow(course.id, block.number);
-  if (kind === 'A') return `<details class="personal-notes"><summary>Serbest analoji notlarım</summary><label><span>Eski notların burada; bu soruya cevabını yukarıya yazabilirsin.</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label></details>`;
-  return `<details class="personal-notes"><summary>Serbest kavram bağlantılarım</summary><div class="map-editor"><div><label><span>${course.mapSetup?.starter ? `Başlangıç: ${esc(course.mapSetup.starter)}` : 'Kendi kavram bağlantıların'}</span></label><div class="map-link-form"><input data-map-from placeholder="Kavram" aria-label="Başlangıç kavramı"><input data-map-relation placeholder="İlişki (oluşturur, etkiler…)" aria-label="İlişki"><input data-map-to placeholder="Bağlı kavram" aria-label="Hedef kavram"><select data-map-source aria-label="Kaynak paragrafı"><option value="">Kaynak paragrafı (isteğe bağlı)</option>${block.reading.map((para, i) => `<option value="${block.number}:${i + 1}">Blok ${block.number} · ¶${i + 1} · ${esc(shorten(para.text, 54))}</option>`).join('')}</select><button class="btn small" data-action="map-add">Bağlantı ekle</button></div><label><span>Eski notların burada; bu soruya cevabını yukarıya yazabilirsin.</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki → kavram | B1 ¶2">${esc(progress.mapNotes || '')}</textarea></label></div><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div></details>`;
+  if (kind === 'A') return `<details class="personal-notes"><summary>Serbest analoji notlarım</summary><label><span>Kaynak cevabını açıp kendi notunu yazarak çalışabilirsin.</span><textarea data-flow-field="analogyNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Neye benziyor? Nerede ayrılıyor?">${esc(flow.analogyNotes || '')}</textarea></label>${renderNoteAnswerControls(course, block, 'A')}</details>`;
+  return `<details class="personal-notes"><summary>Serbest kavram bağlantılarım</summary><div class="map-editor"><div><label><span>${course.mapSetup?.starter ? `Başlangıç: ${esc(course.mapSetup.starter)}` : 'Kendi kavram bağlantıların'}</span></label><div class="map-link-form"><input data-map-from placeholder="Kavram" aria-label="Başlangıç kavramı"><input data-map-relation placeholder="İlişki (oluşturur, etkiler…)" aria-label="İlişki"><input data-map-to placeholder="Bağlı kavram" aria-label="Hedef kavram"><select data-map-source aria-label="Kaynak paragrafı"><option value="">Kaynak paragrafı (isteğe bağlı)</option>${block.reading.map((para, i) => `<option value="${block.number}:${i + 1}">Blok ${block.number} · ¶${i + 1} · ${esc(shorten(para.text, 54))}</option>`).join('')}</select><button class="btn small" data-action="map-add">Bağlantı ekle</button></div><label><span>Kaynak cevabını açıp kendi notunu yazarak çalışabilirsin.</span><textarea data-flow-field="mapNotes" data-course-id="${esc(course.id)}" data-block-number="${block.number}" placeholder="Her satıra: kavram → ilişki → kavram | B1 ¶2">${esc(progress.mapNotes || '')}</textarea></label>${renderNoteAnswerControls(course, block, 'C')}</div><div class="map-preview" data-map-preview>${renderMapPreview(progress.mapNotes || '')}</div></div></details>`;
 }
 
 function renderStudyTask(course, block, entry) {
@@ -1533,6 +1549,29 @@ document.addEventListener('click', async event => {
   if (action === 'export') { exportState(); return; }
   const rating = event.target.closest('[data-rating]');
   if (rating) { changeLesson(currentCourse().id, { rating: rating.dataset.rating }, 1_500); render(); return; }
+  const noteAction = event.target.closest('[data-note-answer-action]');
+  if (noteAction) {
+    const panel = noteAction.closest('[data-note-source]'), model = panel.querySelector('.note-model-answer');
+    const reveal = panel.querySelector('[data-note-answer-action="reveal"]');
+    const show = visible => {
+      model.hidden = !visible;
+      reveal.textContent = visible ? 'Cevabı gizle' : '? Cevabı göster';
+      reveal.setAttribute('aria-expanded', String(visible));
+    };
+    if (noteAction.dataset.noteAnswerAction === 'reveal') show(model.hidden);
+    else {
+      const course = courses.find(item => item.id === panel.dataset.courseId);
+      const block = course?.blocks.find(item => String(item.number) === panel.dataset.blockNumber);
+      if (!block) return;
+      const answers = noteSourceAnswers(course, block, panel.dataset.noteSource);
+      try {
+        await navigator.clipboard.writeText(answers.map(task => task.answer).join('\n\n'));
+        show(true); noteAction.textContent = 'Kopyalandı ✓';
+        showToast('Notun örnek cevabı panoya kopyalandı.');
+      } catch { show(true); showToast('Cevabı seçerek kopyalayabilirsin.'); }
+    }
+    return;
+  }
   const taskAction = event.target.closest('[data-task-action]');
   if (taskAction) {
     const courseId = taskAction.dataset.courseId, key = taskAction.dataset.taskKey;
