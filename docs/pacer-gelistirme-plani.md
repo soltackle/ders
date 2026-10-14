@@ -4,6 +4,14 @@ Durum: temel uygulama ve ek çalışma paketi `codex/study-app` dalında. Oturum
 
 ### 14 Ekim 2026 — okuma ve hazır harita ek paketi
 
+Görsel güncelleme: sıcak ve daha düşük parlaklıktaki yüzeyler, tek vurgu
+rengi, sistem yazı tipi, 65 karakterlik okuma genişliği ve sade çalışma
+sayfası uygulandı. Tekrarlanan blok yönergesi kaldırıldı; okuma seçenekleri
+ve yönergeler açılır alanlara taşındı. Odak görünümü varsayılan açık;
+ders başlığındaki düğmeden veya Ayarlar'dan değiştirilebilir. Açık ve koyu
+görünümde 360/768/1280 px kontrolleri, oynatma, cevap koruma, odak geçişi
+ve örnek metin/kontrol kontrastı doğrulandı.
+
 - Normal metin görünümüne oynat/durdur ve hız kontrolü eklendi. Kelime arka
   planı metin içinde ilerliyor; kelimeye tıklama, konum sürgüsü, önceki/sonraki
   kelime ve paragraf kontrolleri aynı okuma konumunu kullanıyor. Ortada kelime

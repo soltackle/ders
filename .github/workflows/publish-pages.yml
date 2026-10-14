@@ -44,7 +44,7 @@ jobs:
           index = Path("site/index.html")
           html = index.read_text()
           version = os.environ["RELEASE_SHA"][:12]
-          for asset in ("styles.css", "app.js", "vendor/dagre.min.js"):
+          for asset in ("styles.css", "comfort.css", "app.js", "vendor/dagre.min.js"):
               html = html.replace(f'./{asset}"', f'./{asset}?v={version}"')
           index.write_text(html)
           PY

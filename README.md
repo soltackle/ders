@@ -8,6 +8,7 @@ KPSS A Maliye çalışma kâğıtlarını adım adım kullanmak için GitHub Pag
 - P / A / C / E / R görevlerine göre yapılandırılmış cevap alanları; örnek cevabı açma ve kopyalama
 - Metin üzerinde ilerleyen kelime vurgusu ve ortada kelime gösterimi; her iki görünümde oynat/durdur, hız, konum seçme ve kaldığın kelimeden devam
 - Bionik vurgu, paragraf odağı, otomatik kaydırma ve hareket azaltma; kelime grubu, yazı boyutu ve duraklama tercihleri
+- Sıcak açık zemin ve dengeli koyu tema; derslerde varsayılan odak görünümü, açılır okuma seçenekleri ve rahat metin genişliği
 - Otomatik cihaz kaydı, çalışma istatistikleri, ders sonu öz değerlendirme ve zamanlı tekrar kartları
 - 31 dersin Y cevap anahtarlarından hazırlanmış 93 otomatik kavram haritası; adlandırılmış ilişkiler, otomatik yerleşim ve kaynak açıklaması
 - Kaynak paragrafına bağlı kişisel kavram bağlantıları ve analoji notları; ders sonu kaynak soruları ve Tüket/Sindir süre özeti
