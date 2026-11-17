@@ -5,8 +5,8 @@ import {inspectScenario} from './analyzer.ts';
 import {z} from 'zod';
 export type EditorState={scenario:ScenarioType;selected:string;step:number;time:number;mode:string;view:string};
 export type EditorApi={get:()=>EditorState;set:(s:ScenarioType)=>void;select:(id:string)=>void;undo:()=>void;redo:()=>void;subscribe:(fn:()=>void)=>void;draw:(index:number,enabled:boolean)=>void;preview:(s:ScenarioType|null)=>void;canvas:HTMLCanvasElement;loadModel:(file:File|null)=>Promise<void>};
-export function savedCases():Record<string,ScenarioType>{try{return JSON.parse(localStorage.getItem('ol-cases')||'{}')}catch{return {}}}
-export function saveCase(s:ScenarioType,name=s.name){const cases=savedCases();Object.defineProperty(cases,name,{value:s,enumerable:true,configurable:true,writable:true});localStorage.setItem('ol-cases',JSON.stringify(cases))}
+export {savedCases,saveCase} from './library.ts';
+import {savedCases,saveCase} from './library.ts';
 const el=<T extends HTMLElement>(root:ParentNode,q:string)=>root.querySelector<T>(q)!;
 const escape=(s:string)=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 const number=(data:FormData,key:string)=>Number(data.get(key));

@@ -2,7 +2,7 @@ import {test} from 'node:test';import assert from 'node:assert/strict';
 import {Scenario,position,defaultRules,motion,type ScenarioType} from '../src/model.ts';
 import {alignment,classifyBlitz,resolvedAssignments,generateCase,pullTemplate} from '../src/tactics.ts';
 import {inspectScenario} from '../src/analyzer.ts';
-import {examples} from '../src/examples.ts';
+import {examples} from './fixtures.ts';
 const sample=()=>structuredClone(examples[2]);
 test('teknik: center omzu 1, tackle içi 4i, dışı 5',()=>{const s=sample();assert.equal(alignment(s,-.4).technique,'1');assert.equal(alignment(s,-2).technique,'4i');assert.equal(alignment(s,-2.8).technique,'5')});
 test('field/boundary rolleri hash değişince aynalanır',()=>{const s=sample();assert.equal(resolvedAssignments(s).find(a=>a.role==='FT')?.player,'RT');s.hash='right';assert.equal(resolvedAssignments(s).find(a=>a.role==='FT')?.player,'LT')});

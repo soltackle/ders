@@ -22,3 +22,11 @@
 - Birden fazla ek dış tehdit varsa ilk dış tehdit alınır; diğerleri açık rusher uyarısında yer alır.
 - Savunma oyuncularının yazar tarafından girilen başlangıç konumları korunur. Manuel savunma yolları `auto` niyetinde korunur; `show`/`hold` bunları bastırır. Önceki otomatik yollar sonraki hesaplamada yeniden üretilir.
 - Bu şablon yerel ve deterministiktir; AI anahtarı gerektirmez. Fizik motoru değildir, atama ve hareket öğreticisidir.
+
+## Savunma seçenekleri ve pas seti
+
+Sahanın üstündeki **Savunma seçenekleri** bölümünde Blitz yok, Sol blitz, Orta blitz, Sağ blitz düğmeleri vardır. Sağ/sol hücumun kendi yönleridir; field/boundary karşılığı hash’e göre yanında gösterilir. Gerçek blitz veya sadece göster seçilebilir. Bu seçimler DL yerleşimini korur, seçilen LB tehdidini düzenler. Özel çoklu tehdit için LB’ler elle düzenlenebilir.
+
+Pas koruması animasyonunda OL gövdesi koşu yönüne dönmez; tehdide dönük kalır. Kick–slide–square aşamasından sonra ellerle temas ve anchor/blokta kalma gösterilir. Bir ayak kick atarken diğeri yere basar; temas sırasında dizler kırık ve ayaklar kademelidir.
+
+Uygulamanın başlangıç senaryolarında ve eski tarayıcı kayıtlarında artık yalnız pas koruması tutulur. Trap ve bağımsız 4i başlangıç senaryoları kaldırılmıştır; mevcut pas koruması DL yerleşimleri korunur.

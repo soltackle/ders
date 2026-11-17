@@ -17,7 +17,7 @@ npm run build
 
 ## Eğitim akışı
 
-1. Bir örnek Case seçin; LT/LG/C/RG/RT’ye tıklayarak POV’a geçin.
+1. Pas koruması dizilişini açın; LT/LG/C/RG/RT’ye tıklayarak POV’a geçin.
 2. Sonraki düğmesi aktif adımın sonuna kadar oynatır ve durur. Önceki, tekrar, yavaş çekim, loop ve zaman çizelgesi kullanılabilir. Boşluk tuşu oynatır/durdurur.
 3. POV HUD oyuncunun aktif aksiyon/fazını, atamasını ve hedefini gösterir. Mini harita konumunu gösterir. Omuz arkası düğmesi kendi bedenini görmeyi sağlar.
 4. Karar adımının sonunda yanıt seçin. Seçeneğe kayıtlı Case adı atanmışsa o Case açılır; doğru yanıt belirtilmişse tahmin geri bildirimi gösterilir.
@@ -42,9 +42,9 @@ MediaRecorder destekleyen tarayıcılarda saha videosu kaydedilebilir. Başlatma
 
 ## Takım pas koruması şablonu
 
-Sol senaryo menüsündeki **Takım pas koruması · otomatik**, yerleştirdiğiniz savunmaya göre Oynat anında pas korumasını üretir. Field dış blitz’te FT ALERT → FG → C zinciri, boundary’de RB varsa pickup / yoksa QB hot gözetimi, iç tehditte C–guard 1-tech combo ve LB gözetimi uygulanır. 3/4/5 DL başlangıç front’ları vardır. [Takım kuralı ve kullanım](docs/TEAM-PASS-PROTECTION.md).
+Başlangıçtaki **Pas koruması**, yerleştirdiğiniz savunmaya göre Oynat anında pas korumasını üretir. Field dış blitz’te FT ALERT → FG → C zinciri, boundary’de RB varsa pickup / yoksa QB hot gözetimi, iç tehditte C–guard 1-tech combo ve LB gözetimi uygulanır. 3/4/5 DL başlangıç front’ları vardır. [Takım kuralı ve kullanım](docs/TEAM-PASS-PROTECTION.md).
 
-Diğer örnek Case’lerdeki genel playbook ayrıca düzenlenebilir. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir.
+Savunma seçeneklerinden sağ/sol/orta blitz veya blitz yok seçilir; DL yerleşimi korunur. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir. Pas koruması dışındaki eski başlangıç senaryoları ve tarayıcı kütüphanesi girdileri kaldırılır.
 
 ## Doğrulama sınırları
 

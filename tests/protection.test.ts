@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {Scenario,type ScenarioType} from '../src/model.ts';import {examples} from '../src/examples.ts';
+import {Scenario,type ScenarioType} from '../src/model.ts';import {examples} from './fixtures.ts';
 import {planProtection,protectionFront} from '../src/protection.ts';
 function front(n:3|4|5=4,hash:ScenarioType['hash']='left'){const s=protectionFront(structuredClone(examples[0]),n);s.hash=hash;s.players.push({id:'QB',pos:'QB',side:'OFF',at:[0,-4],stance:'2pt'},{id:'RB',pos:'RB',side:'OFF',at:[.8,-2.5],stance:'2pt'});return s}
 function threat(s:ScenarioType,x:number,id='BLITZ',intent:'blitz'|'show'|'auto'='blitz'){s.players.push({id,side:'DEF',pos:'LB',at:[x,1.5],intent,stance:'2pt'});return s}
@@ -18,3 +18,5 @@ test('yazarın manuel savunma hareketleri korunur ve yerleşimler değişmez',()
 test('field ALERT aksiyonları FT/FG/C’yi sahada gerçekten field yönüne taşır',()=>{const p=planProtection(threat(front(),3.6));for(const id of ['RT','RG','C']){const a=p.scenario.actions.find(a=>a.player===id&&a.start===.55)!;const initial=p.scenario.players.find(p=>p.id===id)!;assert.ok(a.to[0]>initial.at[0])}});
 test('RB boundary tehdidine OL’un arkasındaki yoldan ulaşır',()=>{const p=planProtection(threat(front(),-3.6));const a=p.scenario.actions.find(a=>a.player==='RB')!;assert.ok(a.to[0]<-2.4);assert.ok(a.path?.every(at=>at[1]<-1))});
 test('aynı şablon tekrar hesaplandığında idempotent kalır',()=>{const s=threat(front(),3.6);const a=planProtection(s),b=planProtection(a.scenario);assert.deepEqual(b.assignments,a.assignments);assert.deepEqual(b.scenario.actions,a.scenario.actions)});
+
+test('sağ/sol/orta savunma seçenekleri DL dizilişini değiştirmez',async()=>{const {setDefenseOption}=await import('../src/protection.ts');const s=front();for(const side of ['left','right','middle','none'] as const){const next=setDefenseOption(s,side);assert.deepEqual(next.players.filter(p=>p.pos==='DL'),s.players.filter(p=>p.pos==='DL'));const plan=planProtection(next);assert.ok(side==='right'?plan.alert:side==='left'?plan.boundaryThreats.length:side==='middle'?plan.interiorThreats.length:!plan.alert)}});
