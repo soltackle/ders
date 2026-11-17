@@ -1,5 +1,0 @@
-node_modules/
-.test-output/
-_site/
-__pycache__/
-*.pyc
