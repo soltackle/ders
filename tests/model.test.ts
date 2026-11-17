@@ -4,4 +4,4 @@ test('hareket başlangıç ve bitiş konumlarını korur',()=>{const s=examples[
 test('hash ve blitz için doğru kuralı döndürür',()=>{const result=analysis(examples[2]);assert.equal(result.field,'right');assert.equal(result.blitz,'field');assert.match(result.rule,/Field tackle/) });
 test('bilinmeyen oyuncu referansını reddeder',()=>{const s=structuredClone(examples[0]);s.actions[0].player='YOK';assert.equal(Scenario.safeParse(s).success,false)});
 
-test('pull yolu noktalarından geçer',()=>{const s=structuredClone(examples[0]);s.actions=[{player:'LT',label:'pull',start:0,end:2,to:[2,0],path:[[0,-2]]}];const p=position(s,'LT',1);assert.ok(Math.abs(p[0])<1e-8);assert.equal(p[1],-2)});
+test('pull yolu waypoint yakınından geçer ve hedefte biter',()=>{const s=structuredClone(examples[0]);s.actions=[{player:'LT',label:'pull',start:0,end:2,to:[2,0],path:[[0,-2]]}];let nearest=Infinity;for(let t=0;t<=2;t+=.005){const p=position(s,'LT',t);nearest=Math.min(nearest,Math.hypot(p[0],p[1]+2))}assert.ok(nearest<.025);assert.deepEqual(position(s,'LT',2),[2,0])});

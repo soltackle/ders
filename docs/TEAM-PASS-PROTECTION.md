@@ -30,3 +30,12 @@ Sahanın üstündeki **Savunma seçenekleri** bölümünde Blitz yok, Sol blitz,
 Pas koruması animasyonunda OL gövdesi koşu yönüne dönmez; tehdide dönük kalır. Kick–slide–square aşamasından sonra ellerle temas ve anchor/blokta kalma gösterilir. Bir ayak kick atarken diğeri yere basar; temas sırasında dizler kırık ve ayaklar kademelidir.
 
 Uygulamanın başlangıç senaryolarında ve eski tarayıcı kayıtlarında artık yalnız pas koruması tutulur. Trap ve bağımsız 4i başlangıç senaryoları kaldırılmıştır; mevcut pas koruması DL yerleşimleri korunur.
+
+## Eğitim temposu ve hareket hızı
+
+- İlk açılışta **0.5× Eğitim** seçilir. 0.25×, 0.75×, 1× ve 1.5× de seçilebilir; tercih tarayıcıda saklanır.
+- Senaryo süresi sabit 2.8 saniyeye sıkıştırılmaz. Hazırlık, mesafeye bağlı pas seti/karşılama, temas ve son blok kontrolü ayrı aşamalardır. Varsayılan hazır seçenekler eğitim hızında yaklaşık 12–16 saniye sürer; daha uzak bir RB’nin yolu uzarsa süre de uzar.
+- RB kontrollü koşuyla yaklaşır, temas öncesi gather yapar ve blokta kalır. Otomatik RB yolunun senaryo zamanındaki tepe hızı en fazla 3 yard/sn olacak şekilde süre hesaplanır. Bu bir eğitim temposudur; ölçülmüş oyuncu performansı iddiası değildir.
+- Eğri yolun hızı waypoint sayısına göre değil, gerçek yol mesafesine göre hesaplanır. Uzun bir parçada ani sıçrama oluşmaz.
+- Blokta kalma aşaması son pickup’tan sonra da sürer. Tam oyun Loop, son adımı değil ID aşamasından bütün korumayı tekrarlar. Animasyon bittikten sonra Oynat yeniden başlatır.
+- Dış blitz’in temas koridoru tackle’dan ayrıdır. Combo yardımlarında ve dar iç korumada OL sırası ve oyuncu aralıkları korunur.
