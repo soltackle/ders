@@ -5,7 +5,7 @@ Amerikan futbolunda OL, QB ve receiver görevlerini anlatmak için Türkçe, çe
 - [Uygulamayı aç](https://soltackle.github.io/ders/)
 - [Tek HTML dosyasını indir](https://github.com/soltackle/ders/raw/refs/heads/master/OL_Atolye_Editor.html)
 
-İndirilen `OL_Atolye_Editor.html` dosyasını tarayıcıda açın. Kurulum, sunucu ve internet bağlantısı gerektirmez. GitHub Pages yayını ilk aktarım sonrası Actions işlemi tamamlandığında güncellenir.
+İndirilen `OL_Atolye_Editor.html` dosyasını tarayıcıda açın. Kurulum, sunucu ve internet bağlantısı gerektirmez. GitHub Pages yayını için `github-pages` ortamının `master` dalından dağıtıma izin vermesi gerekir. Aktarım sırasında mevcut ortam koruması bu dalı reddetti; çevrimdışı HTML ve repo dosyaları kullanılabilir. Yayını açmak için repo ayarlarında **Environments → github-pages → Deployment branches and tags** bölümünden `master` dalına izin verin.
 
 ## Kullanım
 
