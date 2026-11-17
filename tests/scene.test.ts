@@ -7,3 +7,5 @@ test('POV seçili oyuncu gövdesini gizler, elleri ve perspektifi açar',()=>{co
 test('aynı veriyle tekrar çizimde sahne nesneleri büyümez',()=>{const {view,state}=setup();view.update(state);const count=view.paths.children.length;for(let i=0;i<20;i++)view.update({...state,time:i*.05});assert.equal(view.paths.children.length,count);assert.equal(view.rigs.size,state.scenario.players.length)});
 
 test('tahta ve mini haritada yanal yönler aynı veri eksenini gösterir',()=>{const {view,state}=setup();view.update(state);view.scene.updateMatrixWorld(true);const lt=view.rigs.get('LT')!.root.getWorldPosition(new T.Vector3());assert.equal(lt.x,-state.scenario.players[0].at[0])});
+
+test('POV’dan 2D’ye yumuşak geçiş ortografik kamerada tamamlanır',()=>{const {view,state}=setup();view.update({...state,view:'pov'});for(let i=0;i<100;i++)view.frame(.016);view.update({...state,view:'2d'});for(let i=0;i<150;i++)view.frame(.016);assert.equal(view.camera,view.ortho)});

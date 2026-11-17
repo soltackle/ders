@@ -13,3 +13,5 @@ test('pull fazları aksiyon süresinin içinde ve yol hattın arkasında',()=>{c
 test('engage edilen savunmacı aynı mesafeyi kat eder',()=>{const s=sample();s.actions=[{player:'LT',label:'engage',engage:'DE1',start:0,end:2,to:[-1,2]}];const at=position(s,'DE1',2),lt=position(s,'LT',2);assert.ok(Math.abs((at[0]-lt[0])-(s.players[5].at[0]-s.players[0].at[0]))<1e-8)});
 test('zamanda ileri geri sarma aynı pozu döndürür',()=>{const s=sample();const first=motion(s,'RT',1);motion(s,'RT',1.5);assert.deepEqual(motion(s,'RT',1),first)});
 test('yanlış engage ve faz aralıkları reddedilir',()=>{const s=sample();s.actions[0].engage='YOK';assert.equal(Scenario.safeParse(s).success,false);s.actions[0].engage=undefined;s.actions[0].phases=[{name:'open',start:0,end:99}];assert.equal(Scenario.safeParse(s).success,false)});
+
+test('engage bitince savunmacı başlangıç noktasına sıçramaz',()=>{const s=sample();s.actions=[{player:'LT',label:'engage',engage:'DE1',start:0,end:1,to:[-1,2]}];assert.deepEqual(position(s,'DE1',1),position(s,'DE1',1.1))});
