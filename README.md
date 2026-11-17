@@ -17,7 +17,7 @@ npm run build
 
 ## Eğitim akışı
 
-1. Pas koruması dizilişini açın; LT/LG/C/RG/RT’ye tıklayarak POV’a geçin.
+1. Pas koruması veya Field zone senaryosunu açın; LT/LG/C/RG/RT’ye tıklayarak POV’a geçin.
 2. Sonraki düğmesi aktif adımın sonuna kadar oynatır ve durur. Önceki, tekrar, yavaş çekim, loop ve zaman çizelgesi kullanılabilir. Boşluk tuşu oynatır/durdurur.
 3. POV HUD oyuncunun aktif aksiyon/fazını, atamasını ve hedefini gösterir. Mini harita konumunu gösterir. Omuz arkası düğmesi kendi bedenini görmeyi sağlar.
 4. Karar adımının sonunda yanıt seçin. Seçeneğe kayıtlı Case adı atanmışsa o Case açılır; doğru yanıt belirtilmişse tahmin geri bildirimi gösterilir.
@@ -44,7 +44,17 @@ MediaRecorder destekleyen tarayıcılarda saha videosu kaydedilebilir. Başlatma
 
 Başlangıçtaki **Pas koruması**, yerleştirdiğiniz savunmaya göre Oynat anında pas korumasını üretir. Field dış blitz’te FT ALERT → FG → C zinciri, boundary’de RB varsa pickup / yoksa QB hot gözetimi, iç tehditte C–guard 1-tech combo ve LB gözetimi uygulanır. 3–4, 4–3, 5 ve 6 kişilik DL hatları vardır. Kalabalık 5/6 DL baskısında big-on-big paylaşımı uygulanır: OL kendi DL’sini bırakmaz; RB ek DL veya iç/field tehdidini alır. [Takım kuralı ve kullanım](docs/TEAM-PASS-PROTECTION.md).
 
-Savunma seçeneklerinden sağ/sol/orta, iki dış blitz veya blitz yok seçilir; DL yerleşimi korunur. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir. Sahanın altındaki Adam paylaşımı tablosu gerçek blokçu/tehdit ilişkilerini, boundary adamlarını ve QB hot gözetimini gösterir. Pas koruması dışındaki eski başlangıç senaryoları ve tarayıcı kütüphanesi girdileri kaldırılır.
+Savunma seçeneklerinden sağ/sol/orta, iki dış blitz veya blitz yok seçilir; DL yerleşimi korunur. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir. Sahanın altındaki Adam paylaşımı tablosu gerçek blokçu/tehdit ilişkilerini, boundary adamlarını ve QB hot gözetimini gösterir. Eski trap/4i başlangıç senaryoları kaldırılır; pas koruması ve yeni field zone birlikte saklanır.
+
+## Field zone · Inside / Outside
+
+Aktif senaryodan **Field zone · Inside / Outside** seçin. Sahanın altındaki **Zone türü** alanında inside zone veya outside/stretch seçilebilir. Hash değişince ikisi de field yönüne aynalanır. Pas ve zone taslakları senaryo değiştirirken ayrı saklanır.
+
+3–4 / 4–3 / 5 / 6 DL front’ları, DL teknikleri, elle yerleşim, sağ/sol/orta/iki dış blitz ve gösterme seçenekleri burada da kullanılabilir. DL için base, field/boundary slant, pinch, widen ve twist; LB için fit, flow, scrape, sail, bait ve hold seçilir. Oyuncu bazında reaksiyon genel ayarı değiştirmeden ayrıştırılabilir.
+
+Oynat, ileri zone adımı, covered DL eşleşmesi, uygun uncovered komşuyla combo, kontrollü temas sonrasında LB’ye climb ve backside cutoff üretir. RB handoff sonrası koşucudur; bang/bend/bounce elle seçilir veya gerçek blok yollarına göre geometrik koridor önerisi kullanılır. Sayı fazlası savunmacı **blok dışı / takip** olarak gösterilir. RB blokçu sayılmaz.
+
+Bu yeni koşu oyunu takımın henüz tarif etmediği ayrıntılar için **koç tarafından düzenlenebilir standart zone taslağıdır**. Takıma özel combo/devir ve RB okuma kuralları olarak kabul edilmemelidir. [Uygulanan zone kuralları ve sınırlar](docs/FIELD-ZONE.md).
 
 ## Doğrulama sınırları
 

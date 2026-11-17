@@ -1,10 +1,11 @@
+import {planZone} from './zone.ts';
 import {analysis,position,config,activeRule,type ScenarioType} from './model.ts';
 import {alignment,classifyBlitz,resolvedAssignments} from './tactics.ts';
 import {planProtection} from './protection.ts';
 export type Finding={level:'info'|'warning',text:string};
 type Resolved={role:string;player:string;type:string;targets:string[];present:boolean;target?:string;toward?:string;note?:string;partner?:string};
 export function inspectScenario(input:ScenarioType){
- const team=input.protection?.enabled?planProtection(input):null,s=team?.scenario??input;
+ const team=input.zone?.enabled?planZone(input):input.protection?.enabled?planProtection(input):null,s=team?.scenario??input;
  const base=analysis(s),ol=s.players.filter(p=>p.side==='OFF'&&['LT','LG','C','RG','RT'].includes(p.pos));
  const defenders=s.players.filter(p=>p.side==='DEF').map(p=>{const a=alignment(s,p.at[0]),action=s.actions.find(a=>a.player===p.id);return {id:p.id,position:p.pos,technique:p.pos==='DL'?a.technique:null,nearestOL:a.nearest,gap:action?.gap??a.gap,action:action?.label??null,alignment:p.at}});
  const covered=ol.map(p=>({player:p.id,covered:defenders.some(d=>d.position==='DL'&&d.nearestOL===p.id&&Math.abs(d.alignment[0]-p.at[0])<config(s).shoulder*1.5)}));
@@ -19,10 +20,10 @@ export function inspectScenario(input:ScenarioType){
  const offense=(id:string)=>s.players.some(p=>p.id===id&&p.side==='OFF');
  function responsible(id:string){return [...new Set([...s.actions.filter(a=>a.target===id&&offense(a.player)&&a.assignment!=='watch'&&a.label!=='watch').map(a=>a.player),...assignments.filter(a=>a.present&&a.type!=='watch'&&a.targets.includes(id)).map(a=>a.player)])]}
  function watching(id:string){return [...new Set([...s.actions.filter(a=>a.target===id&&offense(a.player)&&(a.assignment==='watch'||a.label==='watch')).map(a=>a.player),...assignments.filter(a=>a.present&&a.type==='watch'&&a.targets.includes(id)).map(a=>a.player)])]}
- const explicitRush=s.actions.filter(a=>s.players.some(p=>p.id===a.player&&p.side==='DEF')&&/blitz|rush|penetrate|attack-gap/.test(a.label));
+ const explicitRush=s.actions.filter(a=>s.players.some(p=>p.id===a.player&&p.side==='DEF')&&/blitz|rush|penetrate|attack-gap|run-read|slant|pinch|widen|twist|stunt|^fit$|^flow$|^scrape$/.test(a.label));
  const freeRushers=[...new Map(explicitRush.map(a=>[a.player,{player:a.player,responsible:responsible(a.player),watchers:watching(a.player)}])).values()];
- for(const r of freeRushers)if(!r.responsible.length&&!findings.some(f=>f.text.startsWith(r.player+':')||f.text.startsWith(r.player+' ')))findings.push({level:r.watchers.length?'info':'warning',text:`${r.player}: ${r.watchers.length?`blok yok; ${r.watchers.join(', ')} hot gözetiminde`:'rush sorumlusu bulunamadı'}.`});
+ for(const r of freeRushers)if(!s.zone?.enabled&&!r.responsible.length&&!findings.some(f=>f.text.startsWith(r.player+':')||f.text.startsWith(r.player+' ')))findings.push({level:r.watchers.length?'info':'warning',text:`${r.player}: ${r.watchers.length?`blok yok; ${r.watchers.join(', ')} hot gözetiminde`:'rush sorumlusu bulunamadı'}.`});
  const blitzers=team?[...new Set([...team.fieldThreats,...team.boundaryThreats,...team.interiorThreats])].map(player=>({player,gap:alignment(s,s.players.find(p=>p.id===player)!.at[0]).gap,responsibility:responsible(player),watchers:watching(player)})):blitz.rush.map(a=>({player:a.player,gap:a.gap??alignment(s,a.to[0]).gap,responsibility:responsible(a.player),watchers:watching(a.player)}));
  const left=s.players.filter(p=>p.side==='DEF'&&p.at[0]<0).length,right=s.players.filter(p=>p.side==='DEF'&&p.at[0]>=0).length;
- return {...base,detectedBlitz,activeRule:activeRule(s,detectedBlitz),assignments,coverage:team?.coverage,protectionMode:team?.mode,defenders,covered,blitzers,freeRushers,overload:Math.abs(left-right)>2?(left>right?'left':'right'):null,counts:{offense:ol.length,defense:defenders.length,rushers:freeRushers.length},findings,summary:`${s.name}. Field ${base.field}. ${defenders.map(d=>`${d.id}: ${d.technique??d.position}, ${d.gap}`).join('; ')}. Blitz: ${detectedBlitz}.`,limitations:['Teknik ve temas tespitleri koordinatlara ve ayarlanan omuz mesafesine dayanır.','Atanmamış taktik kuralları otomatik uydurulmaz.']};
+ return {...base,detectedBlitz,activeRule:activeRule(s,detectedBlitz),assignments,coverage:team?.coverage,protectionMode:s.zone?.enabled?undefined:team?.mode,zoneMode:s.zone?.enabled?team?.mode:undefined,defenders,covered,blitzers,freeRushers,overload:Math.abs(left-right)>2?(left>right?'left':'right'):null,counts:{offense:ol.length,defense:defenders.length,rushers:freeRushers.length},findings,summary:`${s.name}. Field ${base.field}. ${defenders.map(d=>`${d.id}: ${d.technique??d.position}, ${d.gap}`).join('; ')}. Blitz: ${detectedBlitz}.`,limitations:['Teknik ve temas tespitleri koordinatlara ve ayarlanan omuz mesafesine dayanır.','Atanmamış taktik kuralları otomatik uydurulmaz.']};
 }
