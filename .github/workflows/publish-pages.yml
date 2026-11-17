@@ -1,14 +1,8 @@
-name: Build and publish Maliye çalışma masası
+name: Validate and publish OL Atölye
 
 on:
   push:
-    branches:
-      - master
-    paths:
-      - "maliye/**"
-      - "site/**"
-      - "scripts/build_content.py"
-      - ".github/workflows/publish-pages.yml"
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -26,18 +20,31 @@ jobs:
     steps:
       - name: Kaynakları al
         uses: actions/checkout@v6
+      - name: Node hazırla
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
       - name: Python hazırla
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
-      - name: P.A.C.E.R. çalışma içeriklerini oluştur
-        run: python scripts/build_content.py
+          python-version: '3.12'
+      - name: Test bağımlılıklarını kur
+        run: npm ci
+      - name: HTML dosyalarını oluştur
+        run: npm run build
+      - name: İşlevleri doğrula
+        run: npm test
       - name: GitHub Pages kullan
         uses: actions/configure-pages@v6
+      - name: Yayın klasörünü hazırla
+        run: |
+          mkdir -p _site
+          cp index.html OL_Atolye_Editor.html .nojekyll _site/
       - name: Site paketini hazırla
         uses: actions/upload-pages-artifact@v5
         with:
-          path: site
+          path: _site
 
   deploy:
     environment:

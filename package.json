@@ -1,0 +1,16 @@
+{
+  "name": "ol-atolye",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Çevrimdışı OL oyun, görev ve savunma editörü",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "python3 scripts/build.py",
+    "test": "node tests/model.cjs && node tests/field.cjs && node tests/integration.cjs .test-output/core.html && node tests/empty.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "31.0.1"
+  }
+}

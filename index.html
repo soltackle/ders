@@ -1,0 +1,1084 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0c151c"><title>OL Atölye — Oyun ve Görev Editörü</title><meta name="description" content="Çevrimdışı oyun, görev, adım ve savunma çizim atölyesi."><style>
+:root{--bg:#0c151c;--panel:#111e27;--line:#2a404a;--ink:#edf4f3;--muted:#9db1ba;--orange:#ffac65;--cyan:#7dd9e4;--red:#f08485;--green:#b2ce9b}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;color:inherit;background:#1b303b;border:1px solid var(--line);border-radius:6px;padding:9px 11px;font-size:12px}button:hover{border-color:#7f9ca7;background:#25404b}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--orange);outline-offset:3px}input,select,textarea{width:100%;padding:9px;background:#0e1b24;border:1px solid #35505c;border-radius:5px;color:var(--ink);min-width:0}input[type=checkbox]{width:auto;accent-color:var(--orange)}input[type=range]{padding:0;accent-color:var(--orange)}textarea{resize:vertical;min-height:70px;line-height:1.55}label{display:block;font-size:11px;color:var(--muted);line-height:1.5}label>input,label>select,label>textarea{margin-top:5px}small,.muted{color:var(--muted);font-size:11px;line-height:1.65}.primary{background:var(--orange);color:#15232b;border-color:var(--orange);font-weight:700}.danger{color:#ffb4ae}.topbar{min-height:77px;border-bottom:1px solid var(--line);padding:16px 24px;display:flex;gap:20px;justify-content:space-between;align-items:center}.brand{display:flex;align-items:center;gap:12px}.brand-mark{background:var(--orange);color:#182127;font-size:22px;font-weight:900;letter-spacing:-3px;width:39px;height:43px;display:grid;place-items:center;clip-path:polygon(0 0,100% 0,100% 75%,50% 100%,0 75%)}.brand b{font-size:19px;letter-spacing:.3px}.brand b span{color:var(--orange);font-weight:400}.brand small{display:block;letter-spacing:1.5px;font-size:9px;margin-top:3px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{min-width:0}.row>.grow{flex:1}.top-actions button{font-size:11px}.save-status{font-size:10px;color:var(--green)}.layout{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:calc(100vh - 77px)}aside{background:#0e1921;border-right:1px solid var(--line);padding:20px 14px}h2,h3,p{margin-top:0}h2{font-size:16px}h3{font-size:13px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:1.6px;color:var(--orange);margin:0 0 10px}.side-title{display:flex;justify-content:space-between;margin:2px 2px 13px;color:#92aab4;font-size:10px;letter-spacing:1.2px}.create-row{display:flex;gap:5px;margin-bottom:14px}.create-row input{font-size:11px}.create-row button{padding:8px 10px}.play-nav{display:grid;gap:6px;margin-top:12px;max-height:45vh;overflow:auto}.play-item{text-align:left;padding:12px;background:transparent;border-color:transparent}.play-item.active{background:#2a312e;border-color:#68503d;color:var(--orange)}.play-item small{display:block;font-size:10px;margin-top:5px}.side-note{border:1px solid var(--line);border-radius:8px;padding:13px;margin-top:25px}.side-note b{font-size:11px}.side-note p{font-size:11px;line-height:1.75;color:var(--muted);margin:8px 0 0}.count{color:var(--orange)}main{padding:24px;min-width:0;max-width:2000px;width:100%;margin:auto}.intro{display:flex;justify-content:space-between;gap:20px;margin-bottom:18px}.intro h1{font-size:26px;letter-spacing:-.5px;margin:0 0 8px}.intro p{font-size:12px;color:var(--muted);max-width:750px;line-height:1.7;margin:0}.badge{display:inline-block;background:#1a3038;border:1px solid #3c5961;border-radius:5px;padding:5px 8px;font-size:10px;color:var(--cyan)}.manual{color:var(--orange);border-color:#7c6044;background:#302c27}.card{border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}.card-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.card-head h2,.card-head h3{margin:0}.card-body{padding:16px}.grid{display:grid;gap:10px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.def-controls{margin-bottom:16px}.def-top{display:grid;grid-template-columns:1fr 1fr 1fr 1.3fr auto;gap:10px;align-items:end}.ruleline{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:11px;color:#b5c9cd;line-height:1.7}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 355px;gap:17px;align-items:start}.field-toolbar{padding:11px 13px;border-bottom:1px solid var(--line);display:flex;gap:7px;justify-content:space-between;align-items:center;flex-wrap:wrap}.segmented{display:flex;gap:4px}.segmented button{padding:7px 9px;font-size:10px}.segmented button[aria-pressed=true]{border-color:var(--orange);color:var(--orange);background:#302d29}.field-wrap{aspect-ratio:1000/630;background:#102d2c}#field{display:block;width:100%;height:100%;touch-action:none;user-select:none}.field-caption{padding:10px 14px;color:#bdd1d0;font-size:10px;line-height:1.6;border-top:1px solid var(--line)}.transport{padding:13px;border-top:1px solid var(--line)}.transport .play-button{background:var(--orange);color:#14252a;min-width:40px}.transport input{flex:1;width:auto;min-width:55px}.phase-label{padding:8px 0 0;color:#cfbba5;font-size:11px}.phase-buttons{display:flex;gap:5px;overflow-x:auto;padding-top:10px}.phase-buttons button{padding:5px 9px;font-size:10px}.phase-buttons .active{color:var(--orange);border-color:var(--orange)}.inspector{max-height:980px;overflow:auto}.actor-chip{padding:6px 8px;font-size:10px}.actor-chip.active{background:var(--cyan);color:#132b34;border-color:var(--cyan)}.inspector-title{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-bottom:13px}.inspector-title h2{margin:0;font-size:19px}.inspector label{margin-bottom:10px}.tabs{display:flex;border-bottom:1px solid var(--line);padding:8px;gap:4px}.tabs button{flex:1;font-size:11px;padding:9px 5px}.tabs button.active{background:#273a42;color:var(--orange);border-color:#6f5a41}.step-card{border:1px solid var(--line);border-radius:7px;padding:12px;margin:10px 0;background:#11232b}.step-card.active{border-color:#c99056}.step-card summary{cursor:pointer;font-size:12px;line-height:1.5}.step-actions{margin-top:10px;display:flex;gap:5px;align-items:center}.step-actions button{font-size:10px;padding:5px 8px}.step-card .grid{gap:8px}.step-card label{margin:9px 0}.step-card textarea{min-height:85px;font-size:12px}.step-card input{font-size:12px}.step-card .step-coordinate input{font-size:11px}.lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin-top:17px}.assignment-table{width:100%;border-collapse:collapse;font-size:11px}.assignment-table th,.assignment-table td{text-align:left;border-bottom:1px solid var(--line);padding:9px 7px;vertical-align:top;line-height:1.6}.assignment-table th{color:var(--muted);font-weight:500;font-size:10px}.table-wrap{overflow:auto}.empty{padding:23px;color:var(--muted);font-size:12px;line-height:1.8}.empty strong{color:var(--ink)}.path-list{display:grid;gap:6px;max-height:300px;overflow:auto}.path-point{display:grid;grid-template-columns:22px 1fr 1fr 1fr auto auto auto;gap:4px;align-items:center}.path-point input{padding:6px;font-size:11px}.path-point button{padding:6px;font-size:10px}.point-active{outline:1px solid var(--orange);border-radius:5px}.callout{border-left:3px solid var(--orange);background:#252b29;padding:11px;font-size:11px;line-height:1.8;margin:12px 0}.notice{font-size:11px;color:#c4d5da;line-height:1.8}.bottom-line{padding:18px 0 0;color:#829da7;font-size:10px;line-height:1.7}dialog{border:1px solid #48626a;border-radius:12px;background:#111e27;color:var(--ink);width:650px;max-width:94vw;max-height:88vh;padding:22px;overflow:auto}dialog::backdrop{background:#020a12cf}.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}.dialog-head h2{margin:0}.dialog-head button{padding:6px 10px}.library-list{display:grid;gap:8px}.library-item{border:1px solid var(--line);border-radius:7px;padding:13px}.library-item p{margin:7px 0;font-size:11px;color:var(--muted)}#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#27434c;border:1px solid #83abb4;border-radius:9px;padding:12px 18px;box-shadow:0 5px 30px #0008;z-index:100;max-width:90vw;font-size:12px;pointer-events:none;opacity:0;transition:opacity .15s}#toast.visible{opacity:1}.hidden{display:none!important}details>summary{color:#b8ced4}.inline-check{display:flex;align-items:center;gap:7px}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--muted)}.legend span:before{content:'●';color:var(--cyan);margin-right:5px}.legend span.def:before{content:'▲';color:var(--red)}.legend span.target:before{content:'⇢';color:var(--orange)}.warning{color:#ffc0ae}.mt{margin-top:12px}.scroll-archive{white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:350px;overflow:auto;background:#0b1720;padding:12px}.app-help{line-height:1.8;color:#b7cbd1;font-size:12px}.app-help li{margin-bottom:10px}@media(min-width:1700px){.workspace{grid-template-columns:minmax(0,1fr) 420px}.inspector{max-height:1150px}}@media(max-width:1250px){.layout{grid-template-columns:185px minmax(0,1fr)}main{padding:19px}.workspace{grid-template-columns:minmax(0,1fr) 315px}.def-top{grid-template-columns:1fr 1fr 1fr}.def-top .look-label{grid-column:span 2}}@media(max-width:1000px){.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line);padding:13px 18px;display:flex;align-items:start;gap:15px}.side-note{display:none}.side-title{margin-bottom:8px}.play-nav{display:flex;overflow:auto;max-height:150px;margin:0;flex:1}.play-item{min-width:145px}.side-create{width:210px;flex-shrink:0}#playSearch{display:none}.workspace{grid-template-columns:minmax(0,1fr) 320px}.intro h1{font-size:23px}}@media(max-width:760px){.topbar{padding:13px 15px;align-items:start;gap:10px;flex-wrap:wrap}.brand b{font-size:17px}.brand small{font-size:8px}.top-actions{gap:5px}.top-actions button{font-size:10px;padding:7px}.save-status{font-size:9px}main{padding:15px}.intro{display:block}.intro .badge{margin-top:10px}.intro h1{font-size:22px}.workspace,.lower-grid{grid-template-columns:1fr}.def-top{grid-template-columns:1fr 1fr}.def-top .look-label{grid-column:auto}.def-top>button{align-self:end}.card-body{padding:13px}.inspector{max-height:none}.field-toolbar{gap:9px}.legend{gap:6px}.grid.three{grid-template-columns:1fr 1fr}.layout aside{display:block;padding:13px 15px}.side-create{width:100%}.side-create .create-row{margin-bottom:8px}.side-title{display:none}.play-nav{max-height:120px}.play-item{padding:9px}.def-controls .card-body{padding:12px}.path-point{grid-template-columns:18px 1fr 1fr 1fr auto auto auto}.path-point button{padding:6px 4px}.path-point input{padding:6px 3px}.field-caption{font-size:10px}.lower-grid .card-head{padding:12px}.intro p{font-size:11px}}@media print{.topbar,aside,.def-controls,.field-toolbar,.transport,.lower-grid,.bottom-line,.tabs,button{display:none!important}.layout,.workspace{display:block}body{background:white;color:black}main{padding:0}.card{border-color:#888}.inspector{max-height:none}.field-wrap{print-color-adjust:exact}.step-card input,.step-card textarea{background:white;color:black}input,textarea{border:none;color:black}}
+[data-learning][aria-pressed="true"]{border-color:var(--orange);color:var(--orange);background:#302d29}.step-card p{white-space:pre-wrap}
+</style></head><body>
+<header class="topbar"><div class="brand"><div class="brand-mark">OL</div><div><b>OL <span>ATÖLYE</span></b><small>OYUN · GÖREV · SAVUNMA EDİTÖRÜ</small></div></div><div class="row top-actions"><span class="save-status" id="saveStatus">Yerel kayıt hazır</span><button id="libraryBtn">Adım şablonları</button><button id="backupBtn">Yedek / HTML</button><button id="helpBtn" aria-label="Kullanım rehberi">Rehber</button></div></header>
+<div class="layout"><aside><div class="side-create"><div class="side-title">OYUNLARIM <span id="playCount" class="count">0</span></div><div class="create-row"><input id="newPlayName" placeholder="Yeni oyunun adı…" aria-label="Yeni oyunun adı" maxlength="160"><button class="primary" id="newPlayBtn" aria-label="Yeni oyun ekle">＋</button></div><button id="createEmptyBtn" style="width:100%;margin-bottom:8px">＋ Görüşülen Empty oyununu ekle</button><input id="playSearch" placeholder="Oyun ara…" aria-label="Oyun ara"></div><nav class="play-nav" id="playNav" aria-label="Oyunlarım"></nav><div class="side-note"><b>Oyunları siz belirleyin.</b><p>Yeni oyun, boş görevlerle açılır. Şablonlar öğretim örneğidir; takım kuralı ve son açıklama koça aittir.</p><p>● Hücum <span style="color:var(--cyan)">●</span><br>▲ Savunma <span style="color:var(--red)">▲</span></p></div></aside>
+<main><section class="intro"><div><p class="eyebrow">TAKIMINIZIN ÇALIŞMA ALANI</p><h1 id="pageTitle">İlk oyununuzu ekleyin.</h1><p id="pageIntro">Oyunu adlandırın, oyuncuyu seçin ve görevlerini oluşturun. Savunmayı şimdi kurabilir, çizdiğiniz look’u bütün oyunlara karşı kullanabilirsiniz.</p></div><span class="badge">Tek HTML · çevrimdışı</span></section>
+<section class="card def-controls" aria-label="Savunma ve hash"><div class="card-body"><div class="def-top"><label>Hazır front · düzenlenebilir örnek<select id="frontSelect"></select></label><label>Hazır savunma hareketi<select id="moveSelect"></select></label><label>Topun hash’i · hücuma göre<select id="ballSelect"><option value="left">Sol hash</option><option value="middle">Orta</option><option value="right">Sağ hash</option></select></label><label class="look-label">Look adı<input id="lookName" placeholder="Örn. Rakip · 1. hafta" maxlength="160"></label><button id="saveLookBtn" class="primary">Look kaydet</button></div><div class="ruleline"><span id="lookStatus" class="badge">Yeni savunma</span><span id="fieldRule"></span><button id="looksBtn">Kayıtlı look’lar <span id="lookCount">0</span></button></div></div></section>
+<div class="workspace"><section class="card field-card"><div class="field-toolbar"><div class="segmented" aria-label="Saha aracı"><button data-mode="select" aria-pressed="true">Seç / taşı</button><button data-mode="draw" aria-pressed="false">＋ Yol çiz</button><button data-mode="erase" aria-pressed="false">Nokta sil</button></div><div class="row"><label class="inline-check"><input type="checkbox" id="pathsToggle" checked>Yollar</label><label class="inline-check"><input type="checkbox" id="targetsToggle" checked>Paylaşım</label><button id="undoBtn" title="Son düzenlemeyi geri al">↶ Geri al</button></div></div><div class="field-wrap"><svg id="field" viewBox="0 0 1000 630" role="img" aria-label="Oyuncular ve düzenlenebilir hareket yolları"></svg></div><div class="field-caption" id="fieldHint">Oyuncuyu seçin. Yol çiz modunda sahaya dokunarak ara noktalar ekleyin; noktaları sürükleyerek düzeltin.</div><div class="transport"><div class="row"><button id="prevBtn" aria-label="Önceki adım">◀</button><button class="play-button" id="playBtn" aria-label="Hareketleri oynat">▶</button><button id="nextBtn" aria-label="Sonraki adım">▶|</button><input id="progress" type="range" min="0" max="5" step="1" value="0" aria-label="Geçerli adım"><span id="phaseCount" class="muted">0 / 5</span><select id="speedSelect" aria-label="Oynatma hızı" style="width:73px"><option value="1600">Yavaş</option><option value="950" selected>Normal</option><option value="500">Hızlı</option></select></div><div id="phaseLabel" class="phase-label"></div><div id="phaseButtons" class="phase-buttons"></div></div><div class="field-caption legend"><span>Hücum</span><span class="def">Savunma</span><span class="target">Blok hedefi / sonra hedef</span></div></section>
+<section class="card inspector" aria-label="Seçili oyuncu editörü"><div class="card-head"><div class="row" id="actorChips"></div></div><div class="tabs"><button data-inspector-tab="task" class="active">Oyuncu / görev</button><button data-inspector-tab="steps">Adımlar</button><button data-inspector-tab="path">Yol noktaları</button></div><div class="card-body" id="inspector"></div></section></div>
+<div class="lower-grid"><section class="card"><div class="card-head"><h2>Oyun ve formasyon</h2><div class="row"><button id="copyPlayBtn">Kopyala</button><button id="deletePlayBtn" class="danger">Oyunu sil</button></div></div><div class="card-body" id="playEditor"></div></section><section class="card"><div class="card-head"><h2>Adam paylaşımı ve açık hedefler</h2><span class="badge">Elle seçim öncelikli</span></div><div class="card-body" id="assignments"></div></section></div><footer class="bottom-line">Yönler hücuma göredir · Her düzenleme tarayıcıya kaydedilir. Dosya veya tarayıcı değiştirirken JSON yedeğini ya da güncel HTML’yi indirin. <button id="archiveBtn">Eski kayıt arşivi</button></footer>
+</main></div>
+<dialog id="looksDialog"><div class="dialog-head"><h2>Savunma look’ları</h2><button data-close aria-label="Kapat">✕</button></div><p class="notice">Look yüklemek hücum görevlerini değiştirmez. Oyunlar arasında seçili savunma korunur.</p><div id="looksList" class="library-list"></div></dialog>
+<dialog id="libraryDialog"><div class="dialog-head"><h2>Düzenlenebilir adım şablonları</h2><button data-close aria-label="Kapat">✕</button></div><p class="notice">Bunlar genel öğretim önerileridir. Oyuncuya ekledikten sonra her adımı değiştirin. Kopyalar birbirinden bağımsızdır.</p><div class="grid two"><label>Şablon ara<input id="templateSearch" placeholder="Kick set, pull, mesh…"></label><label>Kategori<select id="templateCategory"><option value="">Bütün kategoriler</option></select></label></div><div id="templatesList" class="library-list mt"></div><p class="notice mt">Yeni şablon: bir oyuncunun adımlarını düzenleyip “Şablon olarak kaydet” düğmesini kullanın. Kütüphanedeki özel şablonlar da düzenlenebilir.</p></dialog>
+<dialog id="templateDialog"><div class="dialog-head"><h2>Şablonu düzenle</h2><button data-close aria-label="Kapat">✕</button></div><div id="templateEditor"></div></dialog>
+<dialog id="backupDialog"><div class="dialog-head"><h2>Yedekleme ve taşıma</h2><button data-close aria-label="Kapat">✕</button></div><p class="notice">JSON yedeği bütün oyunları, adımları, şablonları, look’ları, çizgileri, varyasyonları ve eski kayıt arşivini içerir. Güncel HTML aynı kayıtlarla tek başına açılır.</p><div class="row"><button id="exportJsonBtn" class="primary">JSON yedeğini indir</button><button id="exportHtmlBtn" class="primary">Güncel HTML’yi indir</button></div><label class="mt">JSON yedeği yükle · v2 ve yeni editör kayıtları<input type="file" id="importFile" accept=".json,application/json"></label><p class="notice">Yükleme mevcut kayıtlarla birleştirilir. Aynı kimlikte farklı içerik varsa ayrı kopya korunur; mevcut kayıt silinmez.</p><div class="callout">Eski dosyanızdaki kayıtlar burada görünmüyorsa, eski HTML’den JSON yedeği indirip bu alana yükleyin. Tarayıcılar farklı yerel HTML dosyalarının kayıt alanını ayırabilir.</div><p id="importStatus" role="status" class="notice"></p></dialog>
+<dialog id="helpDialog"><div class="dialog-head"><h2>Atölyeyi kullanma</h2><button data-close aria-label="Kapat">✕</button></div><ol class="app-help"><li>Sol alana bir ad yazıp ＋ ile boş oyun oluşturun. Formasyon, oyuncu adı ve konumunu aşağıdan düzenleyin; sahada oyuncuyu sürükleyebilirsiniz.</li><li>Oyuncuyu seçin. Görev, blok hedefi, combo sonrası hedef ve gap’i yazın. Adımlar sekmesinde bir şablon ekleyin veya boş adımları düzenleyin; ekleme, silme, sıralama serbesttir.</li><li>“Yol çiz” modunda seçili oyuncu için sahaya tıklayın ya da dokunun. Her tıklama bir ara nokta ekler. Noktaları sürükleyin; “Nokta sil” ile kaldırın. Yol noktaları sekmesinde koordinatları, gecikmeyi ve sıralamayı değiştirebilirsiniz.</li><li>Savunmacının hizası, tekniği ve baskı kutusu bağımsızdır. LB’yi LOS’a taşımak blitz’i açmaz. Örnek hareketler mevcut yolları değiştirir; “Geri al” son düzenlemeyi geri getirir.</li><li>Look’a isim verip kaydedin. Başka oyun açtığınızda savunma aynı kalır. Belirli savunma + hash için “Özel varyasyon aç” düğmesiyle ayrı görevler yazabilirsiniz.</li><li>İleri / geri ile adımları inceleyin. Yol adımlar boyunca ilerler; adımın X/Y alanları o adımda kesin konum verir. Metinsel yön alanı açıklamadır, otomatik yol üretmez. Nokta gecikmesi adım cinsindendir.</li><li>Half-slide önerisini oyun başına açabilirsiniz. Field GAP/SLIDE, boundary MAN; orta top sol hash gibi değerlendirilir. RB’ye otomatik tarama kuralı atanmaz. Elle yazılan açıklama her zaman korunur.</li><li>Tarayıcı verisini taşımanız gerektiğinde JSON veya güncel HTML indirin. Silinen oyun, look ve şablonları eski kayıt arşivinden geri alabilirsiniz.</li></ol></dialog>
+<dialog id="archiveDialog"><div class="dialog-head"><h2>Korunan kayıtlar ve arşiv</h2><button data-close aria-label="Kapat">✕</button></div><div id="archiveContent"></div></dialog>
+<dialog id="lessonDialog"><div class="dialog-head"><h2>Empty · ortak adım metinleri</h2><button data-close aria-label="Kapat">✕</button></div><div id="lessonEditor"></div></dialog><div id="toast" role="status" aria-live="polite"></div>
+<script id="embeddedBackup" type="application/json">{}</script>
+<script id="suppliedPlays" type="application/json">[{"id":"supplied-empty","name":"Empty","formation":"Empty · 5 OL + QB + X/U/H/Y/Z","notes":"Koçla doğrulandı: field yönüne kayma; boundary MAN; boundary LB blitz’ini QB görüp hareket eder. Empty’de RB yok. Slant, stunt ve fazla baskıya verilen cevaplar bu mantıktan üretilen düzenlenebilir taktik önerileridir. Receiver rota ayrıntıları görsel ve oyuncu notlarıyla düzenlenir.","halfSlide":false,"players":[{"id":"empty-lt","label":"LT","position":"LT","x":320,"y":330,"path":[],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-lg","label":"LG","position":"LG","x":410,"y":330,"path":[],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-c","label":"C","position":"C","x":500,"y":330,"path":[],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-rg","label":"RG","position":"RG","x":590,"y":330,"path":[],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-rt","label":"RT","position":"RT","x":680,"y":330,"path":[],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-qb","label":"QB","position":"QB","x":500,"y":435,"path":[],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-x","label":"X","position":"WR","x":210,"y":330,"path":[{"x":250,"y":265},{"x":300,"y":165},{"x":335,"y":65}],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-u","label":"U","position":"WR","x":240,"y":380,"path":[{"x":150,"y":375},{"x":130,"y":380},{"x":140,"y":70},{"x":105,"y":105}],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-h","label":"H","position":"WR","x":645,"y":390,"path":[{"x":720,"y":390},{"x":830,"y":360},{"x":925,"y":300},{"x":975,"y":150}],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-y","label":"Y","position":"WR","x":815,"y":330,"path":[{"x":815,"y":240},{"x":815,"y":150},{"x":815,"y":65}],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"},{"id":"empty-z","label":"Z","position":"WR","x":935,"y":380,"path":[{"x":850,"y":340},{"x":730,"y":285},{"x":660,"y":250}],"task":"","target":"","secondary":"","gap":"","source":"","steps":[{"title":"Snap öncesi hizalanma ve okuma","text":"","direction":"","target":"","condition":""},{"title":"İlk adım","text":"","direction":"","target":"","condition":""},{"title":"İkinci adım","text":"","direction":"","target":"","condition":""},{"title":"Temas / hedefe yaklaşma","text":"","direction":"","target":"","condition":""},{"title":"Okuma, devir veya ikinci seviyeye çıkış","text":"","direction":"","target":"","condition":""},{"title":"Devam ve bitiriş","text":"","direction":"","target":"","condition":""}],"stepMode":"auto"}],"emptyProtection":true,"emptyCurriculum":{"field":[{"title":"Snap öncesi hizalanma ve okuma","text":"Top {hash}. Field {field}; sen {position}, sorumlu alanın {gap}. {front} DL yerleşimini ve {threats} tehditlerini say. İlk hedef önerin {target}. {shift} Komşularınla aynı kaymayı gördüğünü kontrol et.","cue":"Field yönünü, gapini ve hedefi söyle.","direction":"Snap öncesi sabit","target":"{target} / {gap}","condition":"{blitz}","error":"Field yönünü oyun çiziminin sağıyla karıştırma.","check":"Top sağ hash’e geçerse field hangi taraf olur?"},{"title":"İlk adım","text":"Snap ile ilk hareketini field olan {field} tarafa, {gap} sorumluluğunu koruyacak şekilde başlat. Hedef {target}; rakibe uzanarak dengeyi bozma. Kullanılacak set tipi ve ayak mesafesi koçun düzenleyeceği teknik tercihidir.","cue":"{field} kay; iç kapını açık bırakma.","direction":"Field {field}","target":"{target} / {gap}","condition":"LB’nin yaklaşması yetmez; baskı durumu açık mı kontrol et.","error":"Hedefi kovalamak için komşunun alanına kontrolsüz geçme.","check":"İlk adımının amacı alanı mı, rastgele bir adamı mı korumak?"},{"title":"İkinci adım","text":"İkinci ayağınla dengeli tabanını yeniden kur; ilk adımla açtığın mesafeyi kontrol et. {target} ve {lbRead} aynı görüş alanında kalsın. Şu anki DL tekniği: {technique}. Rakibin ilk iki hareketiyle gapine giren tehdidi yeniden değerlendir.","cue":"Tabanı kur; hedef ve LB’yi birlikte gör.","direction":"Field kaymasını dengeli tamamla","target":"{target}","condition":"{shift}","error":"İki ayağı birleştirip dengeni kaybetme.","check":"Hedef içe slant yaparsa hangi gap tehlikeye giriyor?"},{"title":"Temas / hedefe yaklaşma","text":"Hedef {target} temas mesafesine geldiyse ayaklarınla hizalan ve dengeli temas kur. Eller, baş ve kalça pozisyonu için koçun öğrettiği tekniği uygula. Hedef yoksa gapini boşaltmadan {lbRead} okumasına devam et.","cue":"Dengeli temas; boşsa alanı koru.","direction":"Hedefe kontrollü yaklaş","target":"{target} / {gap}","condition":"Temas mesafesi oluştuysa; oluşmadıysa uzanma.","error":"Sırf ok çizili diye rakibi bloklanmış kabul etme.","check":"Rakiple temasın sürerken yeni tehdidi görebiliyor musun?"},{"title":"Okuma, devir ve karar","text":"{shift} Field LB baskısı varsa tackle LB’ye kayar; guard ve center field yönündeki sıradaki tehditlere kayar. {open} Çapraz girişte kendi gapine giren penetrator’ı önce karşıla; komşunun alanına geçen tehdidi iletişimle aktarırken gapine dönen looper’ı gör. Birini bırakıp diğerine geçerken arada açık koridor oluşturma.","cue":"Yeni tehdidi gör; komşuyla konuş.","direction":"Field kayması / gap içinde kal","target":"{target}; okuma: {lbRead}","condition":"{blitz}","error":"İlk çapraz hareketi kontrolsüz kovalamak yerine kendi gapine dönen ikinci tehdidi gör.","check":"LB baskısı açılınca senin hedefin neden değişti?"},{"title":"Devam ve bitiriş","text":"Atanan {gap} bütünlüğünü ve dengeni oyun bitene kadar koru. QB’nin boundary LB okumasını onun yerine üstlenmek için görevini bırakma. Tekrar sonunda {target}, kayma sebebin ve açık kalan tehdidi kendi cümlenle anlat.","cue":"Gapini sürdür; bitişte kararını anlat.","direction":"Dengeli devam","target":"{target} / {gap}","condition":"{open}","error":"Blok başarılı göründü diye ayakları ve okumayı durdurma.","check":"Aynı frontu ters hash’te açıklayabilir misin?"}],"centerCombo":[{"title":"Snap öncesi hizalanma ve okuma","text":"LB blitz yok. 1 teknik {target}, {comboGuard} tarafında. {comboGuard} ile aynı hedef üzerinde ortak çalışacağını belirle. Field {field}, senin field sorumluluğun {gap}. Gözün ve gövden karşıdaki {lbRead} okumasına açık kalsın.","cue":"1 tekniği guard ile al; LB’yi gör.","direction":"1 tekniğin bulunduğu tarafı kontrol et","target":"{target} + {comboGuard}","condition":"Gerçek LB blitz yoksa bu ortak blok kuralı geçerli.","error":"Başını tamamen DL’ye çevirerek LB’yi görüşten çıkarma.","check":"1 teknik hangi guard tarafında ve birlikte kiminle çalışıyorsun?"},{"title":"İlk adım","text":"İlk adımını {target} üzerindeki ortak bloğa dengeli katılacak şekilde al. {comboGuard} ile aranı kontrol et; göz ve gövden LB’ye açık kalsın. Özel ilk ayak ve adım ölçüsü koç tarafından düzenlenebilir.","cue":"Dengeli katıl; LB’ye açık kal.","direction":"{comboSide} / ortak blok açısı","target":"{target}","condition":"LB baskısı başlarsa ortak blokta kör kalma.","error":"DL’ye yardım ederken LB okumasını bırakma.","check":"Yardım ederken görüşün hangi oyuncuda kalmalı?"},{"title":"İkinci adım","text":"İkinci ayağınla tabanını kur. {comboGuard} ile aynı 1 tekniği kontrol ederken {lbRead} hareketini izle. Rakibin slantı ortak temas açısını değiştiriyorsa ayaklarınla yeniden hizalan.","cue":"Tabanını kur; ortak hedef ve LB aynı görüşte.","direction":"Dengeli toparlama","target":"{target}; okuma: {lbRead}","condition":"{target} yer değiştirirse temas açını yenile.","error":"Sabitlenip yeni baskıya tepki veremez hale gelme.","check":"LB çizgiye yaklaştı diye otomatik blitz kabul ediyor musun?"},{"title":"Temas / hedefe yaklaşma","text":"{target} ile ortak teması {comboGuard} yanında kur. Gövdeni ve gözünü LB’ye açık tut; bir DL üzerinde iki kişinin çalışması LB’nin bloklandığı anlamına gelmez.","cue":"Ortak temas; göz ve gövde LB’ye.","direction":"Kontrollü temas açısı","target":"{target} + {comboGuard}","condition":"LB okuması sürer.","error":"Aynı DL’ye kapanıp karşıyı tamamen kaybetme.","check":"LB’nin yeri ve baskı durumu şu an ne?"},{"title":"Okuma, devir ve karar","text":"LB gerçekten baskıya gelirse field kayma veya boundary QB okuması ayrımını yap. Field tarafındaki baskıda C–guard–tackle kayması güncellenir. Boundary LB için tackle adamını bırakmaz; Empty’de QB görüp hareket eder. LB’ye otomatik koşu bloğu çıkışı atanmaz.","cue":"Field baskısına kay; boundary okuması QB’de.","direction":"Yeni tehdide göre field kayması","target":"{target}; {lbRead}","condition":"LB rush durumu veya hareket yolu değiştiğinde tekrar oku.","error":"Pas korumasını otomatik ikinci seviye koşu bloğuna çevirme.","check":"Field LB ile boundary LB kararının farkı ne?"},{"title":"Devam ve bitiriş","text":"Yeni baskı yoksa {comboGuard} ile 1 teknik üzerindeki kontrolü sürdür; dengen ve karşıya görüşün devam etsin. Tekrar sonunda hangi durumda yardımı sürdürdüğünü, hangi durumda yeniden okuduğunu anlat.","cue":"Yardımı sürdür; ayık ve dengeli kal.","direction":"Kontrollü devam","target":"{target}","condition":"Koçun belirlediği bitişe kadar oku.","error":"İlk temas sonrası LB kontrolünü bırakma.","check":"Bu ortak blok neden kör bir double-team değil?"}],"guardCombo":[{"title":"Snap öncesi hizalanma ve okuma","text":"LB blitz yok; center senin tarafındaki 1 teknik {target} üzerinde seninle çalışıyor. Senin hedefin değişmiş sayılmaz. {position} olarak {field} field ve {boundarySide} boundary ayrımını söyle.","cue":"1 teknik benim; center yardım ediyor.","direction":"Başlangıçta dengeli","target":"{target} + C","condition":"LB blitz yok; ortak blok etkin.","error":"Center yardımı var diye kendi hedefini bırakma.","check":"Center hangi tehdidi ayrıca okumaya devam ediyor?"},{"title":"İlk adım","text":"Snap ile {target} için dengeli setini başlat. Center’ın yardım açısını kapatmadan kendi hedefini karşıla. Kesin ayak tekniğini koçun talimatına göre düzenleyin.","cue":"Set al; yardım açısını koru.","direction":"1 teknik hedefe göre","target":"{target}","condition":"Hedef hareketine göre açı değişebilir.","error":"Center’a yaslanarak tabanını kaybetme.","check":"İlk hareketin hedefin hangi kaçışını karşılıyor?"},{"title":"İkinci adım","text":"İkinci adımda tabanını kur ve {target} ile arandaki mesafeyi yönet. Center’ın göz ve gövdesi {lbRead} okumasına açık kalacak; sen kendi temasını dengeli sürdür.","cue":"Tabanını kur; kendi adamını kontrol et.","direction":"Dengeli toparlama","target":"{target}","condition":"Yeni LB baskısı görülürse çağrıyı yenileyin.","error":"Center’ın yardımını tek başına blok başarısı sayma.","check":"LB gelirse iki oyuncunun görevi aynı mı kalacak?"},{"title":"Temas / hedefe yaklaşma","text":"Center ile {target} üzerinde ortak teması kur. Kimin hangi el veya omuzla çalışacağı koçun teknik açıklamasına göre düzenlenir. Birbirinizi itmeden ve dengenizi bozmadan kontrol edin.","cue":"Birlikte temas, ayrı denge.","direction":"Ortak temas açısı","target":"{target} + C","condition":"DL slant yaparsa temas açısını yeniden kur.","error":"İki hücumcunun ayaklarının birbirini engellemesine izin verme.","check":"Temas sırasında hangi boşluk açılabilir?"},{"title":"Okuma, devir ve karar","text":"Field LB baskısında field guard isen sıradaki field tehdidine kay; boundary guard isen MAN kuralını koru. Center’ın LB okumasını takip et. Çapraz hareket field tarafındaysa giren tehdidi önce kontrol et, komşuya aktar ve geri dönen tehdidi kendi gapinde karşıla. Boundary MAN tarafında kendi eşleşmeni izle; LB’ye geçme.","cue":"Field guard kayar; boundary MAN kalır.","direction":"Tarafına göre karar","target":"{target}","condition":"{blitz}","error":"Field ve boundary guard kararını birbirine karıştırma.","check":"Ters hash’te senin tarafın ve kararın nasıl değişir?"},{"title":"Devam ve bitiriş","text":"Dengeli teması ve koçun belirlediği pas koruma noktasını sürdür. Tekrar sonunda center yardımının amacını ve LB gelirse değişen kararı anlat.","cue":"Kontrolü sürdür; kararını anlat.","direction":"Dengeli devam","target":"{target}","condition":"Oyun bitene kadar tehdidi izle.","error":"Rakip uzaklaştı diye kontrolsüz kovalamaya başlama.","check":"Center yardımı kalkarsa kendi görevini söyleyebilir misin?"}],"man":[{"title":"Snap öncesi hizalanma ve okuma","text":"Sen {boundarySide} boundary tarafındasın. MAN hedef önerin {target}; teknik {technique}. Aynı taraftaki LB’yi gör, fakat LB baskısı kendi adamını bırakman anlamına gelmez. Empty’de o LB’nin okuması QB’dedir.","cue":"Boundary MAN; LB gelirse adamında kal.","direction":"Hedefle başlangıç hizası","target":"{target}","condition":"Boundary LB okuması QB’ye aittir.","error":"Gelen LB’yi almak için atanmış DL’yi boş bırakma.","check":"QB’ye ait tehdit ile senin adamın hangileri?"},{"title":"İlk adım","text":"İlk adımda {target} için dengeli pas seti al. Field yönüne toplu kayma boundary MAN görevini değiştirmez. Setin açısı ve adım tekniği koçun düzenleyebileceği çalışma ayrıntısıdır.","cue":"Kendi adamına set al.","direction":"MAN hedefe göre","target":"{target}","condition":"Boundary LB görünse de hedefini bırakma.","error":"Field kaymasını kendi tarafında kopyalama.","check":"İlk adımının yönünü hangi oyuncu belirliyor?"},{"title":"İkinci adım","text":"İkinci ayağınla tabanını kur. {target} içe veya dışa hareket ediyorsa dengeni koruyarak açını ayarla. Boundary LB baskısı: {boundaryBlitz}. Onu görmen kendi hedefini terk edeceğin anlamına gelmez.","cue":"Tabanını kur; MAN hedefini izle.","direction":"Hedefin hareketine göre","target":"{target}","condition":"Rakibin hareketini ve QB’ye açık tehdidi ayırt et.","error":"İki tehdidi aynı anda tek başına kapatmış gibi davranma.","check":"LB geldiğinde neden adam değiştirmiyorsun?"},{"title":"Temas / hedefe yaklaşma","text":"{target} temas mesafesine girdiyse koçun öğrettiği güvenli temas tekniğiyle karşıla. Pas koruma dengesini koru. Hedefin yoksa yeni bir adam uydurmadan koçun belirlediği yardım sınırında kal.","cue":"Dengeli MAN teması.","direction":"Kontrollü temas","target":"{target}","condition":"Hedef varsa temas; yoksa açık sorumluluğu bildir.","error":"Hedef yokken rastgele LB kovalamaya çıkma.","check":"Bu frontta sana gerçekten bir DL atanmış mı?"},{"title":"Okuma, devir ve karar","text":"Boundary LB blitz’inde {target} üzerinde kal. QB şu tehdidi okuyacak: {boundaryBlitz}. İki DL çapraz yaptığında ilk rakibini kontrolsüz kovalamadan iç kapıyı koru; komşunla konuşarak iki tehdidin de karşılandığını doğrula. Boundary LB’ye geçme. Bu, MAN bütünlüğünü ve QB’ye açık kalan LB okumasını koruyan taktik öneridir.","cue":"Adamında kal; özel devri iletişimle belirle.","direction":"MAN sorumluluğunu sürdür","target":"{target}","condition":"Boundary LB, özel devir veya slant görülürse yeniden iletişim kur.","error":"QB’nin okuyacağı LB’ye geçip DL’yi serbest bırakma.","check":"İlk rakibi kovalamak hangi iç koridoru açabilir; ikinci tehdidi kim görecek?"},{"title":"Devam ve bitiriş","text":"Kendi adamına karşı dengen ve ayakların çalışsın. Bitişte MAN hedefini, boundary LB’nin kimin sorumluluğunda olduğunu ve varsa açık kalan baskıyı anlat.","cue":"MAN’i bitir; QB okumasını ayır.","direction":"Dengeli devam","target":"{target}","condition":"Oyun bitene kadar kontrol et.","error":"QB hareket edince kendi görevini sebepsiz bırakma.","check":"Aynı savunma ters hash’te sana field görevi verir mi?"}],"qb":[{"title":"Snap öncesi hizalanma ve okuma","text":"Empty: korumada RB yok. Top {hash}; field {field}, boundary {boundarySide}. OL field kayma ve boundary MAN oynar. Boundary LB tehdidi: {boundaryBlitz}. Snap öncesi onu gör; OL’nin bilerek değiştirmediği eşleşmeyi tanı.","cue":"RB yok; boundary LB’yi ben okurum.","direction":"Snap öncesi görüş / duruş","target":"Boundary LB: {boundaryBlitz}","condition":"Yakın LB hizası tek başına blitz değildir.","error":"Görünmeyen bir RB’nin baskıyı kapatacağını varsayma.","check":"Boundary LB gelirse tackle mı, QB mi karar verecek?"},{"title":"İlk adım","text":"Snap’i alırken boundary LB’yi görüşünde tut ve gerçek baskıyı ayırt et. Boundary tackle kendi adamında kalacak. Drop mesafesi ve pas zamanlaması bu koruma kuralından çıkarılmaz; koçun oyun açıklamasına göre yazılır.","cue":"Snap ile LB’yi kontrol et.","direction":"Koçun belirlediği drop","target":"Boundary LB / pas okuması","condition":"Baskı gerçekten başlıyor mu?","error":"LB yaklaştı diye kesin blitz veya belirli bir pas kararı üretme.","check":"LB coverage’a dönerse baskı kabul eder misin?"},{"title":"İkinci adım","text":"Pas hazırlığı sırasında boundary LB’nin gelmesini veya çekilmesini oku. {boundaryBlitz}. Field tarafındaki kaymanın hangi tehditleri aldığına bak. Baskının geliş açısına göre pas hazırlığını hızlandır veya dengeli boşluğa hareket et; alıcıların erişilebilirliğini değerlendir. Her baskıda aynı receiver’ı veya kaçış tarafını ezberleme.","cue":"Gerçek baskıyı ayır; zamanlamanı yönet.","direction":"Koçun belirlediği pas hazırlığı","target":"Boundary LB","condition":"LB rush ve hareket yolunu birlikte kontrol et.","error":"Sistemin sana belirli bir receiver’ı zorunlu seçtiğini sanma.","check":"Bu baskı hangi taraftan ve ne zaman geliyor?"},{"title":"Temas / hedefe yaklaşma","text":"Boundary LB gerçekten geliyorsa QB olarak onu görerek hareket et. Tackle’ın adamını bırakmasını bekleme. Açık baskı erken geliyorsa pas hazırlığını hızlandır; cepte yer varsa baskının geliş hattından kontrollü uzaklaşıp dengeni yeniden kur. Önceden yazılmamış bir receiver’a zorunlu hot rota uydurma.","cue":"Boundary baskısına QB cevap verir.","direction":"Açık baskı hattından kontrollü uzaklaşma / hızlı pas hazırlığı","target":"{boundaryBlitz}","condition":"Tehdit pas noktasını etkiliyorsa karar ver.","error":"Savunmacıyı görmeden ezberlenmiş bir tarafa kaçma.","check":"Baskıya doğru mu gidiyorsun, yoksa pas için dengeli boşluk mu yaratıyorsun?"},{"title":"Okuma, devir ve karar","text":"Ek baskı: {open} Boundary LB okumasını, OL’nin hedefleri ve koçun pas kararlarıyla birleştir. Baskı yoksa seçilmiş oyun okumasını sürdür. Açık baskı pas süresini kısaltıyorsa ulaşılabilir alıcı ve boş alanı hızlı değerlendir; baskı hattına doğru kaçma.","cue":"Açık tehdidi gör; koçun cevabını uygula.","direction":"Pas / hareket kararı koç metnine göre","target":"Boundary LB + açık baskı","condition":"Birden çok açık baskı varsa tek LB kuralı yeterli sayılmaz.","error":"Aşırı baskıyı beş OL’nin tamamını kapattığı gibi gösterme.","check":"Açık kalan ikinci tehdit varsa önce hangi tehdidi görmen ve pas hazırlığını nasıl değiştirmen gerekiyor?"},{"title":"Devam ve bitiriş","text":"Koçun belirlediği pas veya hareket kararını bitir. Tekrar sonunda field/boundary ayrımını, tackle’ın neden adamında kaldığını ve boundary LB’ye verdiğin cevabı anlat.","cue":"Kararı bitir; baskıyı nasıl okuduğunu anlat.","direction":"Koçun bitiriş talimatı","target":"Koçun seçtiği hedef","condition":"Bitiş ve tekrar değerlendirmesi.","error":"Bir başarılı sonuçla yanlış okumayı doğru kabul etme.","check":"LB gelmediği tekrar ile geldiği tekrardaki farkı açıklayabilir misin?"}],"receiver":[{"title":"Snap öncesi hizalanma ve okuma","text":"{label}: {routeStart}. Görseldeki iz {routeFirst} ile başlıyor. Başlangıç hizanı, snap zamanını ve önündeki savunmacıyı gör. Bu çizim yaklaşık görsel izdir; rota adı veya ölçülü yard derinliği değildir.","cue":"{routeStart}; izimi ve savunmayı gör.","direction":"Başlangıç hizası","target":"{label} başlangıç alanı","condition":"Snap zamanı ve çizilmiş yol birlikte kontrol edilir.","error":"Görsel izini kesin yard derinliğiyle karıştırma.","check":"Başlangıç yerin çizginin üzerinde mi gerisinde mi?"},{"title":"İlk adım","text":"İlk hareket: {routeFirst}. Önündeki savunmacının çıkış açını kapatıp kapatmadığını gör; dengen bozulmadan çizilmiş izine çık. U için kesikli bölümün snap öncesi motion mu yoksa snap sonrası çıkış mı olduğu ayrıca düzenlenebilir; görsel tek başına zamanını kanıtlamaz.","cue":"{routeFirst}.","direction":"{routeFirst}","target":"Çizilmiş ilk yol noktası","condition":"Çıkış kapanırsa dengeli serbest kal; yeni rota adı üretme.","error":"Savunmacıya bakmadan ezberlenen noktaya koşma.","check":"İlk iki yol noktası senin ilk hareketinle uyumlu mu?"},{"title":"İkinci adım","text":"İkinci bölüm: {routeSecond}. Ayaklarını ve gövdeni izin yönünde dengeli tut. Savunmacının seni içeri veya dışarı yönlendirmesine göre kendi alanını koru; çizgiler kesişse de takım arkadaşının yolunu kapatma.","cue":"{routeSecond}.","direction":"{routeSecond}","target":"Çizilmiş yolun ikinci bölümü","condition":"Çıkış engellenirse yolunu dengeli yeniden kur.","error":"Özellikle H ile Z’nin kesişen izlerini çarpışma noktası haline getirme.","check":"İkinci adımda hangi alana yer açıyorsun?"},{"title":"Temas / hedefe yaklaşma","text":"Yaklaşma / yön değişimi: {routeBreak}. Dönüş varsa önce dengenle açıyı kur, sonra yeni yöne hızlan. Dönüş yoksa sırf bu adımın adı kırılma diye yeni bir kırılma ekleme.","cue":"{routeBreak}.","direction":"{routeBreak}","target":"Çizilmiş yön değişimi veya devam noktası","condition":"Görseldeki iz ve düzenlenen yol noktaları geçerlidir.","error":"Y ve X için görselde bulunmayan ekstra kırılma uydurma.","check":"Bu oyuncuda gerçek bir yön değişimi var mı?"},{"title":"Okuma, devir ve karar","text":"Devam: {routeFinish}. Coverage’ın bıraktığı alanı ve QB’nin pas hazırlığını gör. Boundary LB baskısında QB karar süresi kısalabilir; hazır ve görünür ol. Bu durum tek başına bütün receiver’lara otomatik hot rota veya option dönüşü atamaz.","cue":"Alanı gör, pas için hazır ol.","direction":"{routeFinish}","target":"Rota alanı / QB görüşü","condition":"QB baskı altındaysa hazır ol; yazılı rota değişimin varsa onu uygula.","error":"QB baskı gördü diye plansızca başka bir rota koşma.","check":"QB seni hangi açık alanda görebilir?"},{"title":"Devam ve bitiriş","text":"Bitiriş: {routeFinish}. Top sana gelirse görüşünü topa getirip dengeli yakalama ve koçun bitiriş talimatını uygula. Top gelmezse izin ve takım aralığının devamını koru; tekrar sonunda başlangıç, çıkış, dönüş ve bitişi kendi sözlerinle anlat.","cue":"İzi bitir; topa ve oyuna hazır kal.","direction":"{routeFinish}","target":"Rota son alanı","condition":"Topun gelişi ve oyunun bitişi.","error":"Top gelmedi diye görevin ortasında durma.","check":"Rotanı isim ezberlemeden baştan sona anlatabilir misin?"}]},"seedKey":"user-empty-field-man-v1"}]</script>
+<script id="legacyCatalog" type="application/json">[
+  {
+    "id": "p01",
+    "title": "MOST A0-Empty-X44-U88-H13-Y9-Z33",
+    "page": 1
+  },
+  {
+    "id": "p02",
+    "title": "MOST A1-X9-UShortMotion4-HPP-Y9-Z9",
+    "page": 2
+  },
+  {
+    "id": "p03",
+    "title": "MOST A2-Empty-X9-U88-H2-YShortMotion4-Z9",
+    "page": 3
+  },
+  {
+    "id": "p04",
+    "title": "MOST A3-Empty-X14-HLongMotion9-U10-Y20-Z44",
+    "page": 4
+  },
+  {
+    "id": "p05",
+    "title": "MOST A4-Empty-X14-U21-H2-Y20-Z9",
+    "page": 5
+  },
+  {
+    "id": "p06",
+    "title": "MOST A5-OUTZONE-",
+    "page": 6
+  },
+  {
+    "id": "p07",
+    "title": "MOST A7",
+    "page": 7
+  },
+  {
+    "id": "p08",
+    "title": "MOST B1-MAZE-ZONE",
+    "page": 8
+  },
+  {
+    "id": "p09",
+    "title": "MOST B2-MAZE-GTCOUNTER-",
+    "page": 9
+  },
+  {
+    "id": "p10",
+    "title": "MOST B3-X88-ULongMotion13-Y20-Z88",
+    "page": 10
+  },
+  {
+    "id": "p11",
+    "title": "MOST B4-QB SPEED OPTION-UShortMotion16",
+    "page": 11
+  },
+  {
+    "id": "p12",
+    "title": "MOST B5-MAZE-COCKTAIL-GTcounter",
+    "page": 12
+  },
+  {
+    "id": "p13",
+    "title": "MOST C0-kuzgun",
+    "page": 13
+  },
+  {
+    "id": "p14",
+    "title": "MOST C1-kuzgun-option",
+    "page": 14
+  },
+  {
+    "id": "p15",
+    "title": "MOST PERDE-X9-U21-Y9-Z9",
+    "page": 15
+  },
+  {
+    "id": "p16",
+    "title": "MOST YÜZÜK-E0",
+    "page": 16
+  },
+  {
+    "id": "p17",
+    "title": "MOST YÜZÜK-E1- QB SPEED OPTION",
+    "page": 17
+  },
+  {
+    "id": "p18",
+    "title": "MOST YÜZÜK-E2-ROLL BOUNDARY",
+    "page": 18
+  },
+  {
+    "id": "p19",
+    "title": "MOST YÜZÜK-E4- JET",
+    "page": 19
+  },
+  {
+    "id": "p20",
+    "title": "MOST YÜZÜK-E5-ZONERİGHT",
+    "page": 20
+  },
+  {
+    "id": "p21",
+    "title": "MOST Yuzuk-E7",
+    "page": 21
+  },
+  {
+    "id": "p22",
+    "title": "MOST MAKARA-G0",
+    "page": 22
+  },
+  {
+    "id": "p23",
+    "title": "MOST KUKARA-G1-check cover 3- stick",
+    "page": 23
+  },
+  {
+    "id": "p24",
+    "title": "MOST Pistol-Efes",
+    "page": 24
+  },
+  {
+    "id": "p25",
+    "title": "MOST Pistol-Malt",
+    "page": 25
+  },
+  {
+    "id": "p26",
+    "title": "MOST Pistol-Değirmen",
+    "page": 26
+  },
+  {
+    "id": "p27",
+    "title": "MOST PİSTOL-A0",
+    "page": 27
+  },
+  {
+    "id": "p28",
+    "title": "MOST Pistol A2",
+    "page": 28
+  },
+  {
+    "id": "p29",
+    "title": "MOST Pistol-A6-Kemik",
+    "page": 29
+  },
+  {
+    "id": "p30",
+    "title": "MOST Bunch close-c0",
+    "page": 30
+  },
+  {
+    "id": "p31",
+    "title": "MOST Bunch close-C1",
+    "page": 31
+  },
+  {
+    "id": "p32",
+    "title": "MOST Bunch close-c2-EAST",
+    "page": 32
+  },
+  {
+    "id": "p33",
+    "title": "MOST BUNCH CLOSE-C3-NKU SPECIAL",
+    "page": 33
+  },
+  {
+    "id": "p34",
+    "title": "MOST GTA1",
+    "page": 34
+  },
+  {
+    "id": "p35",
+    "title": "MOST TAŞ0",
+    "page": 35
+  }
+]</script>
+<script>
+/* Düzenlenebilir öğretim önerileri. Takım çağrısı veya kesin görev ataması değildir.
+   Oyuna uygulanırken steps dizisi derin kopyalanır; kütüphane ortak veri olarak değiştirilmez. */
+const OLStepTitles = [
+  'Snap öncesi hizalanma ve okuma',
+  'İlk adım',
+  'İkinci adım',
+  'Temas / hedefe yaklaşma',
+  'Okuma, devir veya ikinci seviyeye çıkış',
+  'Devam ve bitiriş'
+];
+
+const OLTemplates = (() => {
+  const specs = [
+    ['pass-kick', 'Kick set', 'Pas', 'Dış baskıya karşı açı ve mesafe çalışması.',
+      ['Hizalanmanı ve koçun belirlediği iç/dış tehdidi kontrol et.', 'Dış ayağınla kontrollü bir kick adımı al.', 'İç ayağını dengeyi koruyarak yerine getir; tabanı daraltma.', 'Koçun belirlediği temas noktasında göğsünü ve ellerini hazırla.', 'Rakip içe dönerse iç kapını, dışa devam ederse set açını kontrol et.', 'Dengeli ayaklarla QB noktasına göre korumayı sürdür.'],
+      'Dışa / geriye', 'Rakibin içe veya dışa hareketine göre koçun tekniğini uygula.'],
+    ['pass-vertical', 'Vertical set', 'Pas', 'Derinlik kazanırken iç kapıyı koruma çalışması.',
+      ['Set derinliğini ve koruma yardımını koçla belirle.', 'Dengeli biçimde geriye derinlik kazan.', 'Ayaklarını çaprazlamadan set tabanını yeniden kur.', 'Rakibe uzanmak yerine temas mesafesinde ellerini kullan.', 'Rakibin hızdan güce veya içe dönüşünü oku.', 'QB noktasını koruyarak ayağını çalıştırmayı sürdür.'],
+      'Geriye', 'Rakip içe dönerse koçun iç kapı kuralını uygula.'],
+    ['pass-jump', 'Kısa / jump set', 'Pas', 'Kısa sette kontrollü ilk temas çalışması.',
+      ['Çağrının kısa sete uygun olduğunu ve hedefini doğrula.', 'Kısa, dengeli bir adımla mesafeyi kapat.', 'İkinci ayağınla tabanını kur; ağırlığını öne düşürme.', 'Ellerini ve kalçanı dengeli kullanarak teması karşıla.', 'Rakibin kaçış yönünü okuyup ayaklarınla yeniden hizalan.', 'Tutma ve geç temas olmadan korumayı bitir.'],
+      'Kısa / öne', 'Rakip mesafeyi açarsa koçun yeniden set talimatını uygula.'],
+    ['pass-post', 'İç post adımı', 'Pas', 'İç kapıya gelen harekete dengeli cevap önerisi.',
+      ['İç tehdidi, yardımını ve koruma sınırını belirle.', 'İç ayağınla kısa bir post adımı al.', 'Dış ayağını tabanını koruyacak şekilde toparla.', 'Başını düşürmeden rakiple hizanı koru.', 'İç hareket sürüyor mu, rakip yeniden dışa mı dönüyor oku.', 'Aşırı içe kapanmadan koçun koruma açısında kal.'],
+      'İçe', 'İç hareket görülürse; çağrıdaki iç sorumluluğu doğrula.'],
+    ['pass-man', 'Man koruma', 'Pas', 'Koçun seçtiği bire bir eşleşmeyi çalışma taslağı.',
+      ['Koçun belirlediği adamı ve olası devri doğrula.', 'Rakibin ilk hareketine uygun set açını al.', 'İç kapını ve dengeni koruyarak mesafeyi ayarla.', 'Temas mesafesinde ellerinle rakibi karşıla.', 'Stunt veya devir varsa takımın çağrısını uygula.', 'QB noktasına göre bire bir korumayı sürdür.'],
+      'Koçun belirlediği set yönü', 'Stunt olursa otomatik kovalamak yerine devir çağrısını kontrol et.'],
+    ['pass-slide', 'Gap / slide koruma', 'Pas', 'Koçun seçtiği gap sorumluluğunu çalışma taslağı.',
+      ['Sorumlu olduğun gap ve yanındaki yardım ilişkisini doğrula.', 'Çağrının tarafına dengeli ilk adım at.', 'İkinci adımla gap içinde dengeli koruma tabanı kur.', 'Gap içine giren tehdidi karşıla.', 'Çapraz gelen baskıyı komşunla iletişim kurarak değerlendir.', 'Gap bütünlüğünü ve QB noktasını koru.'],
+      'Atanan gap tarafına', 'Gap boşsa yardım sınırını koç belirler; yeni görev uydurma.'],
+    ['pass-help', 'Pas korumada yardım', 'Pas', 'Öncelikli görevden sonra kontrollü yardım önerisi.',
+      ['Kendi öncelikli tehdidini ve yardım edeceğin komşuyu belirle.', 'Kendi sorumluluğunu koruyarak set al.', 'Boşluğu ve yeni bir iç tehdidi kontrol et.', 'Koçun izin verdiği mesafede komşuna yardım et.', 'Kendi gapine yeni tehdit gelirse önceliğine dön.', 'Yardım ederken dengenle koruma hattını sürdür.'],
+      'Koçun belirlediği yardım tarafı', 'Yalnız öncelikli sorumluluk güvenliyse yardım et.'],
+    ['pass-stunt', 'Stunt devri', 'Pas', 'Penetrator ve looper hareketine iletişimli cevap taslağı.',
+      ['Yanındaki oyuncuyla devir çağrısını ve sınırını belirle.', 'İlk tehdide karşı dengeli set al.', 'Gözlerini kaldırıp çapraz gelen ikinci tehdidi takip et.', 'İlk tehdidi komşuna kontrolle aktaracak temas kur.', 'Koçun devir kuralıyla gelen tehdidi devral; iletişimi sürdür.', 'İki koruyucu da dengesini ve kendi kapısını yeniden kursun.'],
+      'Koçun belirlediği devir açısı', 'Çapraz hareket görülürse devir çağrısını uygula.'],
+    ['pass-anchor', 'Anchor', 'Pas', 'Hızdan güce geçişte tabanı yeniden kurma önerisi.',
+      ['QB noktasını ve geriye kalan mesafeyi kontrol et.', 'Güç baskısına karşı kontrollü kısa bir adım al.', 'Kalçanı ve dizlerini dengeli bükerek tabanını kur.', 'Ellerini içeride tutup gücü dengeli karşıla.', 'Rakip yön değiştirirse ayaklarınla yeniden hizalan.', 'Dengen bozulmadan korumayı sürdür; zemine yaslanma.'],
+      'Kısa / dengeli', 'Rakip hızdan güce geçerse anchor tekniğini uygula.'],
+    ['pass-rb-scan', 'RB scan / check-release', 'Pas', 'Tarama sırası ve çıkış koşulu koç tarafından doldurulur.',
+      ['Tarama sırasını, öncelikli tehditleri ve çıkış koşulunu koçla yaz.', 'Atanan ilk okuma noktasına göre dengeli yerleş.', 'Koçun belirlediği sırayla tehditleri kontrol et.', 'Atanan tehdit gelirse güvenli blok açısında karşıla.', 'Çıkışa izin veren koşul sağlanıyor mu kontrol et.', 'Koçun yazdığı görevle blokta kal veya belirlenen rotaya çık.'],
+      '', 'Tarama sırası ve çıkış izni kullanıcı tarafından belirlenmelidir.'],
+
+    ['zone-direction', 'Zone ilk yön adımı', 'Zone', 'Çağrı yönüne dengeli başlangıç önerisi.',
+      ['Oyun tarafını, gapini ve covered/uncovered durumunu doğrula.', 'Çağrı tarafına kısa yön adımı al.', 'İkinci ayağınla zemini kazanıp dengeni kur.', 'Koçun belirlediği iz ve hedefe yaklaş.', 'Savunma akışına göre koçun okumasını uygula.', 'Ayaklarını çalıştırıp blok açısını sürdür.'],
+      'Çağrı tarafına', 'Savunma hareketine göre koçun iz kuralını uygula.'],
+    ['zone-reach', 'Reach', 'Zone', 'Hedefin oyun tarafına kontrollü ulaşma önerisi.',
+      ['Hedefi ve koçun istediği oyun tarafı kaldıraç noktasını belirle.', 'Hedefe açını koruyan yön adımı al.', 'İkinci adımla hedefin oyun tarafına yaklaş.', 'Başını düşürmeden gövdenle temas açını kur.', 'Hedef dışa kaçarsa aşırı uzanmadan koçun devam kuralını uygula.', 'Ayaklarınla teması ve koşu koridorunu sürdür.'],
+      'Hedefin oyun tarafına', 'Oyun tarafı alınamıyorsa koçun alternatif kuralını uygula.'],
+    ['zone-covered', 'Covered / uncovered okuması', 'Zone', 'Hizalanmaya göre komşuyla çalışma taslağı.',
+      ['Üstündeki ve yan gapteki tehdidi incele; eşleşmeni koçla belirle.', 'Çağrı yönünde kontrollü ilk adım al.', 'Komşunla mesafeni ve iki tehdit arasındaki ilişkiyi koru.', 'Koçun belirlediği DL üzerinde yardım veya ilk temas kur.', 'Hangi oyuncunun çıkacağına koçun savunma okumasıyla karar ver.', 'Atanan DL veya LB görevini dengeli sürdür.'],
+      'Çağrı tarafına', 'Covered/uncovered tek başına görev üretmez; koçun eşleşmesi esas.'],
+    ['zone-combo', 'Combo / double-team', 'Zone', 'İki oyuncunun ortak DL ve sonraki hedef çalışması.',
+      ['Ortak DL hedefini, LB hedefini ve çıkış koşulunu belirle.', 'Komşunla aynı çağrıya uygun ilk adım al.', 'Ortak hedefe dengeli açıyla yaklaş.', 'DL üzerinde birlikte kontrol oluştur.', 'Koçun koşulu oluştuğunda belirlenen oyuncu LB’ye çıksın.', 'DL’de kalan ve çıkan oyuncu kendi son hedefini sürdürsün.'],
+      'Ortak hedefe', 'Kimin LB’ye çıkacağını ve ne zaman çıkacağını koç belirler.'],
+    ['zone-climb', 'LB’ye çıkış', 'Zone', 'İkinci seviyeye kontrollü geçiş önerisi.',
+      ['LB hedefini, başlangıç yardımını ve çıkış koşulunu doğrula.', 'İlk adımda çağrı açını koru.', 'Gerekliyse DL üzerinde kontrollü yardım kur.', 'Hedef LB’ye yaklaşırken gözlerini ve dengeni koru.', 'Koçun çıkış koşuluyla LB’nin hareket açısını karşıla.', 'Uzaktan atılmadan ayaklarınla blok açısını sürdür.'],
+      'Koçun belirlediği LB izine', 'DL kontrolü ve çağrıdaki çıkış koşulu sağlanırsa çık.'],
+    ['zone-scoop', 'Scoop / cutoff', 'Zone', 'Backside sızıntısını açıyla kesme çalışması.',
+      ['Backside hedefini ve koruyacağın takip yolunu belirle.', 'Koçun istediği açıyla hedefin önüne yönel.', 'İkinci adımla kalçanı ve tabanını dengeli taşı.', 'Rakibin takip yoluna yasal blok açısında yerleş.', 'İçeri sızma veya dış takip hareketini oku.', 'Hedefi takip ederek koşu yolundan uzak tutmaya çalış.'],
+      'Koçun belirlediği kesme açısı', 'Rakibin sızma yönüne göre ayaklarla açı düzelt.'],
+    ['zone-hinge', 'Backside hinge', 'Zone', 'Arka taraftaki kapıyı kontrollü koruma önerisi.',
+      ['İç gap ve backside edge önceliğini koçla belirle.', 'İç kapıyı kontrol eden kısa adım al.', 'Koçun tarif ettiği açıyla kalçanı kontrollü çevir.', 'Backside takip tehdidine karşı dengeli yerleş.', 'İçeriden sızıntı veya dış takip varsa önceliğini uygula.', 'Korunan kapıyı bırakmadan blok açısını sürdür.'],
+      'Koçun belirlediği hinge açısı', 'Öncelik sırasını koç belirler; iç ve dışı otomatik atama.'],
+
+    ['gap-down', 'Down block', 'Gap / çekme', 'İç taraftaki hedefe açıyla blok önerisi.',
+      ['İç hedefini ve komşuyla çakışma riskini belirle.', 'Hedefe doğru kısa açılı adım al.', 'İkinci adımla tabanını hedefe taşı.', 'Başını düşürmeden yasal temas açısını kur.', 'Hedef sızarsa koçun koridor kuralını uygula.', 'Ayaklarınla hedefin koşu yoluna dönüşünü sınırla.'],
+      'İç hedefe açılı', 'Hedef hareket ederse atılmak yerine açını yeniden kur.'],
+    ['gap-back', 'Back-block', 'Gap / çekme', 'Çeken oyuncunun arkasındaki sorumluluk için taslak.',
+      ['Çeken oyuncuyu, boşalan gapini ve kendi hedefini doğrula.', 'Koçun belirlediği arka hedefe yönel.', 'İkinci adımla boşalan alanı dengeli kapat.', 'Atanan rakibe yasal temas açısında yaklaş.', 'Yeni sızıntı varsa çağrıdaki önceliği uygula.', 'Boşalan kapı ve hedef üzerindeki kontrolü sürdür.'],
+      'Atanan arka hedefe', 'Çeken oyuncunun boşluğuna tehdit gelirse koçun kuralını uygula.'],
+    ['gap-open-pull', 'Açık pull', 'Gap / çekme', 'Açılma ve çekme koridoruna çıkış önerisi.',
+      ['Çekme yönünü, çıkış koridorunu ve son hedefi belirle.', 'Koçun tarif ettiği açık adımla kalçanı çekme yönüne aç.', 'İkinci adımla çizgi arkasında dengeli mesafe kazan.', 'Trafiğe ve hedefe bakarak belirlenen koridordan ilerle.', 'Hedef değişirse koçun kick/log/lead kararını uygula.', 'Hedefe kontrollü yaklaşarak görevini bitir.'],
+      'Çekme tarafına açıl', 'Trafik veya hedef değişiminde koçun alternatifini uygula.'],
+    ['gap-skip-pull', 'Skip pull', 'Gap / çekme', 'Omuz yönünü koruyarak çekme yolu önerisi.',
+      ['Çekme tarafını, derinliği ve hedefini koçla belirle.', 'Koçun gösterdiği skip başlangıç adımını al.', 'İkinci adımla çekme koridorunda tabanını kur.', 'Gözlerin hedefteyken trafiği dolaş.', 'İç/dış hedef hareketini okuyup koçun kararını uygula.', 'Hızını dengeli temasa dönüştürerek bitir.'],
+      'Koçun belirlediği skip açısı', 'Adım biçimini koçun gösterimiyle doğrula.'],
+    ['gap-kickout', 'Kick-out', 'Gap / çekme', 'Atanan kenar hedefini dışa taşıma önerisi.',
+      ['Kick hedefini ve içeride kalacak koşu koridorunu belirle.', 'Belirlenen çekme veya yaklaşma yoluna çık.', 'Hedefin iç tarafına kontrollü yaklaş.', 'İçten dışa yasal temas açısını kur.', 'Hedef içe kapanırsa koçun log veya devam koşulunu uygula.', 'Koşu koridoru için blok açısını dengeli sürdür.'],
+      'Hedefin iç tarafına', 'Hedef içe kapanırsa dönüş kararını koç belirler.'],
+    ['gap-wrap', 'Wrap / lead', 'Gap / çekme', 'İlk blok arkasından ikinci seviyeye giriş taslağı.',
+      ['Geçeceğin koridoru, ön blokları ve son hedefi belirle.', 'Koçun belirlediği çekme veya lead yoluna başla.', 'İkinci adımla koridora dengeli gir.', 'Ön blok arkasından geçerken atanan hedefi bul.', 'LB akışına göre koçun iç/dış tercihine uy.', 'Hedefe kontrollü temasla koşu yolunu açmaya çalış.'],
+      'Atanan wrap / lead yoluna', 'Koridor kapanırsa koçun alternatif yolunu uygula.'],
+    ['gap-log', 'Log', 'Gap / çekme', 'İçe kapanan hedefi içeride tutma taslağı.',
+      ['Log hedefini ve bu kararın hangi koşulda verileceğini belirle.', 'Belirlenen yaklaşma yolunda dengeli ilerle.', 'Hedefin kapanış açısını görerek mesafeyi ayarla.', 'Koçun istediği kaldıraçla hedefin dış tarafına yerleş.', 'Log koşulunu doğrula; koşu yönünü kendiliğinden değiştirme.', 'Rakibi içeride tutan açıyı ayaklarınla sürdür.'],
+      'Hedefin dış tarafına', 'Yalnız koçun belirlediği log koşulunda uygula.'],
+    ['gap-trap1', '1 teknik trap', 'Gap / çekme', 'Koçun seçtiği 1 teknik hedefe trap yaklaşımı.',
+      ['1 teknik hedefi, çekme yönünü ve açık bırakılan alanı doğrula.', 'Koçun çekme tekniğiyle başlangıç yap.', 'Hedefe ulaşacak derinliği dengeli kazan.', '1 teknik hedefe belirlenen iç/dış açıyla yaklaş.', 'Hedef slant yaparsa koçun trap kararını uygula.', 'Yasal temasla atanan koridor görevini sürdür.'],
+      'Seçili 1 teknik hedefe', 'Hedef kayarsa yeni hedefi veya devamı koç belirler.'],
+    ['gap-trap3', '3 teknik trap', 'Gap / çekme', 'Koçun seçtiği 3 teknik hedefe trap yaklaşımı.',
+      ['3 teknik hedefi ve çekme koridorunu koçla belirle.', 'Koçun çekme tekniğiyle dengeli çık.', 'İkinci adımla çizgi arkasında gerekli mesafeyi kazan.', '3 teknik hedefe koçun belirlediği açıyla yaklaş.', 'Penetrasyon veya slant varsa çağrıdaki kararı uygula.', 'Atılmadan dengeli temas ve ayaklarla görevi bitir.'],
+      'Seçili 3 teknik hedefe', 'Penetrasyon/slant tepkisini koç belirler.'],
+
+    ['back-lead', 'Lead / insert', 'Back görevleri', 'Koşu koridoruna girip atanan hedefi karşılama.',
+      ['Giriş gapini, taşıyıcı yolunu ve blok hedefini belirle.', 'Koçun zamanlamasıyla giriş yoluna başla.', 'Gözlerin hedefteyken kontrollü mesafe kazan.', 'Koridora girip atanan hedefe dengeli yaklaş.', 'LB akışına göre koçun kararını uygula.', 'Taşıyıcının yolunu engellemeden blok açısını sürdür.'],
+      'Atanan giriş gapine', 'Hedef akışına göre tercih koçun yazdığı koşula bağlıdır.'],
+    ['back-sift', 'Sift / split', 'Back görevleri', 'Formasyon arkasından karşı tarafa geçiş taslağı.',
+      ['Geçiş yolunu, zamanlamayı ve son hedefi belirle.', 'Koçun snap zamanlamasıyla karşı tarafa yönel.', 'Mesh ve diğer oyuncularla çakışmadan ilerle.', 'Atanan edge veya diğer hedefe yaklaş.', 'Hedef içe/dışa hareket ederse koçun kararını uygula.', 'Yasal blok açısını ve dengeni sürdür.'],
+      'Atanan karşı tarafa', 'Mesh trafiği ve son hedef koç tarafından netleştirilir.'],
+    ['back-edge', 'Edge kapatma', 'Back görevleri', 'Atanan kenar tehdidini kontrol etme çalışması.',
+      ['Edge hedefini ve koruyacağın iç/dış kapıyı belirle.', 'Koçun belirlediği kaldıraç yönünde ilk adım al.', 'Hedefle mesafeyi dengeli kapat.', 'Koçun istediği blok açısında yasal temas kur.', 'Rakibin içe kaçışını veya dış yayını oku.', 'Atanan kapıyı koruyarak ayaklarını çalıştır.'],
+      'Koçun belirlediği edge açısı', 'İç/dış önceliği koç belirler.'],
+    ['back-mesh', 'Mesh', 'Back görevleri', 'QB–RB buluşma ve top alışverişi için düzenlenebilir taslak.',
+      ['Buluşma noktasını, el/cep düzenini ve zamanlamayı koçla belirle.', 'İlk adımını belirlenen buluşma yoluna at.', 'Top noktasına gözlerin ve gövden dengeli yaklaş.', 'Top alışverişini koçun öğrettiği teknikle uygula.', 'Ver/çek kararının kimde olduğunu ve koşulunu çağrıdan doğrula.', 'Topu alan veya fake sürdüren oyuncu atanan yoluna devam etsin.'],
+      'Belirlenen mesh noktasına', 'Ver/çek kararı yalnız koçun belirlediği oyuncu ve okumaya bağlıdır.'],
+    ['back-fake', 'Fake', 'Back görevleri', 'Top sende olmasa da atanan aksiyonu tutarlı sürdürme.',
+      ['Fake türünü, yönünü ve ne kadar sürdüreceğini belirle.', 'İlk adımını gerçek aksiyonla aynı zamanlamada al.', 'Gövde ve ellerini koçun tarif ettiği şekilde kullan.', 'Belirlenen fake noktasından dengeli geç.', 'Sonraki blok, rota veya bekleme koşulunu doğrula.', 'Koçun yazdığı bitiriş görevine devam et.'],
+      'Atanan fake yönüne', 'Fake sonrası görevi kendiliğinden tahmin etme.'],
+    ['back-aim', 'Koşu hedefi / aiming point', 'Back görevleri', 'İlk koşu hedefi ve okuma sırasını koç doldurur.',
+      ['İlk hedefi, yolu ve okunacak oyuncuyu koçla belirle.', 'Koçun zamanlamasıyla ilk adımını al.', 'Top güvenliğiyle hedef yoluna dengeli ilerle.', 'Belirlenen hedefe yaklaşırken ön blokları oku.', 'Koçun belirlediği devam veya kesme koşulunu uygula.', 'Top güvenliği ve dengeli koşuyla bitir.'],
+      'Atanan ilk koşu hedefine', 'İlk hedef ile son boşluk aynı olmak zorunda değildir; kararı koç yazar.'],
+    ['back-cutback', 'Cutback okuması', 'Back görevleri', 'Arka koridora dönüş koşulunu çalışma taslağı.',
+      ['İlk hedefi, cutback okumasını ve yasak koridorları belirle.', 'Atanan ilk hedefe doğru ilk adımı al.', 'Koşu hızını okuma yapabilecek dengede tut.', 'Koçun belirlediği savunmacı veya blok ilişkisini oku.', 'Yalnız yazılan koşul oluşursa atanan cutback yoluna geç.', 'Top güvenliğiyle seçilen koridorda ilerle.'],
+      'Önce koçun ilk hedefine', 'Cutback koşulu ve hedef gap kullanıcı tarafından doldurulur.'],
+    ['back-option', 'Option read / pitch', 'Back görevleri', 'Okunan savunmacı ve ver/çek/pitch koşulu koçundur.',
+      ['Read oyuncusunu, pitch ilişkisini ve karar koşullarını yaz.', 'Koçun zamanlamasıyla mesh veya option yoluna başla.', 'Gözlerini atanan read üzerinde tut; mesafeyi koru.', 'Koçun öğrettiği ver/çek veya taşıma tekniğini uygula.', 'Pitch yalnız koçun belirlediği koşul ve ilişkide uygulanır.', 'Kararı tamamlayıp top güvenliğiyle atanan aksiyonu sürdür.'],
+      'Atanan option yoluna', 'Okuma ve pitch kararı belirtilmeden otomatik görev oluşturulmaz.'],
+    ['back-rollout', 'Rollout', 'Back görevleri', 'QB çıkış yolu ve sonraki görev için taslak.',
+      ['Çıkış tarafını, derinliği, edge yardımını ve son görevi belirle.', 'Koçun zamanlamasıyla çıkış yönüne ilk adımı al.', 'Top güvenliğiyle belirlenen derinliği kazan.', 'Edge bölgesinden dengeli geçip görüşünü sahaya aç.', 'Atış, koşu veya durma koşulunu koçun okumasıyla değerlendir.', 'Koçun belirlediği bitirişle aksiyonu tamamla.'],
+      'Atanan rollout tarafına', 'Atış veya koşu tercihi kullanıcı tarafından tanımlanır.'],
+
+    ['skill-te-block', 'TE blok başlangıcı', 'TE / WR / motion', 'TE için hedef ve kaldıraç odaklı blok taslağı.',
+      ['Hizalanmanı, atanan hedefi ve iç/dış önceliğini belirle.', 'Koçun istediği açıyla dengeli ilk adım al.', 'İkinci adımla hedefe ve tabanına hâkim ol.', 'Başını düşürmeden yasal temas açısını kur.', 'Hedefin hareketine göre koçun devam kararını uygula.', 'Ayaklarınla kaldıraç ve blok açısını sürdür.'],
+      'Koçun belirlediği blok açısı', 'TE görevi çağrıya ve hedefe göre koç tarafından tamamlanır.'],
+    ['skill-wr-block', 'WR stalk / dış alan bloğu', 'TE / WR / motion', 'Dış alanda kontrollü yaklaşma ve yasal blok önerisi.',
+      ['Blok hedefini, yaklaşma yolunu ve koşu yönünü doğrula.', 'Hedefe kontrollü hızla ilk adımı al.', 'Mesafeyi kapatırken dengeli tabanını koru.', 'Hedefi takip edip yasal temas mesafesinde yerleş.', 'Hedefin iç/dış akışına göre koçun açısını uygula.', 'Tutma ve arkadan temas olmadan blok ilişkisini sürdür.'],
+      'Atanan dış alan hedefine', 'Koşu yönüne göre kaldıraç seçimini koç belirler.'],
+    ['skill-motion', 'Motion', 'TE / WR / motion', 'Snap zamanlaması ve bitiş konumu düzenlenebilir hareket.',
+      ['Başlangıcı, motion yolunu, bitiş yerini ve snap zamanını belirle.', 'Koçun işaretiyle tanımlanan yola başla.', 'Hızını ve takım arkadaşlarıyla mesafeni kontrol et.', 'Bitiş veya snap noktasına belirlenen zamanlamayla yaklaş.', 'Motion sonrası blok, rota veya bekleme görevini doğrula.', 'Koçun tanımladığı son göreve geç.'],
+      'Çizilen motion yoluna', 'Motion sonrası görev ve snap zamanı koç tarafından yazılır.'],
+    ['skill-release', 'Rota çıkışı / release', 'TE / WR / motion', 'Rota kendiliğinden üretilmez; çıkış ve yol koçça çizilir.',
+      ['Atanan rotayı, çıkış kaldıraç noktasını ve zamanlamayı doğrula.', 'Koçun belirlediği release yönünde ilk adımı al.', 'Dengeli hızlanıp çıkış koridoruna yerleş.', 'Temas varsa koçun öğrettiği yasal kurtulma tekniğini uygula.', 'Çizilen kırılma noktası veya okuma koşulunu uygula.', 'Atanan rota ve topa tepki görevini tamamla.'],
+      'Koçun çizdiği rota başlangıcına', 'Rota adı veya oyun adı üzerinden yol tahmin edilmez.']
+  ];
+
+  return specs.map(([id, name, category, description, texts, direction, condition]) => ({
+    id,
+    name,
+    category,
+    description: description + ' Bu bir başlangıç önerisidir; takımın kesin kuralı değildir.',
+    steps: texts.map((text, index) => ({
+      title: OLStepTitles[index],
+      text,
+      direction: index === 1 ? direction : '',
+      target: '',
+      condition: index === 4 ? condition : ''
+    }))
+  }));
+})();
+
+/* Generic defensive examples. Every alignment, rush flag and path remains editable. */
+const OLDefense = (() => {
+  const copy = v => JSON.parse(JSON.stringify(v));
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Number(v) || 0));
+  const techX = {'0':0,'1':35,'1i':18,'2i':62,'2':90,'3':125,'3i':108,'4i':153,'4':180,'5':215,'6':245,'7':260,'9':300};
+  const frontNames = [
+    ['43over','4–3 Over'], ['43under','4–3 Under'], ['425','4–2–5'],
+    ['34','3–4'], ['33stack','3–3 Stack'], ['tite','3–3 Tite'],
+    ['bear','Bear'], ['52','5–2'], ['goalline','Goal-line 6–2']
+  ];
+  const moveNames = [
+    ['straight','Düz rush'],['slantL','Sola slant'],['slantR','Sağa slant'],
+    ['pinch','Pinch / içe'],['widen','Dışa açılma'],['et','E–T stunt'],
+    ['tt','T–T stunt'],['lbblitz','Gecikmeli LB blitz'],['overload','Sağ overload'],
+    ['clear','Bütün yolları sil']
+  ];
+  function make(id,label,level,offset,depth,tech='') {
+    return {id,label,level,x:500+offset,y:Math.max(43,300-depth*24),depth,tech:String(tech),side:offset<0?'L':'R',rush:level==='DL',path:[]};
+  }
+  const dl = (id,label,side,tech) => make(id,label,'DL',(side==='L'?-1:1)*techX[tech],1.3,tech);
+  const lb = (id,label,x,depth=4.6) => make(id,label,'LB',x,depth);
+  const db = (id,label,x,depth=8) => make(id,label,'DB',x,depth);
+  const secondary = () => [db('CL','CB-L',-390,6),db('CR','CB-R',390,6),db('SS','SS',220,10),db('FS','FS',-40,13)];
+  function create(frontId='43over') {
+    const aliases={over:'43over',under:'43under',even:'425',odd:'34',stack:'33stack',five:'52',six:'goalline'};
+    frontId=aliases[frontId]||frontId;
+    let a;
+    if (['43over','43under','425'].includes(frontId)) {
+      a=frontId==='43under'
+        ? [dl('EL','E-L','L',5),dl('T','T','L',3),dl('N','N','R',1),dl('ER','E-R','R',5)]
+        : [dl('EL','E-L','L',5),dl('N','N','L',1),dl('T','T','R',3),dl('ER','E-R','R',5)];
+      if(frontId==='425')a.push(lb('M','M',-65),lb('S','S',100),db('W','NICKEL',-270,4),...secondary());
+      else a.push(lb('W','W',-155),lb('M','M',0),lb('S','S',190),...secondary());
+    } else if (['34','33stack','tite'].includes(frontId)) {
+      const t=frontId==='tite'?'4i':'4';
+      a=[dl('EL','E-L','L',t),dl('N','N','R',0),dl('ER','E-R','R',t)];
+      if(frontId==='34')a.push(lb('W','W',-290,1.5),lb('M','M',-75),lb('S','S',75),lb('J','J',290,1.5),...secondary());
+      else a.push(lb('W','W',-165),lb('M','M',0),lb('S','S',165),db('J','STAR',285,4),...secondary());
+    } else if (['bear','52'].includes(frontId)) {
+      const t=frontId==='bear'?'3':'4i';
+      a=[dl('EL','E-L','L',5),dl('TL','T-L','L',t),dl('N','N','R',0),dl('TR','T-R','R',t),dl('ER','E-R','R',5),lb('M','M',-75),lb('S','S',90),...secondary()];
+    } else if(frontId==='goalline') {
+      a=[dl('OL','E-L','L',7),dl('EL','T-L','L',5),dl('TL','G-L','L','2i'),dl('TR','G-R','R','2i'),dl('ER','T-R','R',5),dl('OR','E-R','R',7),lb('M','M',-70,3),lb('S','S',70,3),db('CL','CB-L',-385,3),db('CR','CB-R',385,3),db('FS','FS',0,8)];
+    } else return create('43over');
+    return movement(a,'straight');
+  }
+  const point = (x,y,delay) => ({x:clamp(x,15,985),y:clamp(y,15,615),...(delay?{delay}: {})});
+  function rushPath(d,dx=0) {
+    return [point(d.x+dx*.3,d.y+28),point(d.x+dx,310),point(d.x+dx,400)];
+  }
+  function movement(defenders,kind='straight') {
+    const a=copy(defenders);
+    if(kind==='clear'){a.forEach(d=>d.path=[]);return a;}
+    a.forEach(d=>{
+      if(!d.rush){d.path=[];return;}
+      const dx=kind==='slantL'?-90:kind==='slantR'?90:kind==='pinch'?-Math.sign(d.x-500)*75:kind==='widen'?Math.sign(d.x-500)*80:0;
+      d.path=rushPath(d,dx);
+    });
+    function twist(outside,inside) {
+      if(!outside||!inside)return;
+      outside.rush=true;inside.rush=true;
+      const sign=Math.sign(outside.x-500)||1;
+      outside.path=[point(outside.x, outside.y+24),point(inside.x,310),point(inside.x-sign*20,385)];
+      inside.path=[point(inside.x,inside.y-10),point(inside.x+sign*45,inside.y-25,0.25),point(outside.x+sign*35,310),point(outside.x+sign*35,405)];
+    }
+    const line=a.filter(d=>d.level==='DL').sort((x,y)=>x.x-y.x);
+    if(kind==='et') {
+      const right=line.filter(d=>d.x>500);
+      const left=line.filter(d=>d.x<500);
+      if(right.length>=2)twist(right[right.length-1],right[right.length-2]);
+      else if(left.length>=2)twist(left[0],left[1]);
+    }
+    if(kind==='tt') {
+      const inner=[...line].sort((x,y)=>Math.abs(x.x-500)-Math.abs(y.x-500));
+      if(inner.length>=2)twist(inner[0],inner[1]);
+    }
+    if(kind==='lbblitz') {
+      const d=a.filter(d=>d.level==='LB').sort((x,y)=>Math.abs(x.x-500)-Math.abs(y.x-500))[0];
+      if(d){d.rush=true;d.path=[point(d.x,d.y,0.5),point(d.x,275),point(535,340),point(535,430)];}
+    }
+    if(kind==='overload') {
+      const lbs=a.filter(d=>d.level==='LB').slice(0,2);
+      lbs.forEach((d,i)=>{d.x=735+i*70;d.y=265;d.depth=(300-d.y)/24;d.side='R';d.rush=true;d.path=[point(d.x,300),point(680+i*60,365),point(600+i*75,440)];});
+    }
+    return a;
+  }
+  function legacyPath(d,x,y) {
+    const move=d.move||'straight';
+    if(move==='drop')return [point(x,y-35),point(x+(d.side==='L'?-45:45),Math.max(35,y-100))];
+    if(!d.rush)return [];
+    let endX=x;
+    if(d.twist&&Number.isFinite(Number(d.twist.to)))endX=500+Number(d.twist.to);
+    else if(move==='left')endX-=90;
+    else if(move==='right')endX+=90;
+    else if(move==='pinch')endX-=Math.sign(x-500)*78;
+    else if(move==='wide')endX+=Math.sign(x-500)*78;
+    else if(move==='loopLeft')endX-=140;
+    else if(move==='loopRight')endX+=140;
+    const loop=d.twist?.kind==='looper'||move.startsWith('loop');
+    const delay=move==='delay'?.5:undefined;
+    return [point(x+(endX-x)*.18,y+17,delay),point(x+(endX-x)*.43,y+(loop?-5:25)),point(x+(endX-x)*.8,302),point(endX,375),point(endX,445)];
+  }
+  function fromLegacy(defenders) {
+    if(!Array.isArray(defenders))return [];
+    return defenders.map((old,i)=>{
+      const d=copy(old);
+      const x=clamp(500+Number(d.x||0),15,985), y=clamp(Math.max(43,300-Number(d.depth||0)*24),15,615);
+      let path;
+      if(Array.isArray(d.path))path=d.path.map(p=>Array.isArray(p)?point(500+Number(p[0]),p[1]):point(500+Number(p.x||0),p.y,p.delay));
+      else path=legacyPath(d,x,y);
+      return {...d,id:String(d.id||'legacy-'+i),label:String(d.label||d.id||'D'+(i+1)),level:['DL','LB','DB'].includes(d.level)?d.level:'DL',x,y,side:d.side==='L'?'L':'R',tech:String(d.tech??''),rush:!!d.rush,path,legacy:copy(old)};
+    });
+  }
+  return {fronts:()=>frontNames.map(([id,name])=>({id,name})),moves:()=>moveNames.map(([id,name])=>({id,name})),create,movement,fromLegacy,techX};
+})();
+
+'use strict';
+const OLModel = (() => {
+ const clone=v=>JSON.parse(JSON.stringify(v)), uid=(prefix='id')=>prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
+ const steps=()=>OLStepTitles.map(title=>({title,text:'',direction:'',target:'',condition:''}));
+ const actor=(label,x,y)=>({id:uid('a'),label,position:label,x,y,path:[],task:'',target:'',secondary:'',gap:'',source:'',steps:steps()});
+ function fresh(){return {app:'ol-atolye-editor',version:3,id:uid('workshop'),plays:[],templates:clone(OLTemplates),looks:[],defenders:OLDefense.create(),front:'43over',selectedPlayId:'',selectedLookId:'',ball:'middle',variants:[],legacy:[],trash:[],updatedAt:Date.now()};}
+ function newPlay(name){return {id:uid('play'),name,formation:'',notes:'',halfSlide:false,players:[actor('LT',320,330),actor('LG',410,330),actor('C',500,330),actor('RG',590,330),actor('RT',680,330),actor('QB',500,435),actor('RB',550,510)]};}
+ function hash(v){let n=2166136261;for(const c of JSON.stringify(v)){n^=c.charCodeAt(0);n=Math.imul(n,16777619);}return (n>>>0).toString(36);}
+ function variantKey(db,p){return p.id+'|'+db.ball+'|'+hash(db.defenders);}
+ function migrate(db,old){
+  if(!old||old.version!==2||!Array.isArray(old.looks)||old.looks.length>500||!old.looks.every(l=>l&&typeof l==='object'&&typeof l.id==='string'&&typeof l.name==='string'&&Array.isArray(l.defenders)&&l.defenders.length<=50&&new Set(l.defenders.map(d=>d?.id)).size===l.defenders.length&&l.defenders.every(d=>d&&typeof d.id==='string'&&typeof d.label==='string'&&Number.isFinite(d.x)&&Math.abs(d.x)<=440&&Number.isFinite(d.depth)&&d.depth>=0&&d.depth<=20&&['DL','LB','DB'].includes(d.level)&&typeof d.rush==='boolean'&&(!d.twist||Number.isFinite(d.twist.to)))))throw Error('Geçerli eski OL Atölye yedeği değil.');
+  const signature=hash(old);if(db.legacy.some(x=>x.signature===signature))return;
+  db.legacy.push({id:uid('legacy'),signature,importedAt:Date.now(),data:clone(old)});
+  for(const l of old.looks){const nl={...clone(l),id:l.id||uid('look'),defenders:OLDefense.fromLegacy(l.defenders||[]),legacy:clone(l)};if(db.looks.some(x=>x.id===nl.id)){if(JSON.stringify(db.looks.find(x=>x.id===nl.id).legacy)===JSON.stringify(l))continue;nl.id=uid('look');nl.name+=' (eski yedek)';}db.looks.push(nl);}
+  if(['left','middle','right'].includes(old.ball))db.ball=old.ball;
+ }
+ const rec=x=>x&&typeof x==='object'&&!Array.isArray(x), str=x=>typeof x==='string', coord=x=>Number.isFinite(x)&&x>=0&&x<=1000;
+ function checkActor(a,def=false){
+  if(!rec(a)||!str(a.id)||!str(a.label)||!coord(a.x)||!Number.isFinite(a.y)||a.y<0||a.y>630||!Array.isArray(a.path)||a.path.length>300||!a.path.every(p=>rec(p)&&coord(p.x)&&Number.isFinite(p.y)&&p.y>=0&&p.y<=630&&(!Object.hasOwn(p,'delay')||Number.isFinite(p.delay)&&p.delay>=0&&p.delay<=100)))return false;
+  if(def)return ['DL','LB','DB'].includes(a.level)&&typeof a.rush==='boolean';
+  return Array.isArray(a.steps)&&a.steps.length<=100&&a.steps.every(s=>rec(s)&&['title','text','direction','target','condition'].every(k=>str(s[k]))&&(s.x===undefined||coord(s.x))&&(s.y===undefined||Number.isFinite(s.y)&&s.y>=0&&s.y<=630))&&['task','target','secondary','gap'].every(k=>str(a[k]));
+ }
+ const actorsValid=(arr,def=false)=>Array.isArray(arr)&&arr.length<=50&&new Set(arr.map(x=>x?.id)).size===arr.length&&arr.every(a=>checkActor(a,def));
+ function validTeaching(p){return (p.emptyTexts===undefined||rec(p.emptyTexts)&&Object.values(p.emptyTexts).every(str))&&(p.emptyCurriculum===undefined||rec(p.emptyCurriculum)&&Object.values(p.emptyCurriculum).every(list=>Array.isArray(list)&&list.length<=100&&list.every(t=>rec(t)&&['title','text','direction','target','condition'].every(k=>str(t[k]))&&['cue','error','check'].every(k=>t[k]===undefined||str(t[k])))));}
+ function validate(v){
+  return rec(v)&&v.app==='ol-atolye-editor'&&v.version===3&&str(v.id)&&Array.isArray(v.plays)&&v.plays.length<=500&&new Set(v.plays.map(p=>p?.id)).size===v.plays.length&&v.plays.every(p=>rec(p)&&str(p.id)&&str(p.name)&&actorsValid(p.players)&&validTeaching(p))&&Array.isArray(v.looks)&&v.looks.length<=500&&new Set(v.looks.map(l=>l?.id)).size===v.looks.length&&v.looks.every(l=>rec(l)&&str(l.id)&&str(l.name)&&actorsValid(l.defenders,true))&&actorsValid(v.defenders,true)&&['left','middle','right'].includes(v.ball)&&Array.isArray(v.templates)&&v.templates.length<=1000&&new Set(v.templates.map(t=>t?.id)).size===v.templates.length&&v.templates.every(t=>rec(t)&&str(t.id)&&str(t.name)&&Array.isArray(t.steps)&&t.steps.length<=100&&t.steps.every(s=>rec(s)&&['title','text','direction','target','condition'].every(k=>str(s[k]))))&&Array.isArray(v.variants)&&new Set(v.variants.map(a=>a?.id)).size===v.variants.length&&v.variants.every(a=>rec(a)&&str(a.id)&&str(a.playId)&&str(a.key)&&actorsValid(a.players))&&Array.isArray(v.legacy)&&Array.isArray(v.trash);
+ }
+ function merge(db,incoming){
+  if(incoming.version===2){migrate(db,incoming);return;}
+  if(!validate(incoming))throw Error('Dosya geçerli bir OL Atölye editör yedeği değil.');
+  const wasEmpty=!db.plays.length&&!db.looks.length, remap=new Map(), lookRemap=new Map();
+  // Give conflicting imported variants their own playable copy instead of hiding either version.
+  const variantConflicts=new Set(incoming.variants.filter(a=>db.variants.some(b=>b.playId===a.playId&&b.key===a.key&&JSON.stringify(b.players)!==JSON.stringify(a.players))).map(a=>a.playId));
+  for(const list of ['plays','looks','templates','variants'])for(const raw of incoming[list]){
+   const item=clone(raw);if(list==='variants'){item.playId=remap.get(item.playId)||item.playId;item.key=item.playId+item.key.slice(item.key.indexOf('|'));}
+   const current=db[list].find(x=>x.id===item.id);
+   if(current&&JSON.stringify(current)===JSON.stringify(item)&&!(list==='plays'&&variantConflicts.has(item.id)))continue;
+   if(current){const oldId=item.id;item.id=uid(list);if(list==='plays')remap.set(oldId,item.id);if(list==='looks')lookRemap.set(oldId,item.id);if(item.name)item.name+=' (içe aktarılan)';}
+   db[list].push(item);
+  }
+  const incomingDefense=JSON.stringify(incoming.defenders);
+  if(incomingDefense!==JSON.stringify(db.defenders)&&!db.looks.some(l=>JSON.stringify(l.defenders)===incomingDefense))db.looks.push({id:uid('look'),name:'Çalışma savunması (içe aktarılan)',front:incoming.front||'43over',defenders:clone(incoming.defenders),updatedAt:Date.now()});
+  if(wasEmpty){db.defenders=clone(incoming.defenders);db.front=incoming.front||'43over';db.ball=incoming.ball;db.selectedPlayId=remap.get(incoming.selectedPlayId)||incoming.selectedPlayId||'';db.selectedLookId=lookRemap.get(incoming.selectedLookId)||incoming.selectedLookId||'';}
+  for(const a of incoming.legacy)if(!db.legacy.some(b=>b.signature===a.signature))db.legacy.push(clone(a));
+  for(const a of incoming.trash)if(!db.trash.some(b=>JSON.stringify(a)===JSON.stringify(b)))db.trash.push(clone(a));
+ }
+ const emptyTexts={field:'Field yönündeki tehditlere kay. İlk hedef: {target}. {blitz}',combo:'LB blitz yok: center, 1 teknik üzerinde guard ile birlikte çalışır; göz ve gövde LB’ye dönük, ayaklar yeni tehdide hazırdır.',boundary:'Boundary MAN: {target} ile kal. Boundary LB gelse de tackle kendi adamını bırakmaz.',qb:'Empty’de RB yok. Boundary LB baskısını QB kendisi görüp hareket eder. Tehdit: {boundary}. Belirli bir hot rota veya kaçış yönü atanmadı.',receiver:'Rota ve ayrıntılı okuma koçun düzenlediği adımlardadır.'};
+ function emptySuggestions(db,p){return OLEmpty.analyze(db,p).jobs;}
+ function suggestions(db,p){
+  if(p?.emptyProtection)return emptySuggestions(db,p);
+  if(!p?.halfSlide)return {};
+  const field=db.ball==='right'?'L':'R', side=field==='R'?'sağ':'sol', defs=db.defenders.filter(d=>d.rush), out={},used=new Set();
+  const slots=field==='R'?{C:'A',RG:'B',RT:'C'}:{C:'A',LG:'B',LT:'C'};
+  // Gap ownership comes from the team's stated rule; matching defenders is only a visual suggestion.
+  for(const a of p.players.filter(a=>['LT','LG','C','RG','RT'].includes(a.position))){
+   const gap=slots[a.position],gx=500+(field==='R'?1:-1)*({A:45,B:135,C:225}[gap]||0);
+   const candidates=defs.filter(d=>!used.has(d.id)&&(!gap||Math.abs(d.x-gx)<75));
+   const target=candidates.sort((b,c)=>Math.abs(b.x-(gap?gx:a.x))-Math.abs(c.x-(gap?gx:a.x)))[0];if(target)used.add(target.id);
+   out[a.id]={task:gap?`GAP/SLIDE · ${side} ${gap} gap`:'MAN · boundary tarafı',gap:gap?`${side} ${gap}`:'',target:target?.id||'',source:'suggestion'};
+  }
+  return out;
+ }
+ return {emptyTexts,emptySuggestions,clone,uid,steps,actor,fresh,newPlay,hash,variantKey,migrate,validate,merge,suggestions};
+})();
+
+/* Team rules are those explicitly supplied by the coach. Technique details are editable teaching prompts. */
+const OLEmpty = (() => {
+ const clone=v=>JSON.parse(JSON.stringify(v));
+ const roles={field:'Field kayma',centerCombo:'Center · 1 teknik ortak blok',guardCombo:'Guard · center ile ortak blok',man:'Boundary MAN',qb:'QB · boundary LB okuması',receiver:'Receiver · rota çalışması'};
+ const titles=['Snap öncesi hizalanma ve okuma','İlk adım','İkinci adım','Temas / hedefe yaklaşma','Okuma, devir ve karar','Devam ve bitiriş'];
+ const make=(text,cue,direction,target,condition,error,check)=>({title:'',text,cue,direction,target,condition,error,check});
+ const banks={
+ field:[
+ make('Top {hash}. Field {field}; sen {position}, sorumlu alanın {gap}. {front} DL yerleşimini ve {threats} tehditlerini say. İlk hedef önerin {target}. {shift} Komşularınla aynı kaymayı gördüğünü kontrol et.','Field yönünü, gapini ve hedefi söyle.','Snap öncesi sabit','{target} / {gap}','{blitz}','Field yönünü oyun çiziminin sağıyla karıştırma.','Top sağ hash’e geçerse field hangi taraf olur?'),
+ make('Snap ile ilk hareketini field olan {field} tarafa, {gap} sorumluluğunu koruyacak şekilde başlat. Hedef {target}; rakibe uzanarak dengeyi bozma. Kullanılacak set tipi ve ayak mesafesi koçun düzenleyeceği teknik tercihidir.','{field} kay; iç kapını açık bırakma.','Field {field}','{target} / {gap}','LB’nin yaklaşması yetmez; baskı durumu açık mı kontrol et.','Hedefi kovalamak için komşunun alanına kontrolsüz geçme.','İlk adımının amacı alanı mı, rastgele bir adamı mı korumak?'),
+ make('İkinci ayağınla dengeli tabanını yeniden kur; ilk adımla açtığın mesafeyi kontrol et. {target} ve {lbRead} aynı görüş alanında kalsın. Şu anki DL tekniği: {technique}. Rakibin ilk iki hareketiyle gapine giren tehdidi yeniden değerlendir.','Tabanı kur; hedef ve LB’yi birlikte gör.','Field kaymasını dengeli tamamla','{target}','{shift}','İki ayağı birleştirip dengeni kaybetme.','Hedef içe slant yaparsa hangi gap tehlikeye giriyor?'),
+ make('Hedef {target} temas mesafesine geldiyse ayaklarınla hizalan ve dengeli temas kur. Eller, baş ve kalça pozisyonu için koçun öğrettiği tekniği uygula. Hedef yoksa gapini boşaltmadan {lbRead} okumasına devam et.','Dengeli temas; boşsa alanı koru.','Hedefe kontrollü yaklaş','{target} / {gap}','Temas mesafesi oluştuysa; oluşmadıysa uzanma.','Sırf ok çizili diye rakibi bloklanmış kabul etme.','Rakiple temasın sürerken yeni tehdidi görebiliyor musun?'),
+ make('{shift} Field LB baskısı varsa tackle LB’ye kayar; guard ve center field yönündeki sıradaki tehditlere kayar. {open} Çapraz girişte kendi gapine giren penetrator’ı önce karşıla; komşunun alanına geçen tehdidi iletişimle aktarırken gapine dönen looper’ı gör. Birini bırakıp diğerine geçerken arada açık koridor oluşturma.','Yeni tehdidi gör; komşuyla konuş.','Field kayması / gap içinde kal','{target}; okuma: {lbRead}','{blitz}','İlk çapraz hareketi kontrolsüz kovalamak yerine kendi gapine dönen ikinci tehdidi gör.','LB baskısı açılınca senin hedefin neden değişti?'),
+ make('Atanan {gap} bütünlüğünü ve dengeni oyun bitene kadar koru. QB’nin boundary LB okumasını onun yerine üstlenmek için görevini bırakma. Tekrar sonunda {target}, kayma sebebin ve açık kalan tehdidi kendi cümlenle anlat.','Gapini sürdür; bitişte kararını anlat.','Dengeli devam','{target} / {gap}','{open}','Blok başarılı göründü diye ayakları ve okumayı durdurma.','Aynı frontu ters hash’te açıklayabilir misin?')],
+ centerCombo:[
+ make('LB blitz yok. 1 teknik {target}, {comboGuard} tarafında. {comboGuard} ile aynı hedef üzerinde ortak çalışacağını belirle. Field {field}, senin field sorumluluğun {gap}. Gözün ve gövden karşıdaki {lbRead} okumasına açık kalsın.','1 tekniği guard ile al; LB’yi gör.','1 tekniğin bulunduğu tarafı kontrol et','{target} + {comboGuard}','Gerçek LB blitz yoksa bu ortak blok kuralı geçerli.','Başını tamamen DL’ye çevirerek LB’yi görüşten çıkarma.','1 teknik hangi guard tarafında ve birlikte kiminle çalışıyorsun?'),
+ make('İlk adımını {target} üzerindeki ortak bloğa dengeli katılacak şekilde al. {comboGuard} ile aranı kontrol et; göz ve gövden LB’ye açık kalsın. Özel ilk ayak ve adım ölçüsü koç tarafından düzenlenebilir.','Dengeli katıl; LB’ye açık kal.','{comboSide} / ortak blok açısı','{target}','LB baskısı başlarsa ortak blokta kör kalma.','DL’ye yardım ederken LB okumasını bırakma.','Yardım ederken görüşün hangi oyuncuda kalmalı?'),
+ make('İkinci ayağınla tabanını kur. {comboGuard} ile aynı 1 tekniği kontrol ederken {lbRead} hareketini izle. Rakibin slantı ortak temas açısını değiştiriyorsa ayaklarınla yeniden hizalan.','Tabanını kur; ortak hedef ve LB aynı görüşte.','Dengeli toparlama','{target}; okuma: {lbRead}','{target} yer değiştirirse temas açını yenile.','Sabitlenip yeni baskıya tepki veremez hale gelme.','LB çizgiye yaklaştı diye otomatik blitz kabul ediyor musun?'),
+ make('{target} ile ortak teması {comboGuard} yanında kur. Gövdeni ve gözünü LB’ye açık tut; bir DL üzerinde iki kişinin çalışması LB’nin bloklandığı anlamına gelmez.','Ortak temas; göz ve gövde LB’ye.','Kontrollü temas açısı','{target} + {comboGuard}','LB okuması sürer.','Aynı DL’ye kapanıp karşıyı tamamen kaybetme.','LB’nin yeri ve baskı durumu şu an ne?'),
+ make('LB gerçekten baskıya gelirse field kayma veya boundary QB okuması ayrımını yap. Field tarafındaki baskıda C–guard–tackle kayması güncellenir. Boundary LB için tackle adamını bırakmaz; Empty’de QB görüp hareket eder. LB’ye otomatik koşu bloğu çıkışı atanmaz.','Field baskısına kay; boundary okuması QB’de.','Yeni tehdide göre field kayması','{target}; {lbRead}','LB rush durumu veya hareket yolu değiştiğinde tekrar oku.','Pas korumasını otomatik ikinci seviye koşu bloğuna çevirme.','Field LB ile boundary LB kararının farkı ne?'),
+ make('Yeni baskı yoksa {comboGuard} ile 1 teknik üzerindeki kontrolü sürdür; dengen ve karşıya görüşün devam etsin. Tekrar sonunda hangi durumda yardımı sürdürdüğünü, hangi durumda yeniden okuduğunu anlat.','Yardımı sürdür; ayık ve dengeli kal.','Kontrollü devam','{target}','Koçun belirlediği bitişe kadar oku.','İlk temas sonrası LB kontrolünü bırakma.','Bu ortak blok neden kör bir double-team değil?')],
+ guardCombo:[
+ make('LB blitz yok; center senin tarafındaki 1 teknik {target} üzerinde seninle çalışıyor. Senin hedefin değişmiş sayılmaz. {position} olarak {field} field ve {boundarySide} boundary ayrımını söyle.','1 teknik benim; center yardım ediyor.','Başlangıçta dengeli','{target} + C','LB blitz yok; ortak blok etkin.','Center yardımı var diye kendi hedefini bırakma.','Center hangi tehdidi ayrıca okumaya devam ediyor?'),
+ make('Snap ile {target} için dengeli setini başlat. Center’ın yardım açısını kapatmadan kendi hedefini karşıla. Kesin ayak tekniğini koçun talimatına göre düzenleyin.','Set al; yardım açısını koru.','1 teknik hedefe göre','{target}','Hedef hareketine göre açı değişebilir.','Center’a yaslanarak tabanını kaybetme.','İlk hareketin hedefin hangi kaçışını karşılıyor?'),
+ make('İkinci adımda tabanını kur ve {target} ile arandaki mesafeyi yönet. Center’ın göz ve gövdesi {lbRead} okumasına açık kalacak; sen kendi temasını dengeli sürdür.','Tabanını kur; kendi adamını kontrol et.','Dengeli toparlama','{target}','Yeni LB baskısı görülürse çağrıyı yenileyin.','Center’ın yardımını tek başına blok başarısı sayma.','LB gelirse iki oyuncunun görevi aynı mı kalacak?'),
+ make('Center ile {target} üzerinde ortak teması kur. Kimin hangi el veya omuzla çalışacağı koçun teknik açıklamasına göre düzenlenir. Birbirinizi itmeden ve dengenizi bozmadan kontrol edin.','Birlikte temas, ayrı denge.','Ortak temas açısı','{target} + C','DL slant yaparsa temas açısını yeniden kur.','İki hücumcunun ayaklarının birbirini engellemesine izin verme.','Temas sırasında hangi boşluk açılabilir?'),
+ make('Field LB baskısında field guard isen sıradaki field tehdidine kay; boundary guard isen MAN kuralını koru. Center’ın LB okumasını takip et. Çapraz hareket field tarafındaysa giren tehdidi önce kontrol et, komşuya aktar ve geri dönen tehdidi kendi gapinde karşıla. Boundary MAN tarafında kendi eşleşmeni izle; LB’ye geçme.','Field guard kayar; boundary MAN kalır.','Tarafına göre karar','{target}','{blitz}','Field ve boundary guard kararını birbirine karıştırma.','Ters hash’te senin tarafın ve kararın nasıl değişir?'),
+ make('Dengeli teması ve koçun belirlediği pas koruma noktasını sürdür. Tekrar sonunda center yardımının amacını ve LB gelirse değişen kararı anlat.','Kontrolü sürdür; kararını anlat.','Dengeli devam','{target}','Oyun bitene kadar tehdidi izle.','Rakip uzaklaştı diye kontrolsüz kovalamaya başlama.','Center yardımı kalkarsa kendi görevini söyleyebilir misin?')],
+ man:[
+ make('Sen {boundarySide} boundary tarafındasın. MAN hedef önerin {target}; teknik {technique}. Aynı taraftaki LB’yi gör, fakat LB baskısı kendi adamını bırakman anlamına gelmez. Empty’de o LB’nin okuması QB’dedir.','Boundary MAN; LB gelirse adamında kal.','Hedefle başlangıç hizası','{target}','Boundary LB okuması QB’ye aittir.','Gelen LB’yi almak için atanmış DL’yi boş bırakma.','QB’ye ait tehdit ile senin adamın hangileri?'),
+ make('İlk adımda {target} için dengeli pas seti al. Field yönüne toplu kayma boundary MAN görevini değiştirmez. Setin açısı ve adım tekniği koçun düzenleyebileceği çalışma ayrıntısıdır.','Kendi adamına set al.','MAN hedefe göre','{target}','Boundary LB görünse de hedefini bırakma.','Field kaymasını kendi tarafında kopyalama.','İlk adımının yönünü hangi oyuncu belirliyor?'),
+ make('İkinci ayağınla tabanını kur. {target} içe veya dışa hareket ediyorsa dengeni koruyarak açını ayarla. Boundary LB baskısı: {boundaryBlitz}. Onu görmen kendi hedefini terk edeceğin anlamına gelmez.','Tabanını kur; MAN hedefini izle.','Hedefin hareketine göre','{target}','Rakibin hareketini ve QB’ye açık tehdidi ayırt et.','İki tehdidi aynı anda tek başına kapatmış gibi davranma.','LB geldiğinde neden adam değiştirmiyorsun?'),
+ make('{target} temas mesafesine girdiyse koçun öğrettiği güvenli temas tekniğiyle karşıla. Pas koruma dengesini koru. Hedefin yoksa yeni bir adam uydurmadan koçun belirlediği yardım sınırında kal.','Dengeli MAN teması.','Kontrollü temas','{target}','Hedef varsa temas; yoksa açık sorumluluğu bildir.','Hedef yokken rastgele LB kovalamaya çıkma.','Bu frontta sana gerçekten bir DL atanmış mı?'),
+ make('Boundary LB blitz’inde {target} üzerinde kal. QB şu tehdidi okuyacak: {boundaryBlitz}. İki DL çapraz yaptığında ilk rakibini kontrolsüz kovalamadan iç kapıyı koru; komşunla konuşarak iki tehdidin de karşılandığını doğrula. Boundary LB’ye geçme. Bu, MAN bütünlüğünü ve QB’ye açık kalan LB okumasını koruyan taktik öneridir.','Adamında kal; özel devri iletişimle belirle.','MAN sorumluluğunu sürdür','{target}','Boundary LB, özel devir veya slant görülürse yeniden iletişim kur.','QB’nin okuyacağı LB’ye geçip DL’yi serbest bırakma.','İlk rakibi kovalamak hangi iç koridoru açabilir; ikinci tehdidi kim görecek?'),
+ make('Kendi adamına karşı dengen ve ayakların çalışsın. Bitişte MAN hedefini, boundary LB’nin kimin sorumluluğunda olduğunu ve varsa açık kalan baskıyı anlat.','MAN’i bitir; QB okumasını ayır.','Dengeli devam','{target}','Oyun bitene kadar kontrol et.','QB hareket edince kendi görevini sebepsiz bırakma.','Aynı savunma ters hash’te sana field görevi verir mi?')],
+ qb:[
+ make('Empty: korumada RB yok. Top {hash}; field {field}, boundary {boundarySide}. OL field kayma ve boundary MAN oynar. Boundary LB tehdidi: {boundaryBlitz}. Snap öncesi onu gör; OL’nin bilerek değiştirmediği eşleşmeyi tanı.','RB yok; boundary LB’yi ben okurum.','Snap öncesi görüş / duruş','Boundary LB: {boundaryBlitz}','Yakın LB hizası tek başına blitz değildir.','Görünmeyen bir RB’nin baskıyı kapatacağını varsayma.','Boundary LB gelirse tackle mı, QB mi karar verecek?'),
+ make('Snap’i alırken boundary LB’yi görüşünde tut ve gerçek baskıyı ayırt et. Boundary tackle kendi adamında kalacak. Drop mesafesi ve pas zamanlaması bu koruma kuralından çıkarılmaz; koçun oyun açıklamasına göre yazılır.','Snap ile LB’yi kontrol et.','Koçun belirlediği drop','Boundary LB / pas okuması','Baskı gerçekten başlıyor mu?','LB yaklaştı diye kesin blitz veya belirli bir pas kararı üretme.','LB coverage’a dönerse baskı kabul eder misin?'),
+ make('Pas hazırlığı sırasında boundary LB’nin gelmesini veya çekilmesini oku. {boundaryBlitz}. Field tarafındaki kaymanın hangi tehditleri aldığına bak. Baskının geliş açısına göre pas hazırlığını hızlandır veya dengeli boşluğa hareket et; alıcıların erişilebilirliğini değerlendir. Her baskıda aynı receiver’ı veya kaçış tarafını ezberleme.','Gerçek baskıyı ayır; zamanlamanı yönet.','Koçun belirlediği pas hazırlığı','Boundary LB','LB rush ve hareket yolunu birlikte kontrol et.','Sistemin sana belirli bir receiver’ı zorunlu seçtiğini sanma.','Bu baskı hangi taraftan ve ne zaman geliyor?'),
+ make('Boundary LB gerçekten geliyorsa QB olarak onu görerek hareket et. Tackle’ın adamını bırakmasını bekleme. Açık baskı erken geliyorsa pas hazırlığını hızlandır; cepte yer varsa baskının geliş hattından kontrollü uzaklaşıp dengeni yeniden kur. Önceden yazılmamış bir receiver’a zorunlu hot rota uydurma.','Boundary baskısına QB cevap verir.','Açık baskı hattından kontrollü uzaklaşma / hızlı pas hazırlığı','{boundaryBlitz}','Tehdit pas noktasını etkiliyorsa karar ver.','Savunmacıyı görmeden ezberlenmiş bir tarafa kaçma.','Baskıya doğru mu gidiyorsun, yoksa pas için dengeli boşluk mu yaratıyorsun?'),
+ make('Ek baskı: {open} Boundary LB okumasını, OL’nin hedefleri ve koçun pas kararlarıyla birleştir. Baskı yoksa seçilmiş oyun okumasını sürdür. Açık baskı pas süresini kısaltıyorsa ulaşılabilir alıcı ve boş alanı hızlı değerlendir; baskı hattına doğru kaçma.','Açık tehdidi gör; koçun cevabını uygula.','Pas / hareket kararı koç metnine göre','Boundary LB + açık baskı','Birden çok açık baskı varsa tek LB kuralı yeterli sayılmaz.','Aşırı baskıyı beş OL’nin tamamını kapattığı gibi gösterme.','Açık kalan ikinci tehdit varsa önce hangi tehdidi görmen ve pas hazırlığını nasıl değiştirmen gerekiyor?'),
+ make('Koçun belirlediği pas veya hareket kararını bitir. Tekrar sonunda field/boundary ayrımını, tackle’ın neden adamında kaldığını ve boundary LB’ye verdiğin cevabı anlat.','Kararı bitir; baskıyı nasıl okuduğunu anlat.','Koçun bitiriş talimatı','Koçun seçtiği hedef','Bitiş ve tekrar değerlendirmesi.','Bir başarılı sonuçla yanlış okumayı doğru kabul etme.','LB gelmediği tekrar ile geldiği tekrardaki farkı açıklayabilir misin?')],
+ receiver:[
+ make('{label}: {routeStart}. Görseldeki iz {routeFirst} ile başlıyor. Başlangıç hizanı, snap zamanını ve önündeki savunmacıyı gör. Bu çizim yaklaşık görsel izdir; rota adı veya ölçülü yard derinliği değildir.','{routeStart}; izimi ve savunmayı gör.','Başlangıç hizası','{label} başlangıç alanı','Snap zamanı ve çizilmiş yol birlikte kontrol edilir.','Görsel izini kesin yard derinliğiyle karıştırma.','Başlangıç yerin çizginin üzerinde mi gerisinde mi?'),
+ make('İlk hareket: {routeFirst}. Önündeki savunmacının çıkış açını kapatıp kapatmadığını gör; dengen bozulmadan çizilmiş izine çık. U için kesikli bölümün snap öncesi motion mu yoksa snap sonrası çıkış mı olduğu ayrıca düzenlenebilir; görsel tek başına zamanını kanıtlamaz.','{routeFirst}.','{routeFirst}','Çizilmiş ilk yol noktası','Çıkış kapanırsa dengeli serbest kal; yeni rota adı üretme.','Savunmacıya bakmadan ezberlenen noktaya koşma.','İlk iki yol noktası senin ilk hareketinle uyumlu mu?'),
+ make('İkinci bölüm: {routeSecond}. Ayaklarını ve gövdeni izin yönünde dengeli tut. Savunmacının seni içeri veya dışarı yönlendirmesine göre kendi alanını koru; çizgiler kesişse de takım arkadaşının yolunu kapatma.','{routeSecond}.','{routeSecond}','Çizilmiş yolun ikinci bölümü','Çıkış engellenirse yolunu dengeli yeniden kur.','Özellikle H ile Z’nin kesişen izlerini çarpışma noktası haline getirme.','İkinci adımda hangi alana yer açıyorsun?'),
+ make('Yaklaşma / yön değişimi: {routeBreak}. Dönüş varsa önce dengenle açıyı kur, sonra yeni yöne hızlan. Dönüş yoksa sırf bu adımın adı kırılma diye yeni bir kırılma ekleme.','{routeBreak}.','{routeBreak}','Çizilmiş yön değişimi veya devam noktası','Görseldeki iz ve düzenlenen yol noktaları geçerlidir.','Y ve X için görselde bulunmayan ekstra kırılma uydurma.','Bu oyuncuda gerçek bir yön değişimi var mı?'),
+ make('Devam: {routeFinish}. Coverage’ın bıraktığı alanı ve QB’nin pas hazırlığını gör. Boundary LB baskısında QB karar süresi kısalabilir; hazır ve görünür ol. Bu durum tek başına bütün receiver’lara otomatik hot rota veya option dönüşü atamaz.','Alanı gör, pas için hazır ol.','{routeFinish}','Rota alanı / QB görüşü','QB baskı altındaysa hazır ol; yazılı rota değişimin varsa onu uygula.','QB baskı gördü diye plansızca başka bir rota koşma.','QB seni hangi açık alanda görebilir?'),
+ make('Bitiriş: {routeFinish}. Top sana gelirse görüşünü topa getirip dengeli yakalama ve koçun bitiriş talimatını uygula. Top gelmezse izin ve takım aralığının devamını koru; tekrar sonunda başlangıç, çıkış, dönüş ve bitişi kendi sözlerinle anlat.','İzi bitir; topa ve oyuna hazır kal.','{routeFinish}','Rota son alanı','Topun gelişi ve oyunun bitişi.','Top gelmedi diye görevin ortasında durma.','Rotanı isim ezberlemeden baştan sona anlatabilir misin?')]
+
+ };
+ for(const list of Object.values(banks))list.forEach((s,i)=>s.title=titles[i]);
+  const routeNotes={
+ X:{start:'sol tarafta çizgi üzerinde',first:'sağa ve ileriye çapraz çıkış',second:'sağa çapraz yükselişi sürdür',break:'sert bir kırılma eklemeden çapraz yükselişi devam ettir',finish:'görseldeki çapraz izin üst noktasına devam et'},
+ U:{start:'sol tarafta çizginin gerisinde',first:'görselde kesikli çizilen bölümle sola, dış kenara hareket',second:'sol kenara ulaştıktan sonra hücum yönünde dikey yükseliş',break:'üst noktada sola ve geriye açılan kısa yön değişimi',finish:'görseldeki son yön değişimini tamamla'},
+ H:{start:'sağ iç tarafta çizginin gerisinde',first:'sağa yatay açılış',second:'sağa doğru yatay akışı sürdür',break:'sağ dış tarafta yay çizerek ileriye dön',finish:'sağ dış koridorda ileriye yüksel'},
+ Y:{start:'sağ dış tarafta çizgi üzerinde',first:'hücum yönünde dikey çıkış',second:'aynı dikey iz üzerinde yüksel',break:'görselde yön değişimi yok; dikey devam',finish:'aynı dikey koridorda ileriye devam et'},
+ Z:{start:'sağ dış tarafta çizginin gerisinde',first:'sola ve ileriye çapraz çıkış',second:'sola çapraz içeri akışı sürdür',break:'görselde ek bir sert kırılma yok; sol iç alana devam',finish:'görselde okun bittiği sol iç alana ulaş'}
+ };
+ const tasks={field:'Field {field}: {gap} sorumluluğu. Hedef önerisi {target}. {shift}',centerCombo:'Blitz yok: {target} üzerinde {comboGuard} ile ortak blok; göz ve gövde {lbRead} okumasına açık.',guardCombo:'1 teknik {target} üzerinde C ile ortak blok; yeni LB baskısında tarafına göre yeniden oku.',man:'Boundary MAN: {target}. Boundary LB gelse de tackle kendi adamında kalır.',qb:'Empty’de RB yok. Boundary LB: {boundaryBlitz}. QB baskıyı kendisi görüp hareket eder.',receiver:'Görsel izi: {routeFirst}; {routeFinish}. Rota adı ve ölçülü yard derinliği iddia edilmez.'};
+ function format(s,values){return String(s??'').replace(/\{([A-Za-z]+)\}/g,(m,k)=>Object.hasOwn(values,k)?String(values[k]):m);}
+ // Path entry is described, not treated as a new unconfirmed stunt handoff rule.
+ function entry(d){const nodes=[d,...(d.path||[])];for(let i=1;i<nodes.length;i++){const a=nodes[i-1],b=nodes[i];if(a.y<=300&&b.y>=300&&b.y!==a.y)return a.x+(b.x-a.x)*(300-a.y)/(b.y-a.y);}return d.x;}
+ function analyze(db,p){
+  const sign=db.ball==='right'?-1:1,fieldSide=sign===1?'sağ':'sol',boundarySide=sign===1?'sol':'sağ',fieldPos=sign===1?['C','RG','RT']:['C','LG','LT'],manPos=sign===1?['LG','LT']:['RG','RT'];
+  const dl=db.defenders.filter(d=>d.level==='DL'&&d.rush),lbs=db.defenders.filter(d=>d.level==='LB'&&d.rush),fieldLB=lbs.filter(d=>(d.x-500)*sign>=0).sort((a,b)=>Math.abs(b.x-500)-Math.abs(a.x-500)),boundaryLB=lbs.filter(d=>(d.x-500)*sign<0),manDL=dl.filter(d=>(d.x-500)*sign<0).sort((a,b)=>Math.abs(b.x-500)-Math.abs(a.x-500));
+  const targets={},manT=p.players.find(a=>a.position===manPos[1]),manG=p.players.find(a=>a.position===manPos[0]);
+  if(manT&&manDL[0])targets[manT.id]=manDL[0];if(manG&&manDL[1])targets[manG.id]=manDL[1];
+  const one=!lbs.length?dl.filter(d=>d.tech==='1'||d.tech==='1i').sort((a,b)=>Math.abs(a.x-500)-Math.abs(b.x-500))[0]:null;
+  const center=p.players.find(a=>a.position==='C'),fg=p.players.find(a=>a.position===fieldPos[1]),ft=p.players.find(a=>a.position===fieldPos[2]);
+  const comboGuard=one?p.players.find(a=>a.position===(one.x<500?'LG':'RG')):null;
+  const usedByMan=new Set([manT,manG].filter(Boolean).map(a=>targets[a.id]?.id).filter(Boolean));
+  const fdl=dl.filter(d=>!usedByMan.has(d.id)&&(!one||d.id!==one.id)).sort((a,b)=>(entry(a)-entry(b))*sign);
+  if(fieldLB.length){if(ft)targets[ft.id]=fieldLB[0];if(fg&&fdl.length)targets[fg.id]=fdl.length>1?fdl[1]:fdl[0];if(center&&fdl.length>1)targets[center.id]=fdl[0];}
+  else if(one&&center&&comboGuard){targets[center.id]=one;targets[comboGuard.id]=one;const remaining=[fg,ft].filter(a=>a&&a.id!==comboGuard.id);if(remaining.length===1&&fdl.length)targets[remaining[0].id]=fdl.at(-1);else if(remaining.length===2){if(fdl.length)targets[fg.id]=fdl[0];if(fdl.length>1)targets[ft.id]=fdl.at(-1);}}
+  else{if(ft&&fdl.length)targets[ft.id]=fdl.at(-1);if(center&&fdl.length>1)targets[center.id]=fdl[0];if(fg&&fdl.length>2)targets[fg.id]=fdl[1];}
+  for(const a of p.players)if(a.source==='manual'){const manual=db.defenders.find(d=>d.id===a.target);if(manual)targets[a.id]=manual;else delete targets[a.id];}
+  const assigned=new Set(Object.values(targets).map(d=>d.id)),open=db.defenders.filter(d=>d.rush&&!assigned.has(d.id)),extra=open.filter(d=>!boundaryLB.some(b=>b.id===d.id));
+  const warnings=[];if(extra.length||boundaryLB.length>1)warnings.push('Ek açık baskı: '+(extra.length?extra:boundaryLB).map(d=>d.label).join(', ')+'. Beş koruyucu öncelikli eşleşmelerini korur; açık tehdidi QB erken görür ve pas hazırlığını hızlandırır veya baskı hattından kontrollü uzaklaşır. Aynı koruyucu iki ayrı baskıyı kapatmış sayılmaz.');
+  if(db.defenders.some(d=>d.rush&&(Math.abs(entry(d)-d.x)>35||(d.path||[]).length>3)))warnings.push('Slant / çapraz yol var. Field tarafında giren tehdidi gapinde karşıla, komşuya aktar ve dönen looper’ı gözden kaçırma; boundary tarafında MAN eşleşmesini ve iç kapıyı koru. LB’yi almak için tackle adamını bırakmaz.');
+  if(p.players.some(a=>a.position==='RB'))warnings.push('Bu kadroda RB var; görüşülen Empty kuralında RB yok. Kadroyu koçla kontrol edin.');
+  const jobs={};
+  for(const a of p.players){const fi=fieldPos.indexOf(a.position),bi=manPos.indexOf(a.position),target=targets[a.id],isCombo=one&&target?.id===one.id&&comboGuard&&(a.id===center?.id||a.id===comboGuard.id);const role=a.position==='QB'?'qb':isCombo?(a.position==='C'?'centerCombo':'guardCombo'):fi>=0?'field':bi>=0?'man':'receiver';
+   const nearLB=db.defenders.filter(d=>d.level==='LB').sort((b,c)=>Math.abs(b.x-a.x)-Math.abs(c.x-a.x))[0];
+   const route=routeNotes[a.label]||{start:'düzenlenen başlangıç hizası',first:'çizdiğin yolun ilk bölümü',second:'çizdiğin yolun devamı',break:'çizdiğin yön değişimi',finish:'çizdiğin yolun son noktası'};const values={routeStart:route.start,routeFirst:route.first,routeSecond:route.second,routeBreak:route.break,routeFinish:route.finish,label:a.label,position:a.position,hash:db.ball==='right'?'sağ hash’te':db.ball==='left'?'sol hash’te':'ortada (sol hash kuralı)',field:fieldSide,boundarySide,front:db.defenders.filter(d=>d.level==='DL').length,target:target?.label||'şu an doğrudan atanmış baskıcı yok',gap:fi>=0?fieldSide+' '+['A','B','C'][fi]+' gap':'MAN alanı',threats:db.defenders.filter(d=>d.rush).map(d=>d.label).join(', ')||'baskıcı yok',shift:fieldLB.length?'Field LB baskısı: tackle '+fieldLB[0].label+' üzerine, guard ve center field yönündeki sıradaki tehditlere kayar.':'Field LB blitz yok; alanını ve yeni tehdidi oku.',blitz:lbs.length?'LB blitz: '+lbs.map(d=>d.label).join(', '):'LB blitz yok; hiza blitz kararı değildir.',boundaryBlitz:boundaryLB.map(d=>d.label).join(', ')||'şu an boundary LB blitz yok',boundary:boundaryLB.map(d=>d.label).join(', ')||'şu an boundary LB blitz yok',comboGuard:comboGuard?.label||'aynı taraftaki guard',comboSide:one?.x<500?'sol':'sağ',lbRead:nearLB?.label||'karşıdaki LB',technique:target?.tech?target.tech+' teknik':'serbest hiza / doğrudan hedef yok',open:open.length?'Hedeflenmeyen baskı: '+open.map(d=>d.label).join(', ')+'.':'Şu an hedeflenmeyen baskıcı yok.'};
+   // Preserve previously edited team task text as well as the new step curriculum.
+   const oldKey=role==='centerCombo'?'combo':role==='man'?'boundary':role==='guardCombo'?'field':role;
+   const taskTemplate=p.emptyTexts?.[oldKey]??tasks[role];
+   const list=p.emptyCurriculum?.[role]??banks[role];
+   jobs[a.id]={role,values,task:a.source==='manual'?a.task:format(taskTemplate,values),target:target?.id||'',secondary:a.secondary||'',gap:a.source==='manual'?a.gap:fi>=0?values.gap:'',source:a.source==='manual'?'manual':'suggestion',readTargets:a.position==='QB'?boundaryLB.map(d=>d.id):[],steps:list.map(s=>Object.fromEntries(Object.entries(s).map(([k,v])=>[k,typeof v==='string'?format(v,values):v])))};
+   if(p.illustrateProtection!==false&&['LT','LG','C','RG','RT'].includes(a.position)&&!(a.path||[]).length){const clamp=(v,max)=>Math.max(0,Math.min(max,v)),travel=role==='centerCombo'?(one.x<a.x?-1:1):fi>=0?sign:target?Math.sign(target.x-a.x):0,cx=target?Math.max(a.x-110,Math.min(a.x+110,entry(target))):a.x+travel*22;const points=[[a.x,a.y],[a.x+travel*12,a.y-7],[a.x+travel*22,a.y-15],[cx,Math.min(a.y,312)],[cx,Math.min(a.y,308)],[cx,Math.min(a.y,306)]];jobs[a.id].steps.forEach((s,i)=>{const point=points[Math.min(i,5)];s.x=clamp(point[0],1000);s.y=clamp(point[1],630);});}
+
+  }
+  return {jobs,warnings,open:open.map(d=>d.id),boundaryReads:boundaryLB.map(d=>d.id),field:fieldSide,targets};
+ }
+ function newPlay(){const p=OLModel.newPlay('Empty');p.emptyProtection=true;p.formation='Empty · 5 OL + QB + X/U/H/Y/Z';p.players=p.players.filter(a=>a.position!=='RB');for(const [label,x,y] of [['X',210,330],['U',240,380],['H',645,390],['Y',815,330],['Z',935,380]]){const a=OLModel.actor(label,x,y);a.position='WR';p.players.push(a);}const paths={X:[[250,265],[300,165],[335,65]],U:[[150,375],[130,380],[140,70],[105,105]],H:[[720,390],[830,360],[925,300],[975,150]],Y:[[815,240],[815,150],[815,65]],Z:[[850,340],[730,285],[660,250]]};p.players.forEach(a=>{a.stepMode='auto';if(paths[a.label])a.path=paths[a.label].map(([x,y])=>({x,y}));});p.emptyCurriculum=clone(banks);p.notes='Koçla doğrulandı: field yönüne kayma; boundary MAN; boundary LB blitz’ini QB görüp hareket eder. Empty’de RB yok. Slant, stunt ve fazla baskıya verilen cevaplar bu mantıktan üretilen düzenlenebilir taktik önerileridir. Receiver rota ayrıntıları görsel ve oyuncu notlarıyla düzenlenir.';return p;}
+ return {roles,banks,tasks,format,analyze,newPlay};
+})();
+
+/* Editable football field. All coordinates remain in the SVG's 1000 × 630 space. */
+class OLField {
+  constructor(svgElement, callbacks = {}) {
+    this.svg = svgElement;
+    this.callbacks = callbacks;
+    this.model = null;
+    this.drag = null;
+    this.svg.setAttribute('viewBox', '0 0 1000 630');
+    this.svg.setAttribute('role', 'group');
+    this.svg.setAttribute('aria-label', 'Düzenlenebilir Amerikan futbolu sahası');
+    this.svg.style.touchAction = 'none';
+    this.svg.style.userSelect = 'none';
+    this.svg.addEventListener('pointerdown', event => this.pointerDown(event));
+    this.svg.addEventListener('pointermove', event => this.pointerMove(event));
+    this.svg.addEventListener('pointerup', event => this.pointerUp(event));
+    this.svg.addEventListener('pointercancel', event => this.pointerCancel(event));
+    this.svg.addEventListener('keydown', event => this.keyDown(event));
+  }
+  escape(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+  }
+  number(value, fallback = 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+  position(event) {
+    const matrix = this.svg.getScreenCTM();
+    if (!matrix) return {x: 500, y: 300};
+    const point = this.svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const transformed = point.matrixTransform(matrix.inverse());
+    return {x: Math.round(Math.max(22, Math.min(978, transformed.x))), y: Math.round(Math.max(22, Math.min(608, transformed.y)))};
+  }
+  actors(side) {
+    return side === 'defense' ? this.model?.defenders || [] : this.model?.players || [];
+  }
+  actor(side, id) {
+    return this.actors(side).find(actor => actor.id === id);
+  }
+  callback(name, ...args) {
+    if (typeof this.callbacks[name] === 'function') this.callbacks[name](...args);
+  }
+  animatedPosition(actor, phase, maxPhase) {
+    const start = {x: this.number(actor.x, 500), y: this.number(actor.y, 330)};
+    const steps = (actor.steps || []).map((step, index) => ({step, index})).filter(item => Number.isFinite(item.step.x) && Number.isFinite(item.step.y));
+    const path = (actor.path || []).filter(point => Number.isFinite(point.x) && Number.isFinite(point.y));
+    const explicitStart = steps.find(item => item.index === 0)?.step;
+    if (phase <= 0 || maxPhase <= 0) return explicitStart ? {x: explicitStart.x, y: explicitStart.y} : start;
+    if (!path.length) {
+      // Without a drawn path, explicit step coordinates form the movement and
+      // the last coordinate is held until another position is supplied.
+      const timeline = [{index: 0, step: explicitStart || start}, ...steps.filter(item => item.index > 0)];
+      let before = timeline[0];
+      for (const item of timeline) {
+        if (item.index <= phase) before = item;
+        else {
+          const ratio = Math.max(0, Math.min(1, (phase - before.index) / Math.max(1, item.index - before.index)));
+          return {x: before.step.x + (item.step.x - before.step.x) * ratio, y: before.step.y + (item.step.y - before.step.y) * ratio};
+        }
+      }
+      return {x: before.step.x, y: before.step.y};
+    }
+    const baseline = at => {
+      if (at <= 0) return start;
+      if (at >= maxPhase) return {x: path[path.length - 1].x, y: path[path.length - 1].y};
+      const nodes = [start, ...path];
+      const lengths = path.map((point, index) => Math.hypot(point.x - nodes[index].x, point.y - nodes[index].y));
+      const totalLength = lengths.reduce((sum, length) => sum + length, 0) || 1;
+      const delays = path.map(point => Math.max(0, this.number(point.delay)));
+      const delayTotal = delays.reduce((sum, delay) => sum + delay, 0);
+      const delayScale = delayTotal > maxPhase - 0.25 ? (maxPhase - 0.25) / Math.max(0.01, delayTotal) : 1;
+      const movementTime = Math.max(0.25, maxPhase - delayTotal * delayScale);
+      let cursor = 0;
+      for (let index = 0; index < path.length; index++) {
+        const from = nodes[index], to = path[index];
+        const wait = delays[index] * delayScale;
+        if (at <= cursor + wait) return {x: from.x, y: from.y};
+        cursor += wait;
+        const duration = movementTime * lengths[index] / totalLength;
+        if (at <= cursor + duration) {
+          const ratio = duration > 0 ? (at - cursor) / duration : 1;
+          return {x: from.x + (to.x - from.x) * ratio, y: from.y + (to.y - from.y) * ratio};
+        }
+        cursor += duration;
+      }
+      return {x: path[path.length - 1].x, y: path[path.length - 1].y};
+    };
+    const base = baseline(phase);
+    if (!steps.length) return base;
+    // Keep the drawn route as the baseline. Exact step positions add a smooth
+    // offset between coordinate anchors, returning to the route at its end
+    // unless the coach also set an explicit final position.
+    const anchors = steps.filter(item => item.index <= maxPhase).map(item => {
+      const position = baseline(item.index);
+      return {index: item.index, x: item.step.x - position.x, y: item.step.y - position.y};
+    });
+    if (!anchors.some(anchor => anchor.index === 0)) anchors.unshift({index: 0, x: 0, y: 0});
+    if (!anchors.some(anchor => anchor.index === maxPhase)) anchors.push({index: maxPhase, x: 0, y: 0});
+    let before = anchors[0];
+    for (const anchor of anchors) {
+      if (anchor.index <= phase) before = anchor;
+      else {
+        const ratio = Math.max(0, Math.min(1, (phase - before.index) / Math.max(1, anchor.index - before.index)));
+        return {x: base.x + before.x + (anchor.x - before.x) * ratio, y: base.y + before.y + (anchor.y - before.y) * ratio};
+      }
+    }
+    return {x: base.x + before.x, y: base.y + before.y};
+  }
+
+  render(model) {
+    this.model = model;
+    const esc = value => this.escape(value);
+    const players = model.players || [], defenders = model.defenders || [];
+    const phase = this.number(model.phase), maxPhase = Math.max(1, this.number(model.maxPhase, 5));
+    const rendered = new Map([...players, ...defenders].map(actor => [actor.id, this.animatedPosition(actor, phase, maxPhase)]));
+    let output = `<defs>
+      <pattern id="ol-turf" width="1000" height="120" patternUnits="userSpaceOnUse"><rect width="1000" height="60" fill="#102e2c"/><rect y="60" width="1000" height="60" fill="#123330"/></pattern>
+      <marker id="ol-arrow-offense" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#7dd9e4" stroke-width="1.5"/></marker>
+      <marker id="ol-arrow-defense" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#f08485" stroke-width="1.5"/></marker>
+      <marker id="ol-arrow-target" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L6 3 L0 6" fill="none" stroke="#ffac65" stroke-width="1.3"/></marker>
+    </defs><rect width="1000" height="630" fill="url(#ol-turf)" data-field-background="true"/>`;
+    for (let y = 60; y < 630; y += 60) {
+      output += `<line x1="25" y1="${y}" x2="975" y2="${y}" stroke="#8aafa2" stroke-opacity=".12"/>`;
+      for (const x of [180, 820]) output += `<line x1="${x - 6}" y1="${y}" x2="${x + 6}" y2="${y}" stroke="#9dbcae" stroke-opacity=".4" stroke-width="2"/>`;
+    }
+    output += `<line x1="25" y1="300" x2="975" y2="300" stroke="#e1b46e" stroke-opacity=".65" stroke-dasharray="8 7"/>
+      <g fill="#9fb9b0" font-family="system-ui,sans-serif" font-size="11" pointer-events="none"><text x="28" y="38">↑ HÜCUM YÖNÜ</text><text x="28" y="288">LOS</text><text x="30" y="605">Hücumun solu</text><text x="970" y="605" text-anchor="end">Hücumun sağı</text></g>`;
+    for (const [x,label] of [[230,'D'],[275,'C'],[365,'B'],[455,'A'],[545,'A'],[635,'B'],[725,'C'],[770,'D']]) {
+      const display = label;
+      output += `<text x="${x}" y="283" text-anchor="middle" fill="#87a49a" font-size="10" font-family="system-ui,sans-serif" pointer-events="none">${display}</text>`;
+    }
+    if (model.assignmentsVisible) {
+      for (const player of players) {
+        const from = rendered.get(player.id);
+        for (const [target, secondary] of [[player.target, false], [player.secondary, true]]) {
+          const to = rendered.get(target);
+          if (to) output += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="${secondary ? '#b2ce9b' : '#ffac65'}" stroke-opacity=".85" stroke-width="2" stroke-dasharray="${secondary ? '3 6' : '8 5'}" marker-end="url(#ol-arrow-target)" pointer-events="none"/>`;
+        }
+      }
+    }
+    if (model.pathsVisible !== false) {
+      for (const [side, actors] of [['offense', players], ['defense', defenders]]) {
+        for (const actor of actors) {
+          const path = actor.path || [];
+          if (!path.length) continue;
+          const selected = side === model.selectedSide && actor.id === model.selectedId;
+          const coordinates = [actor, ...path].map(point => `${this.number(point.x, 500)},${this.number(point.y, 300)}`).join(' ');
+          output += `<polyline points="${coordinates}" fill="none" stroke="${side === 'offense' ? '#7dd9e4' : '#f08485'}" stroke-opacity="${selected ? '.95' : '.5'}" stroke-width="${selected ? '3.5' : '2.3'}" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ol-arrow-${side})" pointer-events="none"/>`;
+        }
+      }
+    }
+    const claimed = new Set(players.flatMap(actor => [actor.target, actor.secondary]).filter(Boolean));
+    for (const [side, actors] of [['defense', defenders], ['offense', players]]) {
+      for (const actor of actors) {
+        const selected = side === model.selectedSide && actor.id === model.selectedId;
+        const position = rendered.get(actor.id);
+        const x = this.number(position.x, 500), y = this.number(position.y, 300);
+        const color = side === 'offense' ? '#7dd9e4' : '#f08485';
+        const unassigned = side === 'defense' && model.assignmentsVisible && actor.rush && !claimed.has(actor.id);
+        output += `<g data-actor-id="${esc(actor.id)}" data-side="${side}" tabindex="0" role="button" aria-label="${side === 'offense' ? 'Hücum' : 'Savunma'} oyuncusu ${esc(actor.label)}${selected ? ', seçili' : ''}" transform="translate(${x} ${y})" style="cursor:${model.mode === 'draw' ? 'crosshair' : 'grab'}">`;
+        if (selected) output += '<circle r="28" fill="none" stroke="#ffac65" stroke-width="2" stroke-dasharray="4 3"/>';
+        if (unassigned) output += '<circle r="26" fill="none" stroke="#ffac65" stroke-width="1.7"/><text x="24" y="-21" fill="#ffac65" font-size="15" font-family="system-ui,sans-serif">!</text>';
+        if (side === 'offense') output += `<circle class="ol-ring" r="19" fill="#173a43" stroke="${color}" stroke-width="2.2"/>`;
+        else output += `<path d="M0 -23 L23 19 L-23 19 Z" fill="${actor.rush ? '#683e3e' : '#253d3a'}" stroke="${color}" stroke-width="2"/>`;
+        output += `<text text-anchor="middle" y="5" fill="${color}" font-family="system-ui,sans-serif" font-size="${String(actor.label || '').length > 4 ? 10 : 12}" font-weight="700" pointer-events="none">${esc(actor.label || actor.id)}</text></g>`;
+      }
+    }
+    const selected = this.actor(model.selectedSide, model.selectedId);
+    if (selected) {
+      if (phase > 0) output += `<g transform="translate(${this.number(selected.x)} ${this.number(selected.y)})" data-start="true" data-side="${esc(model.selectedSide)}" data-actor-id="${esc(selected.id)}" style="cursor:grab"><circle r="9" fill="#102d2c" stroke="#ffac65" stroke-dasharray="3 2"/></g>`;
+      for (let index = 0; index < (selected.path || []).length; index++) {
+        const point = selected.path[index], active = index === model.pointIndex;
+        output += `<g data-point-index="${index}" data-side="${esc(model.selectedSide)}" data-actor-id="${esc(selected.id)}" transform="translate(${this.number(point.x)} ${this.number(point.y)})" tabindex="0" role="button" aria-label="Yol noktası ${index + 1}${point.delay ? ', gecikme ' + esc(point.delay) : ''}" style="cursor:${model.mode === 'erase' ? 'not-allowed' : 'grab'}"><circle r="${active ? 13 : 11}" fill="${active ? '#ffac65' : '#132b30'}" stroke="#ffac65" stroke-width="2"/><text text-anchor="middle" y="4" font-size="10" font-family="system-ui,sans-serif" font-weight="700" fill="${active ? '#14252b' : '#ffac65'}" pointer-events="none">${index + 1}</text></g>`;
+      }
+    }
+    if (model.mode === 'draw') output += `<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">${selected ? 'Boş alana dokun: yol noktası ekle · Noktaları sürükleyerek düzelt' : 'Yol çizmek için bir oyuncu seç'}</text>`;
+    if (model.mode === 'erase') output += '<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">Silmek için bir yol noktasına dokun</text>';
+    this.svg.innerHTML = output;
+  }
+  pointerDown(event) {
+    if (!this.model || event.button !== 0 && event.button !== undefined) return;
+    const element = event.target.closest('[data-actor-id]');
+    const position = this.position(event);
+    if (element) {
+      const side = element.dataset.side, id = element.dataset.actorId;
+      const index = element.hasAttribute('data-point-index') ? Number(element.dataset.pointIndex) : null;
+      if (index !== null && this.model.mode === 'erase') {
+        event.preventDefault();
+        this.callback('deletePoint', side, id, index);
+        return;
+      }
+      const actor = this.actor(side, id);
+      if (!actor) return;
+      const source = index === null ? actor : actor.path[index];
+      this.drag = {pointerId: event.pointerId, side, id, index, start: position, startClient: {x: event.clientX, y: event.clientY}, origin: {x: source.x, y: source.y}, current: position, moved: false, element};
+    } else if (this.model.mode === 'draw' && this.model.selectedId) {
+      this.drag = {pointerId: event.pointerId, add: true, start: position, startClient: {x: event.clientX, y: event.clientY}, current: position, moved: false};
+    } else return;
+    event.preventDefault();
+    try { this.svg.setPointerCapture(event.pointerId); } catch (_) {}
+  }
+  pointerMove(event) {
+    if (!this.drag || this.drag.pointerId !== event.pointerId) return;
+    const point = this.position(event);
+    this.drag.current = point;
+    // Measure tap jitter in screen pixels so narrow/mobile SVG scaling does not
+    // turn a tiny finger movement into a cancelled tap or accidental drag.
+    if (Math.hypot(event.clientX - this.drag.startClient.x, event.clientY - this.drag.startClient.y) > 6) this.drag.moved = true;
+    if (!this.drag.moved || this.drag.add) return;
+    const x = Math.max(22, Math.min(978, this.drag.origin.x + point.x - this.drag.start.x));
+    const y = Math.max(22, Math.min(608, this.drag.origin.y + point.y - this.drag.start.y));
+    this.drag.destination = {x: Math.round(x), y: Math.round(y)};
+    if (this.drag.element.isConnected) this.drag.element.setAttribute('transform', `translate(${x} ${y})`);
+    event.preventDefault();
+  }
+  pointerUp(event) {
+    if (!this.drag || this.drag.pointerId !== event.pointerId) return;
+    const drag = this.drag;
+    this.drag = null;
+    try { this.svg.releasePointerCapture(event.pointerId); } catch (_) {}
+    event.preventDefault();
+    if (drag.add) {
+      if (!drag.moved) this.callback('addPoint', this.model.selectedSide, this.model.selectedId, this.position(event));
+      return;
+    }
+    if (drag.moved && drag.destination) {
+      if (this.model.selectedSide !== drag.side || this.model.selectedId !== drag.id) this.callback('select', drag.side, drag.id);
+      if (drag.index === null) this.callback('moveActor', drag.side, drag.id, drag.destination.x, drag.destination.y);
+      else this.callback('movePoint', drag.side, drag.id, drag.index, drag.destination);
+      return;
+    }
+    if (drag.index !== null) this.callback('pointSelect', drag.index);
+    else this.callback('select', drag.side, drag.id);
+  }
+  pointerCancel(event) {
+    if (!this.drag || this.drag.pointerId !== event.pointerId) return;
+    this.drag = null;
+    if (this.model) this.render(this.model);
+  }
+  keyDown(event) {
+    const element = event.target.closest('[data-actor-id]');
+    if (!element) return;
+    const side = element.dataset.side, id = element.dataset.actorId;
+    const index = element.hasAttribute('data-point-index') ? Number(element.dataset.pointIndex) : null;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (index === null) this.callback('select', side, id);
+      else this.callback('pointSelect', index);
+    }
+    if (index !== null && (event.key === 'Delete' || event.key === 'Backspace')) {
+      event.preventDefault();
+      this.callback('deletePoint', side, id, index);
+    }
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
+      event.preventDefault();
+      const actor = this.actor(side, id);
+      const point = index === null ? actor : actor?.path?.[index];
+      if (!point) return;
+      const distance = event.shiftKey ? 10 : 2;
+      const next = {x: Math.max(22, Math.min(978, point.x + (event.key === 'ArrowRight' ? distance : event.key === 'ArrowLeft' ? -distance : 0))), y: Math.max(22, Math.min(608, point.y + (event.key === 'ArrowDown' ? distance : event.key === 'ArrowUp' ? -distance : 0)))};
+      if (index === null) this.callback('moveActor', side, id, next.x, next.y);
+      else this.callback('movePoint', side, id, index, next);
+    }
+  }
+}
+
+if (typeof window !== "undefined") window.OLField = OLField;
+
+const App = (() => {
+ const $=id=>document.getElementById(id), M=OLModel, copy=M.clone, key='ol-atolye-editor-v3';
+ const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const opts=(items,value,blank)=> (blank!==undefined?`<option value="">${safe(blank)}</option>`:'')+items.map(i=>`<option value="${safe(i.id)}" ${String(i.id)===String(value)?'selected':''}>${safe(i.name)}</option>`).join('');
+ const input=(label,scope,prop,value,type='text',extra='')=>`<label>${safe(label)}<input type="${type}" data-scope="${scope}" data-prop="${prop}" value="${safe(value)}" ${extra}></label>`;
+ const area=(label,scope,prop,value)=>`<label>${safe(label)}<textarea data-scope="${scope}" data-prop="${prop}">${safe(value)}</textarea></label>`;
+ let db, storageOK=true;
+ try{const embedded=JSON.parse($('embeddedBackup').textContent),local=JSON.parse(localStorage.getItem(key)||'null');db=M.validate(embedded)?embedded:M.validate(local)?local:M.fresh();if(M.validate(embedded)&&M.validate(local)&&embedded.id===local.id&&local.updatedAt>embedded.updatedAt)db=local;const old=JSON.parse(localStorage.getItem('ol-atolye-takim-v2')||'null');if(old?.version===2)M.migrate(db,old);}catch(e){storageOK=false;db??=M.fresh();}
+ const supplied=JSON.parse($('suppliedPlays')?.textContent||'[]');db.seedImports??=[];for(const p of supplied){if(!db.seedImports.includes(p.seedKey)){if(!db.plays.some(old=>old.seedKey===p.seedKey))db.plays.push(copy(p));db.seedImports.push(p.seedKey);if(!db.selectedPlayId)db.selectedPlayId=p.id;}}
+ const S={side:db.plays.length?'offense':'defense',id:db.plays[0]?.players[0]?.id||db.defenders[0]?.id,tab:db.plays.find(p=>p.id===db.selectedPlayId)?.emptyProtection?'steps':'task',phase:0,mode:'select',pointIndex:-1,scope:'auto',variantId:'',playing:false,search:'',history:[],templateId:'',lessonRole:'field',timer:null};
+ if(!db.plays.some(p=>p.id===db.selectedPlayId))db.selectedPlayId=db.plays[0]?.id||'';
+ const play=()=>db.plays.find(p=>p.id===db.selectedPlayId);
+ function variant(){const p=play();if(!p||S.scope==='base')return null;const k=M.variantKey(db,p),v=db.variants.filter(v=>v.playId===p.id&&v.key===k);return v.find(v=>v.id===S.variantId)||v.at(-1)||null;}
+ const actors=()=>variant()?.players||play()?.players||[];
+ const selected=()=> (S.side==='offense'?actors():db.defenders).find(a=>a.id===S.id);
+ function toast(t){$('toast').textContent=t;$('toast').classList.add('visible');clearTimeout(S.toastTimer);S.toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),3800);}
+ function persist(){db.updatedAt=Date.now();try{localStorage.setItem(key,JSON.stringify(db));storageOK=true;$('saveStatus').textContent='● Tarayıcıya kaydedildi';$('saveStatus').style.color='var(--green)';}catch{storageOK=false;$('saveStatus').textContent='Kayıt kapalı · JSON / HTML indirin';$('saveStatus').style.color='var(--red)';toast('Tarayıcı kaydı kullanılamıyor. JSON veya güncel HTML’yi indirin.');}}
+ function stop(){clearInterval(S.timer);S.playing=false;$('playBtn').textContent='▶';}
+ function commit(fn,{render=true,reset=false}={}){stop();const before=copy(db);try{fn();if(!M.validate(db))throw Error('Alan veya kayıt sınırı aşıldı. Düzenleme geri alındı.');}catch(err){db=before;renderAll();toast(err.message||'Düzenleme uygulanamadı.');return false;}S.history.push(before);if(S.history.length>35)S.history.shift();if(reset)S.phase=0;persist();if(render)renderAll();return true;}
+ function ensureSelected(){if(!selected()){S.side=actors().length?'offense':'defense';S.id=(S.side==='offense'?actors():db.defenders)[0]?.id;S.pointIndex=-1;}}
+ function selectActor(side,id){stop();S.side=side;S.id=id;S.pointIndex=-1;renderAll();}
+ function autoSteps(a){return !!play()?.emptyProtection&&a.stepMode!=='manual'&&(a.stepMode==='auto'||a.steps.length===6&&!a.steps.some(s=>s.text||s.direction||s.target||s.condition));}
+ function lessonSteps(a){return autoSteps(a)?M.suggestions(db,{...play(),players:actors()})[a.id]?.steps||a.steps:a.steps;}
+ function coachCopy(a){if(autoSteps(a)){if(a.steps.some(s=>s.text)){a.stepHistory??=[];a.stepHistory.push(copy(a.steps));}a.steps=copy(lessonSteps(a));}a.stepMode='manual';}
+ function effective(a){const p=play(),suggested=M.suggestions(db,{...p,players:actors()})[a.id];return a.source==='manual'?{task:a.task,target:a.target,secondary:a.secondary,gap:a.gap,source:'manual'}:suggested?{...suggested,secondary:a.secondary}:a;}
+ const targetName=id=>db.defenders.find(d=>d.id===id)?.label|| (id?'Eksik hedef ('+id+')':'Atanmadı');
+ const targetOptions=value=>opts(db.defenders.map(d=>({id:d.id,name:d.label+' · '+d.level})),value,'Hedef seçilmedi');
+ function maxPhase(){return Math.max(1,...actors().map(a=>(lessonSteps(a)?.length||1)-1),...[...actors(),...db.defenders].map(a=>{const delay=(a.path||[]).reduce((n,p)=>n+(p.delay||0),0);return delay?Math.ceil(delay)+1:0;}),actors().length?0:5);}
+ const field=new OLField($('field'),{
+  select:selectActor,
+  moveActor:(side,id,x,y)=>commit(()=>{const a=(side==='offense'?actors():db.defenders).find(a=>a.id===id);const dx=x-a.x,dy=y-a.y;a.x=x;a.y=y;a.path=a.path.map(p=>({...p,x:Math.max(0,Math.min(1000,p.x+dx)),y:Math.max(0,Math.min(630,p.y+dy))}));if(side==='offense')for(const step of a.steps){if(Number.isFinite(step.x))step.x=Math.max(0,Math.min(1000,step.x+dx));if(Number.isFinite(step.y))step.y=Math.max(0,Math.min(630,step.y+dy));}if(side==='defense'){a.depth=+(Math.max(0,(300-y)/24)).toFixed(2);a.side=x<500?'L':'R';}},{reset:true}),
+  addPoint:(side,id,point)=>commit(()=>{const a=(side==='offense'?actors():db.defenders).find(a=>a.id===id);a.path.push({...point,delay:0});S.pointIndex=a.path.length-1;},{reset:true}),
+  movePoint:(side,id,i,point)=>commit(()=>{const a=(side==='offense'?actors():db.defenders).find(a=>a.id===id);Object.assign(a.path[i],point);S.pointIndex=i;},{reset:true}),
+  deletePoint:(side,id,i)=>commit(()=>{(side==='offense'?actors():db.defenders).find(a=>a.id===id).path.splice(i,1);S.pointIndex=-1;},{reset:true}),
+  pointSelect:i=>{S.pointIndex=i;renderInspector();renderField();}
+ });
+ function renderField(){
+  field.render({players:actors().map(a=>({...a,...effective(a),steps:lessonSteps(a)})),defenders:db.defenders,selectedId:S.id,selectedSide:S.side,phase:S.phase,maxPhase:maxPhase(),mode:S.mode,pathsVisible:$('pathsToggle').checked,assignmentsVisible:$('targetsToggle').checked,pointIndex:S.pointIndex});
+  const n=maxPhase();$('progress').max=n;$('progress').value=S.phase;$('phaseCount').textContent=`${S.phase} / ${n}`;
+  const a=selected();$('phaseLabel').textContent=`${S.phase} — ${S.side==='offense'?((a?lessonSteps(a):[])[S.phase]?.title||'Bu oyuncuda bu adım yok'):OLStepTitles[S.phase]||'Hareketin devamı'}`;
+  $('phaseButtons').innerHTML=Array.from({length:n+1},(_,i)=>`<button data-phase="${i}" class="${i===S.phase?'active':''}" aria-label="Adım ${i}">${i}</button>`).join('');
+  $('prevBtn').disabled=S.phase===0;$('nextBtn').disabled=S.phase>=n;$('undoBtn').disabled=!S.history.length;
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===S.mode)));
+  $('fieldHint').textContent=S.mode==='draw'?`${a?.label||'Oyuncu'} için yol çiziyorsunuz · Sahaya dokunun / tıklayın. Başlangıç noktası oyuncunun hizasıdır. ${S.phase?'Düzenleme ilk adıma döner.':''}`:S.mode==='erase'?'Seçili oyuncunun numaralı yol noktalarına dokunarak silin.':'Oyuncuyu veya yol noktasını sürükleyin. Yol çiz modunda sahaya dokunarak ara noktalar ekleyin.';
+ }
+ function renderNav(){const list=db.plays.filter(p=>p.name.toLocaleLowerCase('tr').includes(S.search.toLocaleLowerCase('tr')));$('playCount').textContent=db.plays.length;$('playNav').innerHTML=list.map((p,i)=>`<button class="play-item ${p.id===db.selectedPlayId?'active':''}" data-play="${safe(p.id)}">${safe(p.name)}<small>${safe(p.formation||'Formasyon tanımlanmadı')} · ${p.players.length} oyuncu</small></button>`).join('')||'<p class="empty">Henüz oyun yok. Adını yazıp ＋ ile oluşturun.</p>';}
+ function renderDefense(){
+  $('frontSelect').innerHTML=opts([...OLDefense.fronts(),{id:'custom',name:'Özel / içe aktarılan front'}],OLDefense.fronts().some(f=>f.id===db.front)?db.front:'custom');
+  $('moveSelect').innerHTML=opts(OLDefense.moves(),'','Hareket örneği uygula…');$('ballSelect').value=db.ball;$('lookCount').textContent=db.looks.length;
+  const l=db.looks.find(l=>l.id===db.selectedLookId),dirty=l&&JSON.stringify(l.defenders)!==JSON.stringify(db.defenders);
+  $('lookStatus').textContent=l?l.name+(dirty?' · değiştirildi':' · yüklü'):'Yeni / kaydedilmemiş savunma';
+  $('fieldRule').textContent=db.ball==='right'?'FIELD sol → C sol A · LG sol B · LT sol C | RG / RT MAN':'FIELD sağ → C sağ A · RG sağ B · RT sağ C | LG / LT MAN'+(db.ball==='middle'?' · Orta = sol hash':'');
+ }
+ function renderChips(){const off=actors();$('actorChips').innerHTML=off.map(a=>`<button class="actor-chip ${S.side==='offense'&&S.id===a.id?'active':''}" data-select-side="offense" data-select-id="${safe(a.id)}">${safe(a.label)}</button>`).join('')+`<select id="defenderPicker" aria-label="Savunmacı seç" style="width:auto;max-width:150px;font-size:11px;padding:6px">${opts(db.defenders.map(d=>({id:d.id,name:d.label+' · '+d.level})),S.side==='defense'?S.id:'','Savunmacı seç…')}</select>`;}
+ function renderTask(a){
+  const def=S.side==='defense';let html=`<div class="inspector-title"><h2>${safe(a.label)}</h2><span class="badge ${def?'':'manual'}">${def?a.level:'Hücum'}</span></div>`;
+  html+=input('Oyuncu adı / etiket','actor','label',a.label,'text','maxlength="50"');
+  html+=`<div class="grid two">${input('Yatay hiza X (0–1000)','actor','x',a.x,'number','min="0" max="1000" step="1"')}${input('Dikey hiza Y (0–630)','actor','y',a.y,'number','min="0" max="630" step="1"')}</div>`;
+  if(def){
+   html+=`<div class="grid two"><label>Seviye<select data-scope="actor" data-prop="level">${opts(['DL','LB','DB'].map(v=>({id:v,name:v})),a.level)}</select></label><label>Taraf · hücuma göre<select data-scope="actor" data-prop="side">${opts([{id:'L',name:'Sol'},{id:'R',name:'Sağ'}],a.side)}</select></label></div><div class="grid two"><label>DL tekniği<select data-scope="actor" data-prop="tech">${opts(Object.keys(OLDefense.techX).map(t=>({id:t,name:t+' teknik'})),a.tech,'Serbest')}</select></label>${input('Derinlik · yard (LOS = 0)','actor','depth',a.depth??Number(((300-a.y)/24).toFixed(2)),'number','min="0" max="20" step="0.25"')}</div><button data-action="alignTechnique">Tekniğe göre X hizala</button><p class="muted">Teknik etiketi, taraf, X ve derinlik ayrı alanlardır. Yalnız bu düğme X’i tekniğe taşır.</p><label class="inline-check mt"><input type="checkbox" data-scope="actor" data-prop="rush" ${a.rush?'checked':''}>Baskıya gelsin / blitz</label><p class="muted">Yakın hiza baskıyı otomatik açmaz. Coverage yolu çizmek için baskıyı kapalı bırakabilirsiniz.</p><button data-action="defenseStraight">Bu oyuncuya düz yol örneği</button>`;
+  }else{
+   html+=`<label>Pozisyon<select data-scope="actor" data-prop="position">${opts(['LT','LG','C','RG','RT','QB','RB','FB','TE','WR','Özel'].map(v=>({id:v,name:v})),a.position)}</select></label>`;
+   const e=effective(a);html+=`<div class="callout"><span data-effective-badge class="badge ${e.source==='suggestion'?'':'manual'}">${e.source==='suggestion'?'Otomatik öneri · onaysız':a.source==='manual'?'Koçun elle belirlediği görev':'Henüz görev yok'}</span><p data-effective-text class="mt" style="margin-bottom:0">${safe(e.task||'Görev açıklamanızı yazın veya bir şablon seçin.')}</p></div>`;
+   html+=area('Koçun görev açıklaması','actor','task',a.task)+`<div class="grid two"><label>İlk blok hedefi<select data-scope="actor" data-prop="target">${targetOptions(a.target)}</select></label><label>Combo sonrası / ikinci hedef<select data-scope="actor" data-prop="secondary">${targetOptions(a.secondary)}</select></label></div>`+input('Hedef gap / alan','actor','gap',a.gap);
+   if(a.source==='manual'&&(play()?.halfSlide||play()?.emptyProtection))html+='<button data-action="useSuggestion">Bu oyuncuda otomatik öneriyi göster</button><p class="muted">Elle yazılan metin kayıtta korunur; yeniden kullanmak için açıklamayı düzenleyin.</p>';
+  }
+  return html;
+ }
+ function stepEditor(step,i,scope='step'){return `<details class="step-card ${i===S.phase?'active':''}" ${i===S.phase?'open':''}><summary>${i} — ${safe(step.title||'Adsız adım')}</summary><div class="step-actions"><button data-step-action="up" data-index="${i}" data-edit="${scope}" ${i===0?'disabled':''}>↑</button><button data-step-action="down" data-index="${i}" data-edit="${scope}">↓</button><button data-step-action="copy" data-index="${i}" data-edit="${scope}">Kopyala</button><button class="danger" data-step-action="delete" data-index="${i}" data-edit="${scope}">Sil</button></div><label>Adım başlığı<input data-scope="${scope}" data-step="${i}" data-prop="title" value="${safe(step.title)}"></label><label>Açıklama<textarea data-scope="${scope}" data-step="${i}" data-prop="text">${safe(step.text)}</textarea></label><div class="grid two"><label>İlk hareket yönü<input data-scope="${scope}" data-step="${i}" data-prop="direction" value="${safe(step.direction)}"></label><label>Hedef oyuncu / gap<input data-scope="${scope}" data-step="${i}" data-prop="target" value="${safe(step.target)}" list="stepTargets"></label></div><label>Karar koşulu<input data-scope="${scope}" data-step="${i}" data-prop="condition" value="${safe(step.condition)}"></label><label>Kısa görev çağrısı<input data-scope="${scope}" data-step="${i}" data-prop="cue" value="${safe(step.cue||'')}"></label><label>Sık hata<textarea data-scope="${scope}" data-step="${i}" data-prop="error">${safe(step.error||'')}</textarea></label><label>Kontrol sorusu<textarea data-scope="${scope}" data-step="${i}" data-prop="check">${safe(step.check||'')}</textarea></label>${scope==='step'?`<div class="grid two step-coordinate"><label>Adımda konum X · isteğe bağlı<input type="number" min="0" max="1000" data-scope="step" data-step="${i}" data-prop="x" value="${step.x??''}"></label><label>Adımda konum Y · isteğe bağlı<input type="number" min="0" max="630" data-scope="step" data-step="${i}" data-prop="y" value="${step.y??''}"></label></div>`:''}</details>`;}
+ function liveReading(a){const p=play();if(!p?.emptyProtection)return 'Empty koruması bu oyunda etkin değil.';const job=M.emptySuggestions(db,{...p,players:actors()})[a.id];return db.defenders.filter(d=>d.level==='DL').length+' DL front · '+db.defenders.filter(d=>d.level==='DL').map(d=>d.label+': '+(d.tech||'serbest')+' teknik').join(' / ')+'. '+(job?.task||'');}
+ function learningControls(){return `<div class="row mt"><button data-learning="rookie" aria-pressed="${db.learningLevel!=='normal'}">Rookie · ayrıntılı</button><button data-learning="normal" aria-pressed="${db.learningLevel==='normal'}">Normal · kısa görev</button></div>`;}
+ function teachingCards(steps){const normal=db.learningLevel==='normal';return steps.map((t,i)=>`<details class="step-card ${i===S.phase?'active':''}" ${i===S.phase?'open':''}><summary>${i} — ${safe(t.title)}</summary><p class="notice mt">${safe(normal?(t.cue||t.text):t.text)}</p>${normal?'':`<p class="notice"><b>Yön:</b> ${safe(t.direction)}<br><b>Hedef:</b> ${safe(t.target)}<br><b>Koşul:</b> ${safe(t.condition)}</p><div class="callout"><b>Sık hata</b><br>${safe(t.error||'Koç tarafından eklenebilir.')}</div><p class="notice"><b>Kendini kontrol et:</b> ${safe(t.check||'Kararını koçuna anlat.')}</p>`}</details>`).join('');}
+ function renderTeaching(a){const analysis=OLEmpty.analyze(db,{...play(),players:actors()}),job=analysis.jobs[a.id];return `<h2>${safe(a.label)} · adım adım Empty</h2><span class="badge">Canlı anlatım · savunmayla güncellenir</span><p class="muted mt">OL hareketleri yaklaşık öğretim gösterimidir. Çizdiğiniz yol kullanılır; blok başarısı hesaplanmaz.</p>${learningControls()}<div class="callout"><b>${safe(job?.task||'')}</b><p class="notice mt">${safe(liveReading(a))}</p>${analysis.warnings.map(t=>`<p class="warning notice">${safe(t)}</p>`).join('')}</div><div class="row"><button data-action="editLessons">Ortak adım metinlerini düzenle</button><button data-action="copyTeaching" class="primary">Bu oyuncu için düzenlenebilir kopya</button>${a.steps.some(t=>t.text)?'<button data-action="showCoachSteps">Kayıtlı koç adımlarını aç</button>':''}</div><p class="muted mt">Ortak metindeki alanlar savunmacı adlarıyla dolar. Kişisel koç kopyası kendiliğinden değişmez. Field kayma, boundary MAN ve QB okuması takım kuralıdır. Slant, stunt ve fazla baskı cevapları bu mantıktan üretilen düzenlenebilir taktik önerileridir.</p>${teachingCards(job?.steps||[])}`;}
+ function renderLessonEditor(){const p=play();if(!p)return;const list=p.emptyCurriculum?.[S.lessonRole]??OLEmpty.banks[S.lessonRole];$('lessonEditor').innerHTML=`<label>Görev grubu<select id="lessonRole">${opts(Object.entries(OLEmpty.roles).map(([id,name])=>({id,name})),S.lessonRole)}</select></label><p class="notice">Bu oyunun ortak anlatımını düzenliyorsunuz. Canlı anlatımı kullanan oyuncular güncellenir; kişisel koç adımları korunur.</p><details><summary>Otomatik alanlar</summary><p class="notice">{field}, {boundarySide}, {hash}, {position}, {label}, {target}, {gap}, {front}, {technique}, {lbRead}, {comboGuard}, {comboSide}, {blitz}, {boundaryBlitz}, {shift}, {open}, {threats}. Bu alanları silip tamamen kendi cümlenizi de yazabilirsiniz.</p></details><button class="primary mt" data-action="addLessonStep">＋ Ortak adım ekle</button>${list.map((step,i)=>stepEditor(step,i,'lessonStep')).join('')}`;}
+ function renderSteps(a){if(S.side==='offense'&&autoSteps(a))return renderTeaching(a);if(S.side!=='offense')return '<p class="notice">Savunmacının hareketlerini “Yol noktaları” sekmesinden düzenleyin. Hücum oyuncusunu seçerek açıklamalı adımlara geçin.</p>';
+  return `<h2>${safe(a.label)} · adımlar</h2>${play()?.emptyProtection?learningControls()+'<div class="row mt"><button data-action="showAutoSteps">Canlı anlatımı göster</button><button data-action="editLessons">Ortak adım metinleri</button></div>':''}${play()?.emptyProtection?teachingCards(a.steps):''}<div class="callout"><b>Canlı savunma okuması · otomatik</b><p>${safe(liveReading(a))}</p><small>Koçun yazdığı adımlar aşağıda ayrıca korunur.</small></div><label>Hazır şablon<select id="actorTemplate">${opts(db.templates.map(t=>({id:t.id,name:t.category+' · '+t.name})),'','Şablon seç…')}</select></label><div class="row"><button data-action="appendTemplate">Şablonu sona ekle</button><button data-action="replaceTemplate">Adımları şablonla değiştir</button></div><p class="muted mt">Şablon bağımsız kopyalanır. Açıklamalarınız otomatik hesaplamayla değiştirilmez.</p><div class="row"><button data-action="addStep" class="primary">＋ Adım</button><button data-action="saveTemplate">Şablon olarak kaydet</button></div><label class="mt">Yeni şablonun adı<input id="newTemplateName" placeholder="Kendi hareket şablonum" maxlength="160"></label><datalist id="stepTargets">${db.defenders.map(d=>`<option value="${safe(d.label)}">`).join('')}<option value="Sol A gap"><option value="Sağ A gap"><option value="Sol B gap"><option value="Sağ B gap"><option value="Sol C gap"><option value="Sağ C gap"></datalist>${a.steps.map((s,i)=>stepEditor(s,i)).join('')||'<p class="notice mt">Adım yok. Boş adım ekleyin veya bir şablon seçin.</p>'}`;
+ }
+ function renderPath(a){return `<h2>${safe(a.label)} · hareket yolu</h2><div class="row"><button data-action="drawPath" class="primary">Sahada yol çiz</button><button data-action="clearPath" class="danger">Yolu sil</button></div><p class="muted mt">Başlangıç: X ${a.x}, Y ${a.y}. Aşağıdaki noktalar yolu sırayla oluşturur. Gecikme, noktaya ilerlemeden beklenen adım sayısıdır.</p><div class="path-list">${a.path.length?`<div class="path-point muted"><span>#</span><span>X</span><span>Y</span><span>Gecikme</span><span></span><span></span><span></span></div>`:''}${a.path.map((p,i)=>`<div class="path-point ${i===S.pointIndex?'point-active':''}"><span>${i+1}</span><input type="number" min="0" max="1000" data-scope="point" data-point="${i}" data-prop="x" value="${p.x}" aria-label="Nokta ${i+1} X"><input type="number" min="0" max="630" data-scope="point" data-point="${i}" data-prop="y" value="${p.y}" aria-label="Nokta ${i+1} Y"><input type="number" min="0" max="100" step="0.5" data-scope="point" data-point="${i}" data-prop="delay" value="${p.delay||0}" aria-label="Nokta ${i+1} gecikme"><button data-point-action="up" data-index="${i}" title="Noktayı öne al">↑</button><button data-point-action="down" data-index="${i}" title="Noktayı sona al">↓</button><button data-point-action="delete" data-index="${i}" aria-label="Nokta ${i+1} sil">×</button></div>`).join('')}</div><p class="muted mt">Sürüklemek için oyuncuyu seçip numaralı noktaya basılı tutun. Fare ve dokunmatik desteklenir.</p>`;}
+ function renderInspector(){ensureSelected();renderChips();document.querySelectorAll('[data-inspector-tab]').forEach(b=>b.classList.toggle('active',b.dataset.inspectorTab===S.tab));const a=selected();$('inspector').innerHTML=a?(S.tab==='task'?renderTask(a):S.tab==='steps'?renderSteps(a):renderPath(a)):'<p class="empty">Sahadan bir oyuncu seçin.</p>';}
+ function renderPlayEditor(){const p=play();$('copyPlayBtn').disabled=$('deletePlayBtn').disabled=!p;if(!p){$('playEditor').innerHTML='<p class="notice">Oyun adını sol üstten yazarak başlayın. Başlangıçta 5 OL, QB ve RB boş görevlerle eklenir. İhtiyacınıza göre oyuncu ekleyip çıkarabilirsiniz.</p>';return;}
+  const v=variant(),matches=db.variants.filter(v=>v.key===M.variantKey(db,p));
+  $('playEditor').innerHTML=`<div class="grid two">${input('Oyun adı','play','name',p.name,'text','maxlength="160"')}${input('Formasyon','play','formation',p.formation)}</div><div class="callout"><b>${v?'Savunmaya özel görevler':'Temel oyun görevleri'}</b><p style="margin:5px 0">${v?safe(v.name)+' · Bu savunma hizası + hash için ayrı kopya.':'Temel açıklamalar bütün savunmalara karşı kullanılır.'}</p><div class="row"><button data-action="baseScope" ${!v?'disabled':''}>Temel oyunu düzenle</button><button data-action="variantScope">${matches.length?'Savunma varyasyonunu aç':'Özel varyasyon aç'}</button></div>${matches.length>1?`<label class="mt">Korunan varyasyonlar<select id="variantPicker">${opts(matches.map(v=>({id:v.id,name:v.name})),v?.id)}</select></label>`:''}</div><label class="inline-check"><input type="checkbox" data-scope="play" data-prop="emptyProtection" ${p.emptyProtection?'checked':''}>Empty takım kuralı · field kayma / boundary MAN / boundary LB’yi QB okur</label><label class="inline-check"><input type="checkbox" data-scope="play" data-prop="halfSlide" ${p.halfSlide?'checked':''}>Bu oyunda half-slide paylaşım önerisini göster</label><p class="muted">Field GAP/SLIDE · boundary MAN. Elle belirlenen görev önceliklidir; RB’ye kural eklenmez.</p><div class="grid three mt"><label>Yeni oyuncu etiketi<input id="newActorLabel" placeholder="TE / WR / H…" maxlength="50"></label><label>Pozisyon<select id="newActorPosition">${opts(['TE','WR','RB','FB','QB','LT','LG','C','RG','RT','Özel'].map(v=>({id:v,name:v})),'TE')}</select></label><button data-action="addActor" class="mt">＋ Oyuncu ekle</button></div><div class="row mt">${actors().map(a=>`<button class="actor-chip" data-select-side="offense" data-select-id="${safe(a.id)}">${safe(a.label)}</button>`).join('')}</div><button class="danger mt" data-action="deleteActor" ${S.side!=='offense'?'disabled':''}>Seçili hücum oyuncusunu sil</button>${p.emptyProtection?`<label class="inline-check mt"><input type="checkbox" data-scope="play" data-prop="illustrateProtection" ${p.illustrateProtection!==false?'checked':''}>OL ayak ve temas konumlarını yaklaşık göster</label><p class="muted">Bu, adım mantığını gösteren öğretim hareketidir; gerçek blok sonucu veya ölçülü set mesafesi değildir. Çizdiğiniz oyuncu yolu önceliklidir.</p>`:''}${p.emptyProtection?'<details class="mt"><summary>Empty açıklama metinlerini düzenle</summary><p class="muted">{target}, {boundary}, {blitz} alanları savunmayla birlikte güncellenir. Diğer cümleleri koçla değiştirebilirsiniz.</p>'+Object.entries(M.emptyTexts).map(([key,value])=>area(({field:'Field kayma',combo:'Blitz yok / center yardımı',boundary:'Boundary MAN',qb:'QB okuması',receiver:'Receiver'})[key],'emptyText',key,p.emptyTexts?.[key]??value)).join('')+'</details>':''}${area(v?'Varyasyon koç notu':'Oyun koç notu',v?'variant':'play','notes',v?.notes??p.notes)}`;
+ }
+ function renderAssignments(){if(!play()){$('assignments').innerHTML='<p class="notice">Bir oyun oluşturduğunuzda blok hedefleri ve boşta kalan savunmacılar burada görünür.</p>';return;}
+  const analysis=play().emptyProtection?OLEmpty.analyze(db,{...play(),players:actors()}):null;const rows=actors().map(a=>({a,e:effective(a)})),targeted=new Set(rows.flatMap(({e})=>[e.target,e.secondary]).filter(Boolean)),free=db.defenders.filter(d=>d.rush&&!targeted.has(d.id));
+  $('assignments').innerHTML=`<div class="table-wrap"><table class="assignment-table"><thead><tr><th>Oyuncu</th><th>Görev / kaynak</th><th>İlk → sonra hedef</th></tr></thead><tbody>${rows.map(({a,e})=>`<tr><td>${safe(a.label)}</td><td>${safe(e.task||'Görev yok')}<br><span class="${e.source==='manual'?'count':'muted'}">${e.source==='manual'?'Elle':e.source==='suggestion'?'Otomatik öneri':'Atanmadı'}</span>${e.gap?'<br>'+safe(e.gap):''}</td><td>${safe(targetName(e.target))}${e.secondary?' → '+safe(targetName(e.secondary)):''}</td></tr>`).join('')}</tbody></table></div><p class="notice mt"><b class="${free.length?'warning':''}">Hedeflenmeyen baskıcılar:</b> ${safe(free.map(d=>d.label).join(', ')||'Yok')}</p>${analysis?`<p class="notice"><b>QB’nin boundary LB okuması:</b> ${safe(analysis.boundaryReads.map(targetName).join(', ')||'Şu an yok')}</p>${analysis.warnings.map(t=>`<p class="notice warning">${safe(t)}</p>`).join('')}`:''}<p class="muted">Combo için birden fazla hücumcuya aynı ilk hedefi, çıkış için ikinci hedefi seçin. Bir hedefin çizilmesi blok başarısı anlamına gelmez.</p>`;
+ }
+ function renderAll(){ensureSelected();S.phase=Math.min(S.phase,maxPhase());$('pageTitle').textContent=play()?.name||'İlk oyununuzu ekleyin.';$('pageIntro').textContent=play()?'Oyuncuyu seçin; görevi, adımları ve hareket yolunu düzenleyin. Oyun değiştiğinde savunma aynı kalır.':'Oyunu adlandırın, oyuncuyu seçin ve görevlerini oluşturun. Savunmayı şimdi kurabilirsiniz.';renderNav();renderDefense();renderInspector();renderPlayEditor();renderAssignments();renderField();}
+ function loadPlay(id){stop();db.selectedPlayId=id;S.scope='auto';S.variantId='';S.phase=0;S.side='offense';S.id=actors()[0]?.id;S.pointIndex=-1;persist();renderAll();}
+ function createPlay(){const name=$('newPlayName').value.trim();if(!name){$('newPlayName').focus();toast('Oyuna bir ad verin.');return;}commit(()=>{const p=M.newPlay(name);db.plays.push(p);db.selectedPlayId=p.id;S.scope='base';S.variantId='';S.side='offense';S.id=p.players[0].id;$('newPlayName').value='';},{reset:true});toast('Boş oyun oluşturuldu. Görevleri siz belirleyin.');}
+ function loadLook(id){const l=db.looks.find(l=>l.id===id);if(!l)return;commit(()=>{db.defenders=copy(l.defenders);db.front=l.front||'custom';db.selectedLookId=id;S.scope='auto';S.variantId='';S.pointIndex=-1;},{reset:true});$('lookName').value=l.name;$('looksDialog').close();toast('Look yüklendi. Hücum oyunu korunuyor.');}
+ function renderLooks(){$('looksList').innerHTML=db.looks.map(l=>`<div class="library-item"><div class="row"><b class="grow">${safe(l.name)}</b><button data-look-load="${safe(l.id)}">Yükle</button><button data-look-copy="${safe(l.id)}">Kopyala</button><button data-look-delete="${safe(l.id)}" class="danger">Sil</button></div><p>${l.defenders.length} savunmacı · ${l.defenders.filter(d=>d.rush).length} baskıcı · ${l.defenders.reduce((n,d)=>n+d.path.length,0)} yol noktası</p></div>`).join('')||'<p class="empty">Henüz look kaydedilmedi. Savunmanızı kurup isim vererek kaydedin.</p>';}
+ function renderTemplates(){const query=$('templateSearch').value.toLocaleLowerCase('tr'),cat=$('templateCategory').value;$('templatesList').innerHTML=db.templates.filter(t=>(!cat||cat===t.category)&&(`${t.name} ${t.description}`).toLocaleLowerCase('tr').includes(query)).map(t=>`<div class="library-item"><b>${safe(t.name)}</b><p>${safe(t.category)} · ${t.steps.length} adım<br>${safe(t.description||'Koçun özel şablonu')}</p><div class="row"><button data-template-apply="${safe(t.id)}" ${S.side!=='offense'?'disabled':''}>Oyuncuya sona ekle</button><button data-template-edit="${safe(t.id)}">Düzenle</button><button data-template-copy="${safe(t.id)}">Kopyala</button><button class="danger" data-template-delete="${safe(t.id)}">Sil</button></div></div>`).join('');}
+ function openLibrary(){const categories=[...new Set(db.templates.map(t=>t.category))];$('templateCategory').innerHTML=opts(categories.map(v=>({id:v,name:v})),'','Bütün kategoriler');renderTemplates();$('libraryDialog').showModal();}
+ function renderTemplateEditor(){const t=db.templates.find(t=>t.id===S.templateId);if(!t)return;$('templateEditor').innerHTML=`${input('Şablon adı','template','name',t.name)}${input('Kategori','template','category',t.category)}${area('Şablon açıklaması','template','description',t.description||'')}<button data-action="addTemplateStep">＋ Adım</button><p class="muted mt">Değişiklikler yalnız bu şablona kaydedilir. Oyunlara önceden kopyalanan adımlar değişmez.</p>${t.steps.map((s,i)=>stepEditor(s,i,'templateStep')).join('')}`;}
+ function download(name,data,type){const u=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);}
+ function exportHTML(){stop();persist();const doc=document.documentElement.cloneNode(true);doc.querySelector('#embeddedBackup').textContent=JSON.stringify(db).replace(/</g,'\\u003c');doc.querySelectorAll('dialog[open]').forEach(d=>d.removeAttribute('open'));doc.querySelector('#toast').classList.remove('visible');download('OL_Atolye_Editor.html','<!doctype html>\n'+doc.outerHTML,'text/html;charset=utf-8');toast('Bütün kayıtlar güncel HTML’ye eklendi.');}
+ function renderArchive(){const catalog=JSON.parse($('legacyCatalog').textContent);$('archiveContent').innerHTML=`<p class="notice">Eski 35 oyun aktif listeden kaldırıldı. Kaynak oyun adları, eski kayıtların hangi oyuna ait olduğunu bulabilmeniz için tutulur.</p><details><summary>Eski oyun kimlikleri / adları (${catalog.length})</summary><div class="scroll-archive">${safe(catalog.map(p=>p.id+' · '+p.title).join('\n'))}</div></details><h3 class="mt">Eski kullanıcı kayıtları (${db.legacy.length} yedek)</h3>${db.legacy.map((l,i)=>`<div class="library-item"><p>${Object.keys(l.data.notes||{}).length} not · ${Object.keys(l.data.playRules||{}).length} kural · ${Object.keys(l.data.overrides||{}).length} elle paylaşım · ${(l.data.trash||[]).length} eski silinmiş look</p><button data-legacy-export="${i}">Eski yedeği indir</button><details class="mt"><summary>Notları / kuralları / görevleri görüntüle</summary><div class="scroll-archive">${safe(JSON.stringify({notes:l.data.notes,playRules:l.data.playRules,overrides:l.data.overrides},null,2))}</div></details>${(l.data.trash||[]).map((r,j)=>`<button class="mt" data-legacy-restore="${i}:${j}">${safe(r.name||'Eski look')} · geri getir</button>`).join('')}</div>`).join('')||'<p class="notice">Henüz eski yedek içe aktarılmadı. Eski tarayıcı kaydı erişilebiliyorsa otomatik alınır; değilse Yedek / HTML menüsünden eski JSON’u yükleyin.</p>'}<h3 class="mt">Silinenler (${db.trash.length})</h3>${db.trash.map((t,i)=>`<div class="library-item"><div class="row"><span class="grow">${safe(t.item?.name||t.kind)}</span><button data-restore="${i}">Geri getir</button></div></div>`).join('')||'<p class="notice">Silinen kayıt yok.</p>'}`;}
+ function stepAction(button){const kind=button.dataset.edit,list=kind==='lessonStep'?play().emptyCurriculum[S.lessonRole]:kind==='templateStep'?db.templates.find(t=>t.id===S.templateId)?.steps:selected()?.steps;if(!list)return;const i=+button.dataset.index,action=button.dataset.stepAction;commit(()=>{if(action==='up'&&i>0)[list[i-1],list[i]]=[list[i],list[i-1]];if(action==='down'&&i<list.length-1)[list[i+1],list[i]]=[list[i],list[i+1]];if(action==='copy')list.splice(i+1,0,copy(list[i]));if(action==='delete')list.splice(i,1);S.phase=Math.min(S.phase,maxPhase());});if(kind==='templateStep')renderTemplateEditor();if(kind==='lessonStep')renderLessonEditor();}
+ const actions={
+  copyTeaching:()=>commit(()=>{coachCopy(selected());}),
+  showCoachSteps:()=>commit(()=>{selected().stepMode='manual';}),
+  showAutoSteps:()=>commit(()=>{selected().stepMode='auto';}),
+  editLessons:()=>{commit(()=>{play().emptyCurriculum??=copy(OLEmpty.banks);});const job=OLEmpty.analyze(db,{...play(),players:actors()}).jobs[S.id];S.lessonRole=job?.role||'field';renderLessonEditor();$('lessonDialog').showModal();},
+  addLessonStep:()=>{commit(()=>play().emptyCurriculum[S.lessonRole].push({title:'Yeni adım',text:'',direction:'',target:'',condition:'',cue:'',error:'',check:''}));renderLessonEditor();},
+  alignTechnique:()=>commit(()=>{const a=selected();if(a&&a.tech!=='')a.x=500+(a.side==='L'?-1:1)*OLDefense.techX[a.tech];},{reset:true}),
+  defenseStraight:()=>commit(()=>{const a=selected();a.path=OLDefense.movement([{...a,rush:true}],'straight')[0].path;},{reset:true}),
+  useSuggestion:()=>commit(()=>{selected().source='suggestion';}),
+  addStep:()=>commit(()=>{coachCopy(selected());selected().steps.push({title:'Yeni adım',text:'',direction:'',target:'',condition:''});}),
+  appendTemplate:()=>applyTemplate(false),replaceTemplate:()=>applyTemplate(true),
+  saveTemplate:()=>{const name=$('newTemplateName').value.trim();if(!name){toast('Yeni şablon için ad yazın.');return;}commit(()=>db.templates.push({id:M.uid('template'),name,category:'Özel',description:'Koçun oluşturduğu düzenlenebilir şablon.',steps:copy(selected().steps)}));toast('Adımlar bağımsız bir şablon olarak kaydedildi.');},
+  drawPath:()=>{S.mode='draw';S.phase=0;renderField();toast('Sahaya tıklayarak / dokunarak noktalar ekleyin.');},
+  clearPath:()=>{if(selected()?.path.length)commit(()=>{selected().path=[];S.pointIndex=-1;},{reset:true});},
+  baseScope:()=>{S.scope='base';S.variantId='';S.phase=0;renderAll();},
+  variantScope:()=>{const p=play();if(!p)return;const k=M.variantKey(db,p),v=db.variants.filter(v=>v.key===k).at(-1);if(v){S.scope='auto';S.variantId=v.id;renderAll();return;}commit(()=>{const v={id:M.uid('variant'),playId:p.id,key:k,name:(db.looks.find(l=>l.id===db.selectedLookId)?.name||'Özel savunma')+' · '+({left:'sol hash',middle:'orta',right:'sağ hash'}[db.ball]),players:copy(p.players),notes:p.notes};db.variants.push(v);S.scope='auto';S.variantId=v.id;});toast('Bu savunma + hash için bağımsız görev kopyası açıldı.');},
+  addActor:()=>{const label=$('newActorLabel').value.trim()||$('newActorPosition').value,pos=$('newActorPosition').value;commit(()=>{const a=M.actor(label,760,340);a.position=pos;actors().push(a);S.id=a.id;S.side='offense';});},
+  deleteActor:()=>{if(S.side==='offense'&&selected()&&confirm(selected().label+' oyuncusunu ve görevlerini silmek istiyor musunuz?'))commit(()=>{const arr=actors(),i=arr.findIndex(a=>a.id===S.id);db.trash.push({kind:'actor',item:copy(arr[i]),playId:play().id,variantId:variant()?.id});arr.splice(i,1);});},
+  addTemplateStep:()=>{commit(()=>db.templates.find(t=>t.id===S.templateId).steps.push({title:'Yeni adım',text:'',direction:'',target:'',condition:''}));renderTemplateEditor();}
+ };
+ function applyTemplate(replace,id){if(S.side!=='offense'||!selected()){toast('Önce bir hücum oyuncusu seçin.');return;}const t=db.templates.find(t=>t.id===(id||$('actorTemplate')?.value));if(!t){toast('Önce bir şablon seçin.');return;}if(replace&&selected().steps.some(s=>s.text)&&!confirm('Bu oyuncunun mevcut adımlarını şablonla değiştirmek istiyor musunuz?'))return;commit(()=>{coachCopy(selected());if(replace)selected().steps=copy(t.steps);else selected().steps.push(...copy(t.steps));S.tab='steps';S.phase=0;});toast('Şablon kopyalandı; her adımı değiştirebilirsiniz.');}
+ document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.learning){commit(()=>{db.learningLevel=b.dataset.learning;});return;}
+  if(b.hasAttribute('data-close')){b.closest('dialog').close();return;}
+  if(b.dataset.play){loadPlay(b.dataset.play);return;}
+  if(b.dataset.selectId){selectActor(b.dataset.selectSide,b.dataset.selectId);return;}
+  if(b.dataset.mode){S.mode=b.dataset.mode;stop();S.phase=0;renderField();return;}
+  if(b.dataset.inspectorTab){S.tab=b.dataset.inspectorTab;renderInspector();return;}
+  if(b.dataset.phase!==undefined){stop();S.phase=+b.dataset.phase;renderInspector();renderField();return;}
+  if(b.dataset.action){actions[b.dataset.action]?.();return;}
+  if(b.dataset.stepAction){stepAction(b);return;}
+  if(b.dataset.pointAction){const a=selected(),i=+b.dataset.index;commit(()=>{if(b.dataset.pointAction==='delete')a.path.splice(i,1);if(b.dataset.pointAction==='up'&&i>0)[a.path[i-1],a.path[i]]=[a.path[i],a.path[i-1]];if(b.dataset.pointAction==='down'&&i<a.path.length-1)[a.path[i+1],a.path[i]]=[a.path[i],a.path[i+1]];S.pointIndex=-1;},{reset:true});return;}
+  if(b.dataset.lookLoad){loadLook(b.dataset.lookLoad);return;}
+  if(b.dataset.lookCopy){commit(()=>{const l=copy(db.looks.find(l=>l.id===b.dataset.lookCopy));l.id=M.uid('look');l.name+=' (kopya)';db.looks.push(l);});renderLooks();return;}
+  if(b.dataset.lookDelete){if(confirm('Bu look’u arşive taşımak istiyor musunuz?')){commit(()=>{const i=db.looks.findIndex(l=>l.id===b.dataset.lookDelete);db.trash.push({kind:'looks',item:db.looks.splice(i,1)[0]});if(db.selectedLookId===b.dataset.lookDelete)db.selectedLookId='';});renderLooks();}return;}
+  if(b.dataset.templateApply){applyTemplate(false,b.dataset.templateApply);return;}
+  if(b.dataset.templateEdit){S.templateId=b.dataset.templateEdit;renderTemplateEditor();$('templateDialog').showModal();return;}
+  if(b.dataset.templateCopy){commit(()=>{const t=copy(db.templates.find(t=>t.id===b.dataset.templateCopy));t.id=M.uid('template');t.name+=' (kopya)';db.templates.push(t);});renderTemplates();return;}
+  if(b.dataset.templateDelete){if(confirm('Bu şablonu kütüphaneden arşive taşımak istiyor musunuz? Oyunlardaki kopyalar korunur.')){commit(()=>{const i=db.templates.findIndex(t=>t.id===b.dataset.templateDelete);db.trash.push({kind:'templates',item:db.templates.splice(i,1)[0]});});renderTemplates();}return;}
+  if(b.dataset.legacyExport!==undefined){download('OL_Atolye_Eski_Kayitlar.json',JSON.stringify(db.legacy[+b.dataset.legacyExport].data,null,2),'application/json');return;}
+  if(b.dataset.legacyRestore!==undefined){const [i,j]=b.dataset.legacyRestore.split(':').map(Number),l=db.legacy[i].data.trash[j];try{commit(()=>{db.looks.push({...copy(l),id:M.uid('look'),defenders:OLDefense.fromLegacy(l.defenders)});});renderArchive();toast('Eski look geri getirildi.');}catch{toast('Eski look biçimi okunamadı; eski JSON yedeğinde korunuyor.');}return;}
+  if(b.dataset.restore!==undefined){commit(()=>{const t=db.trash.splice(+b.dataset.restore,1)[0];if(t.kind==='actor'){const p=db.plays.find(p=>p.id===t.playId),v=db.variants.find(v=>v.id===t.variantId);if(v||p)(v?.players||p.players).push(t.item);else db.trash.push(t);}else if(['plays','looks','templates'].includes(t.kind)){if(db[t.kind].some(i=>i.id===t.item.id))t.item.id=M.uid(t.kind);db[t.kind].push(t.item);}});renderArchive();return;}
+ });
+ function refreshAfterEdit(){
+  renderNav();renderAssignments();renderField();$('pageTitle').textContent=play()?.name||'İlk oyununuzu ekleyin.';
+  const a=selected(),badge=document.querySelector('[data-effective-badge]'),text=document.querySelector('[data-effective-text]');
+  if(a&&S.side==='offense'&&badge){const ef=effective(a);badge.textContent=ef.source==='suggestion'?'Otomatik öneri · onaysız':a.source==='manual'?'Koçun elle belirlediği görev':'Henüz görev yok';badge.classList.toggle('manual',ef.source!=='suggestion');if(text)text.textContent=ef.task||'Görev açıklamanızı yazın veya bir şablon seçin.';}
+  if(a){const title=document.querySelector('.inspector-title h2');if(title)title.textContent=a.label;}
+ }
+ document.addEventListener('change',e=>{
+  const t=e.target,scope=t.dataset.scope,prop=t.dataset.prop;if(!scope)return;
+  let value=t.type==='checkbox'?t.checked:t.value;
+  if(!t.checkValidity()){toast('Lütfen alanın sınırlarına uygun bir değer girin.');return;}
+  if(scope==='lessonStep'){commit(()=>{play().emptyCurriculum[S.lessonRole][+t.dataset.step][prop]=value;},{render:false});if(prop==='title')t.closest('details').querySelector('summary').textContent=t.dataset.step+' — '+value;renderInspector();renderAssignments();renderField();return;}
+  if(scope==='emptyText'){commit(()=>{play().emptyTexts??={};play().emptyTexts[prop]=value;},{render:false});refreshAfterEdit();return;}
+  if(scope==='point'){commit(()=>{selected().path[+t.dataset.point][prop]=Number(value);},{render:false,reset:true});refreshAfterEdit();return;}
+  if(scope==='step'||scope==='templateStep'){commit(()=>{if(scope==='step')selected().stepMode='manual';const steps=scope==='step'?selected().steps:db.templates.find(t=>t.id===S.templateId).steps,s=steps[+t.dataset.step];if(['x','y'].includes(prop)){if(value==='')delete s[prop];else s[prop]=Number(value);}else s[prop]=value;},{render:false});if(prop==='title')t.closest('details').querySelector('summary').textContent=t.dataset.step+' — '+value;refreshAfterEdit();return;}
+  if(scope==='actor'){commit(()=>{const a=selected();if(['x','y','depth'].includes(prop))value=Number(value);a[prop]=value;if(prop==='depth')a.y=Math.max(43,Math.min(300,300-value*24));if(prop==='y'&&S.side==='defense')a.depth=+(Math.max(0,(300-a.y)/24)).toFixed(2);if(S.side==='offense'&&['task','target','secondary','gap'].includes(prop))a.source='manual';},{render:false,reset:['x','y','depth'].includes(prop)});if(prop==='depth')document.querySelector('[data-scope="actor"][data-prop="y"]').value=selected().y;if(prop==='y'&&S.side==='defense')document.querySelector('[data-scope="actor"][data-prop="depth"]').value=selected().depth;refreshAfterEdit();renderChips();return;}
+  if(scope==='play'){if(prop==='name'&&!value.trim()){t.value=play().name;return;}commit(()=>play()[prop]=value,{render:false});if(t.type==='checkbox')renderAll();else refreshAfterEdit();return;}
+  if(scope==='variant'){commit(()=>variant()[prop]=value,{render:false});refreshAfterEdit();return;}
+  if(scope==='template'){commit(()=>db.templates.find(t=>t.id===S.templateId)[prop]=value,{render:false});renderTemplates();}
+ });
+ $('createEmptyBtn').onclick=()=>{commit(()=>{const p=OLEmpty.newPlay();db.plays.push(p);db.selectedPlayId=p.id;S.scope='base';S.side='offense';S.id=p.players.find(a=>a.position==='C').id;S.tab='steps';},{reset:true});};$('newPlayBtn').onclick=createPlay;$('newPlayName').addEventListener('keydown',e=>{if(e.key==='Enter')createPlay();});$('playSearch').oninput=e=>{S.search=e.target.value;renderNav();};
+ $('copyPlayBtn').onclick=()=>{const p=play();if(!p)return;commit(()=>{const q=copy(p);q.id=M.uid('play');q.name+=' (kopya)';db.plays.push(q);for(const v of db.variants.filter(v=>v.playId===p.id)){const nv=copy(v);nv.id=M.uid('variant');nv.playId=q.id;nv.key=q.id+v.key.slice(v.key.indexOf('|'));db.variants.push(nv);}db.selectedPlayId=q.id;S.scope='auto';S.variantId='';},{reset:true});toast('Oyun ve özel varyasyonları bağımsız kopyalandı.');};
+ $('deletePlayBtn').onclick=()=>{const p=play();if(p&&confirm('“'+p.name+'” oyununu arşive taşımak istiyor musunuz?'))commit(()=>{db.trash.push({kind:'plays',item:db.plays.splice(db.plays.indexOf(p),1)[0]});db.selectedPlayId=db.plays[0]?.id||'';S.scope='auto';S.variantId='';},{reset:true});};
+ $('frontSelect').onchange=e=>{if(e.target.value==='custom')return;const id=e.target.value;commit(()=>{db.defenders=OLDefense.create(id);db.front=id;db.selectedLookId='';S.scope='auto';S.variantId='';},{reset:true});$('lookName').value='';};
+ $('moveSelect').onchange=e=>{if(e.target.value)commit(()=>{db.defenders=OLDefense.movement(db.defenders,e.target.value);S.scope='auto';S.variantId='';},{reset:true});};
+ $('ballSelect').onchange=e=>{const ball=e.target.value;commit(()=>{db.ball=ball;S.scope='auto';S.variantId='';},{reset:true});};
+ $('saveLookBtn').onclick=()=>{const name=$('lookName').value.trim();if(!name){$('lookName').focus();toast('Look’a isim verin.');return;}commit(()=>{const current=db.looks.find(l=>l.id===db.selectedLookId&&l.name===name);const l={...(current||{}),id:current?.id||M.uid('look'),name,front:db.front,defenders:copy(db.defenders),updatedAt:Date.now()};if(current)Object.assign(current,l);else db.looks.push(l);db.selectedLookId=l.id;});toast('Look; hizalar, baskı durumları ve bütün yollarla kaydedildi.');};
+ $('looksBtn').onclick=()=>{renderLooks();$('looksDialog').showModal();};$('libraryBtn').onclick=openLibrary;$('templateSearch').oninput=renderTemplates;$('templateCategory').onchange=renderTemplates;
+ $('backupBtn').onclick=()=>$('backupDialog').showModal();$('helpBtn').onclick=()=>$('helpDialog').showModal();$('archiveBtn').onclick=()=>{renderArchive();$('archiveDialog').showModal();};
+ $('exportJsonBtn').onclick=()=>{persist();download('OL_Atolye_Yedek.json',JSON.stringify(db,null,2),'application/json');};$('exportHtmlBtn').onclick=exportHTML;
+ $('importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>30000000)throw Error('Dosya 30 MB sınırını aşıyor.');const incoming=JSON.parse(await file.text()),test=copy(db);M.merge(test,incoming);if(!M.validate(test))throw Error('Yedekteki veriler doğrulanamadı.');commit(()=>{db=test;if(!play())db.selectedPlayId=db.plays[0]?.id||'';});$('importStatus').textContent='Yedek birleştirildi. Oyunlar, şablonlar ve look’lar korundu. İçe aktarılan çalışma savunması gerekiyorsa kayıtlı look’lar içinden açılabilir.';toast('Yedek yüklendi.');}catch(err){$('importStatus').textContent='Yüklenemedi: '+err.message;}e.target.value='';};
+ $('undoBtn').onclick=()=>{if(!S.history.length)return;stop();db=S.history.pop();S.phase=0;S.scope='auto';S.variantId='';persist();renderAll();toast('Son düzenleme geri alındı.');};
+ const advance=i=>{stop();S.phase=Math.max(0,Math.min(maxPhase(),i));renderInspector();renderField();};$('prevBtn').onclick=()=>advance(S.phase-1);$('nextBtn').onclick=()=>advance(S.phase+1);$('progress').oninput=e=>advance(+e.target.value);
+ $('playBtn').onclick=()=>{if(S.playing){stop();return;}if(S.phase>=maxPhase())S.phase=0;S.playing=true;$('playBtn').textContent='Ⅱ';S.timer=setInterval(()=>{if(S.phase>=maxPhase()){stop();return;}S.phase++;renderInspector();renderField();},+$('speedSelect').value);renderField();};$('speedSelect').onchange=stop;
+ $('pathsToggle').onchange=renderField;$('targetsToggle').onchange=renderField;
+ document.addEventListener('change',e=>{if(e.target.id==='lessonRole'){S.lessonRole=e.target.value;renderLessonEditor();}if(e.target.id==='defenderPicker'&&e.target.value)selectActor('defense',e.target.value);if(e.target.id==='variantPicker'){S.variantId=e.target.value;S.scope='auto';renderAll();}});
+ document.addEventListener('keydown',e=>{if(e.defaultPrevented||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||document.querySelector('dialog[open]'))return;if(e.key==='ArrowRight'){e.preventDefault();advance(S.phase+1);}if(e.key==='ArrowLeft'){e.preventDefault();advance(S.phase-1);}});
+ renderAll();persist();
+ return {get db(){return db;},S,play,actors,variant,selected,loadPlay,loadLook,renderAll,exportHTML,effective};
+})();
+window.OLApp=App;
+
+</script></body></html>
