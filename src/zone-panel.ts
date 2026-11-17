@@ -10,7 +10,7 @@ export function mountZonePanel(
 ) {
   host.className = "zone-panel";
   host.innerHTML =
-    '<strong>FIELD ZONE · KOŞU AYARLARI</strong><p>Standart zone taslağı: combo–climb ve RB okumasını koç doğrulamalıdır.</p><div class="zone-controls"></div><details><summary>Oyuncu bazında savunma reaksiyonu</summary><div class="zone-reactions"></div></details><p class="zone-status" role="status"></p>';
+    '<strong>FIELD ZONE · KOŞU AYARLARI</strong><p>Covered kendi adamını alır. Uncovered, zone yönünde gerekiyorsa yardım eder ve ikinci seviyeye çıkar. RB okuması düzenlenebilir.</p><div class="zone-controls"></div><details><summary>Oyuncu bazında savunma reaksiyonu</summary><div class="zone-reactions"></div></details><p class="zone-status" role="status"></p>';
   const controls = host.querySelector<HTMLElement>(".zone-controls")!,
     rows = host.querySelector<HTMLElement>(".zone-reactions")!,
     status = host.querySelector<HTMLElement>(".zone-status")!;

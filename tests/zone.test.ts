@@ -1,13 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  Scenario,
-  position,
-  pathLength,
-  type ScenarioType,
-} from "../src/model.ts";
+import { Scenario, position, type ScenarioType } from "../src/model.ts";
 import { defaultFieldZone, defaultProtection } from "../src/examples.ts";
-import { planZone, createFieldZone } from "../src/zone.ts";
+import { planZone, createFieldZone, zoneCovered } from "../src/zone.ts";
 import {
   automaticTraining,
   planTraining,
@@ -135,8 +130,10 @@ test("6 DL’de RB blokçu sayılmaz; fazla DL ve LB koşu takipçisi olarak aç
   const p = planZone(trainingFront(defaultFieldZone(), 6));
   assert.equal(
     p.coverage.filter((c) => c.position === "DL" && c.blockers.length).length,
-    5,
+    4,
   );
+  // This six-man front has four shaded OL; the open C must not chase a far edge DL.
+  assert.equal(p.assignments.find((a) => a.player === "C")!.covered, false);
   assert.ok(p.unblocked.length >= 2);
   assert.ok(
     p.unblocked.every(
@@ -317,4 +314,158 @@ test("iki zone, iki hash, 3–4/4–3/5/6 hat ve tüm blitz seçeneklerinde kend
             `${variant} / ${n} / ${hash} / ${side}`,
           );
         }
+});
+
+test("covered DL sorumluluğu slant ve twist sonrası değişmez; yardım için kendi adamı bırakılmaz", () => {
+  for (const variant of variants)
+    for (const hash of ["left", "right"] as const)
+      for (const reaction of [
+        "base",
+        "slant-field",
+        "slant-boundary",
+        "twist",
+      ] as const) {
+        const s = defaultFieldZone();
+        s.zone!.variant = variant;
+        s.zone!.dlReaction = reaction;
+        s.hash = hash;
+        const covered = zoneCovered(s),
+          p = planZone(s);
+        for (const [id, dl] of covered) {
+          const a = p.assignments.find((a) => a.player === id)!;
+          assert.equal(a.target, dl, `${variant}/${hash}/${reaction}/${id}`);
+          assert.equal(a.covered, true);
+          assert.equal(a.partner, undefined);
+          assert.equal(a.release, undefined);
+          assert.equal(a.secondLevel, false);
+          assert.equal(
+            p.scenario.actions.filter((a) => a.player === id).at(-1)!.target,
+            dl,
+          );
+        }
+        assert.equal(
+          p.assignments.find((a) => a.player === "LG")!.covered,
+          false,
+        );
+        assert.deepEqual(
+          inspectScenario(p.scenario)
+            .covered.filter((x) => x.covered)
+            .map((x) => x.player),
+          [...covered.keys()],
+        );
+      }
+});
+test("uncovered oyuncu yalnız field yönündeki yakın covered arkadaşına yardım eder", () => {
+  for (const variant of variants)
+    for (const sign of [-1, 1]) {
+      const s = trainingFront(defaultFieldZone(), 3);
+      s.zone!.variant = variant;
+      s.hash = sign > 0 ? "left" : "right";
+      const p = planZone(s),
+        helper = p.assignments.find(
+          (a) => a.player === (sign > 0 ? "LG" : "RG"),
+        )!;
+      assert.equal(helper.partner, "C");
+      assert.equal(helper.target, "DL2");
+      assert.equal(helper.covered, false);
+      assert.equal(helper.secondLevel, true);
+      for (const a of p.assignments.filter((a) => a.partner)) {
+        const own = s.players.find((p) => p.id === a.player)!,
+          partner = s.players.find((p) => p.id === a.partner)!;
+        assert.ok((partner.at[0] - own.at[0]) * sign > 0);
+      }
+    }
+});
+test("zone yönünde yardım yoksa uncovered doğrudan çıkar; ters yöndeki covered arkadaşına dönmez", () => {
+  for (const variant of variants)
+    for (const sign of [-1, 1]) {
+      const s = defaultFieldZone();
+      s.zone!.variant = variant;
+      s.hash = sign > 0 ? "left" : "right";
+      s.players = s.players.filter((p) => p.side === "OFF" || p.id === "DL2");
+      s.players.find((p) => p.id === "DL2")!.at = [-sign * 1.2, 1.1];
+      const p = planZone(s),
+        a = p.assignments.find((a) => a.player === "C")!;
+      assert.equal(a.covered, false);
+      assert.equal(a.type, "climb");
+      assert.equal(a.partner, undefined);
+      assert.equal(a.target, undefined);
+      assert.ok(
+        !p.scenario.actions.some(
+          (a) => a.player === "C" && a.label === "zone-combo",
+        ),
+      );
+      const climb = p.scenario.actions.find(
+        (a) => a.player === "C" && a.label === "climb",
+      )!;
+      assert.equal(climb.start, 1.7);
+      assert.ok(climb.to[1] >= 2);
+      assert.ok(climb.to[0] * sign > 0);
+      assert.match(a.note, /doğrudan/);
+    }
+});
+test("combo yardımcısı LB hedefi bulunmasa bile ikinci seviyeye çıkar, covered DL’de kalır", () => {
+  for (const variant of variants) {
+    const s = trainingFront(defaultFieldZone(), 3);
+    s.zone!.variant = variant;
+    s.players = s.players.filter((p) => p.pos !== "LB");
+    const p = planZone(s),
+      a = p.assignments.find((a) => a.player === "LG")!;
+    assert.equal(a.type, "combo");
+    assert.equal(a.partner, "C");
+    assert.equal(a.release, undefined);
+    const climb = p.scenario.actions.find(
+        (a) => a.player === "LG" && a.label === "climb",
+      )!,
+      combo = p.scenario.actions.find(
+        (a) => a.player === "LG" && a.label === "zone-combo",
+      )!;
+    assert.equal(climb.start, combo.end);
+    assert.ok(climb.to[1] >= 2);
+    assert.equal(climb.target, undefined);
+    assert.equal(
+      p.scenario.actions.filter((a) => a.player === "C").at(-1)!.target,
+      "DL2",
+    );
+    assert.ok(
+      position(p.scenario, "LG", end(p.scenario))[1] >
+        position(p.scenario, "C", end(p.scenario))[1],
+    );
+  }
+});
+test("aynı covered OL çevresindeki ikinci DL boş OL’u ters yöne sürüklemez", () => {
+  const s = defaultFieldZone();
+  s.players = s.players.filter((p) => p.side === "OFF");
+  s.players.push(
+    { id: "HEAD", side: "DEF", pos: "DL", at: [-1.2, 1.1] },
+    { id: "SHADE", side: "DEF", pos: "DL", at: [-1.6, 1.1] },
+  );
+  const p = planZone(s);
+  assert.equal(p.assignments.find((a) => a.player === "LG")!.target, "HEAD");
+  assert.equal(p.assignments.find((a) => a.player === "C")!.type, "climb");
+  assert.ok(p.unblocked.includes("SHADE"));
+});
+
+test("uncovered doğrudan LB’ye çıktıktan sonra temasta kalır; blitz’i ikinci seviyeye drive eder", () => {
+  for (const side of ["none", "middle"] as const) {
+    const s = trainingDefense(
+        trainingFront(defaultFieldZone(), 3),
+        side,
+        "blitz",
+      ),
+      p = planZone(s);
+    for (const a of p.assignments.filter(
+      (a) => a.type === "climb" && a.target,
+    )) {
+      const first = p.scenario.actions.find(
+          (x) => x.player === a.player && x.label === "climb",
+        )!,
+        hold = p.scenario.actions.find(
+          (x) => x.player === a.player && x.label === "zone-drive",
+        )!;
+      assert.equal(hold.start, first.end);
+      assert.equal(hold.target, a.target);
+      assert.ok(zoneBlockPose(p.scenario, a.player, hold.end - 0.01)!.contact);
+    }
+  }
 });

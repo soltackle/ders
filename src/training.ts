@@ -31,7 +31,7 @@ function preserveZone(previous: ScenarioType, next: ScenarioType) {
   next.scheme = "Field zone";
   next.actions = next.actions.filter((a) => !a.source || a.source === "manual");
   next.rules = [];
-  next.playbook = "Standart field zone taslağı · koç tarafından düzenlenebilir";
+  next.playbook = "Takım field zone · covered / uncovered";
   next.steps = [
     {
       title: "Zone savunma yerleşimi",

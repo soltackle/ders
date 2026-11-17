@@ -1,4 +1,4 @@
-import {planZone} from './zone.ts';
+import {planZone,zoneCovered} from './zone.ts';
 import {analysis,position,config,activeRule,type ScenarioType} from './model.ts';
 import {alignment,classifyBlitz,resolvedAssignments} from './tactics.ts';
 import {planProtection} from './protection.ts';
@@ -8,7 +8,8 @@ export function inspectScenario(input:ScenarioType){
  const team=input.zone?.enabled?planZone(input):input.protection?.enabled?planProtection(input):null,s=team?.scenario??input;
  const base=analysis(s),ol=s.players.filter(p=>p.side==='OFF'&&['LT','LG','C','RG','RT'].includes(p.pos));
  const defenders=s.players.filter(p=>p.side==='DEF').map(p=>{const a=alignment(s,p.at[0]),action=s.actions.find(a=>a.player===p.id);return {id:p.id,position:p.pos,technique:p.pos==='DL'?a.technique:null,nearestOL:a.nearest,gap:action?.gap??a.gap,action:action?.label??null,alignment:p.at}});
- const covered=ol.map(p=>({player:p.id,covered:defenders.some(d=>d.position==='DL'&&d.nearestOL===p.id&&Math.abs(d.alignment[0]-p.at[0])<config(s).shoulder*1.5)}));
+ const coveredIDs=s.zone?.enabled?zoneCovered(s):null;
+ const covered=ol.map(p=>({player:p.id,covered:coveredIDs?coveredIDs.has(p.id):defenders.some(d=>d.position==='DL'&&d.nearestOL===p.id&&Math.abs(d.alignment[0]-p.at[0])<config(s).shoulder*1.5)}));
  const blitz=classifyBlitz(s),detectedBlitz=team?s.blitz:blitz.blitz;
  // Team protection has concrete assignments. Generic nearest-man rules must not claim an unassigned DL is blocked.
  const assignments:Resolved[]=team?team.assignments.map(a=>({...a,role:a.player,targets:[...new Set([a.target,a.release,...(a.watchTargets??[])])].filter((id):id is string=>!!id),present:true})):resolvedAssignments(s,detectedBlitz);

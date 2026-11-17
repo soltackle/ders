@@ -52,9 +52,9 @@ Aktif senaryodan **Field zone · Inside / Outside** seçin. Sahanın altındaki 
 
 3–4 / 4–3 / 5 / 6 DL front’ları, DL teknikleri, elle yerleşim, sağ/sol/orta/iki dış blitz ve gösterme seçenekleri burada da kullanılabilir. DL için base, field/boundary slant, pinch, widen ve twist; LB için fit, flow, scrape, sail, bait ve hold seçilir. Oyuncu bazında reaksiyon genel ayarı değiştirmeden ayrıştırılabilir.
 
-Oynat, ileri zone adımı, covered DL eşleşmesi, uygun uncovered komşuyla combo, kontrollü temas sonrasında LB’ye climb ve backside cutoff üretir. RB handoff sonrası koşucudur; bang/bend/bounce elle seçilir veya gerçek blok yollarına göre geometrik koridor önerisi kullanılır. Sayı fazlası savunmacı **blok dışı / takip** olarak gösterilir. RB blokçu sayılmaz.
+Covered OL başlangıçta karşısındaki adamı alır ve adamında kalır. Uncovered OL yalnız zone yönündeki komşusuna gerekiyorsa kısa combo yardımı yapıp ikinci seviyeye çıkar; yardım gerekmiyorsa doğrudan çıkar. Oynat, bu kuralı inside ve outside zone’da ileri zone adımı, climb ve backside cutoff ile uygular. Covered/uncovered durumu oyuncu kartlarında görünür. RB handoff sonrası koşucudur; bang/bend/bounce elle seçilir veya gerçek blok yollarına göre geometrik koridor önerisi kullanılır. Sayı fazlası savunmacı **blok dışı / takip** olarak gösterilir. RB blokçu sayılmaz.
 
-Bu yeni koşu oyunu takımın henüz tarif etmediği ayrıntılar için **koç tarafından düzenlenebilir standart zone taslağıdır**. Takıma özel combo/devir ve RB okuma kuralları olarak kabul edilmemelidir. [Uygulanan zone kuralları ve sınırlar](docs/FIELD-ZONE.md).
+Covered/uncovered paylaşımı kullanıcının tarif ettiği takım kuralını uygular. Yardımın erişilebilirliği ve ikinci seviye LB seçimi konumlara göre hesaplanır; özel stunt devirleri ve RB okumaları ayrıca düzenlenebilir. [Uygulanan zone kuralları ve sınırlar](docs/FIELD-ZONE.md).
 
 ## Doğrulama sınırları
 

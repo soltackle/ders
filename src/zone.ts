@@ -7,7 +7,7 @@ import {
   type ActionType,
   type PlayerType,
 } from "./model.ts";
-import { matchDefenders } from "./front-matching.ts";
+import { shoulderDistance } from "./techniques.ts";
 import { alignment } from "./tactics.ts";
 import { frontLabel } from "./protection.ts";
 import type { DefenseCoverage } from "./protection.ts";
@@ -28,6 +28,8 @@ export type ZoneAssignment = {
     | "carry"
     | "watch"
     | "handoff";
+  covered?: boolean;
+  secondLevel?: boolean;
   note: string;
 };
 export type ZoneResult = {
@@ -84,14 +86,41 @@ export function createFieldZone(input: ScenarioType) {
       start: 0,
       end: 6,
       description:
-        "Standart, düzenlenebilir zone taslağı. Savunmayı yerleştir; inside/outside, slant ve LB reaksiyonunu seç.",
+        "Takım zone kuralı: covered kendi adamı; uncovered field yardım ve ikinci seviye. Savunmayı yerleştir; inside/outside, slant ve LB reaksiyonunu seç.",
       notes: {},
       focus: [],
     },
   ];
   s.rules = [];
-  s.playbook = "Field zone · koç tarafından düzenlenebilir standart taslak";
+  s.playbook = "Takım field zone · covered / uncovered";
   return Scenario.parse(s);
+}
+// Covered is a pre-snap alignment, not the closest defender after a slant.
+export function zoneCovered(s: ScenarioType) {
+  const ol = s.players.filter(
+    (p) => p.side === "OFF" && ["LT", "LG", "C", "RG", "RT"].includes(p.pos),
+  );
+  const radius = shoulderDistance(s) * 1.5;
+  const result = new Map<string, string>();
+  for (const p of ol) {
+    const defender = s.players
+      .filter(
+        (d) =>
+          d.side === "DEF" &&
+          d.pos === "DL" &&
+          d.intent !== "hold" &&
+          alignment(s, d.at[0]).nearest === p.id &&
+          Math.abs(d.at[0] - p.at[0]) <= radius + 1e-6,
+      )
+      .sort(
+        (a, b) =>
+          Math.abs(a.at[0] - p.at[0]) - Math.abs(b.at[0] - p.at[0]) ||
+          a.at[1] - b.at[1] ||
+          a.id.localeCompare(b.id),
+      )[0];
+    if (defender) result.set(p.id, defender.id);
+  }
+  return result;
 }
 export function planZone(input: ScenarioType): ZoneResult {
   const s = structuredClone(input),
@@ -193,6 +222,14 @@ export function planZone(input: ScenarioType): ZoneResult {
                 ? [p.at[0] + sign * 1.2, 2.8]
                 : [p.at[0] + sign * 0.35, 2.7];
     }
+    // A fitting LB occupies a separate lane from a teammate's declared inside blitz.
+    if (p.pos !== "DL" && r === "fit")
+      for (const other of lbs.filter(
+        (lb) => lb.id !== p.id && reaction(lb) === "blitz",
+      )) {
+        if (Math.abs(to[0] - other.at[0]) < 0.7)
+          to[0] = other.at[0] + Math.sign(p.at[0] - other.at[0] || sign) * 0.8;
+      }
     actions.push({
       source: "zone",
       player: p.id,
@@ -208,10 +245,12 @@ export function planZone(input: ScenarioType): ZoneResult {
       ...p,
       at: position({ ...s, actions }, p.id, fit),
     })),
-    base = matchDefenders(ol, projected);
+    base = zoneCovered(s);
   const assignments: ZoneAssignment[] = ol.map((p) => ({
     player: p.id,
     target: base.get(p.id),
+    covered: base.has(p.id),
+    secondLevel: !base.has(p.id),
     type:
       (p.at[0] - center) * sign < -0.1
         ? "cutoff"
@@ -232,28 +271,29 @@ export function planZone(input: ScenarioType): ZoneResult {
   for (const p of [...ol].sort((a, b) => b.at[0] * sign - a.at[0] * sign)) {
     const a = assignments.find((a) => a.player === p.id)!;
     if (a.target) continue;
-    const adjacent = assignments
-      .filter(
-        (a) =>
-          base.has(a.player) &&
-          a.target &&
-          ol.some(
-            (q) => q.id === a.player && Math.abs(q.at[0] - p.at[0]) <= 1.5,
-          ) &&
-          !assignments.some((x) => x.partner === a.player),
-      )
-      .sort((a, b) => {
-        const pa = ol.find((q) => q.id === a.player)!,
-          pb = ol.find((q) => q.id === b.player)!;
-        return (pa.at[0] - p.at[0]) * sign >= 0 &&
-          (pb.at[0] - p.at[0]) * sign < 0
-          ? -1
-          : Math.abs(pa.at[0] - p.at[0]) - Math.abs(pb.at[0] - p.at[0]);
-      })[0];
+    // Only the immediate teammate in the direction of the zone may receive help.
+    const playside = ol
+      .filter((q) => (q.at[0] - p.at[0]) * sign > 0)
+      .sort(
+        (x, y) => Math.abs(x.at[0] - p.at[0]) - Math.abs(y.at[0] - p.at[0]),
+      )[0];
+    const adjacent = assignments.find(
+      (candidate) =>
+        candidate.player === playside?.id &&
+        candidate.covered &&
+        candidate.target &&
+        !assignments.some((x) => x.partner === candidate.player) &&
+        Math.abs(
+          (projected.find((d) => d.id === candidate.target)?.at[0] ??
+            Infinity) - p.at[0],
+        ) <= 1.65,
+    );
     const backer = activeLB
       .filter(
         (lb) =>
           !usedLB.has(lb.id) &&
+          (position({ ...s, actions }, lb.id, fit)[0] - p.at[0]) * sign >=
+            -0.3 &&
           Math.abs(
             position({ ...s, actions }, lb.id, fit)[0] -
               (projected.find((d) => d.id === adjacent?.target)?.at[0] ??
@@ -273,10 +313,22 @@ export function planZone(input: ScenarioType): ZoneResult {
         a.release = backer.id;
         usedLB.add(backer.id);
       }
-    } else if (backer) {
-      a.target = backer.id;
+    } else {
+      a.target = backer?.id;
       a.type = "climb";
-      usedLB.add(backer.id);
+      if (backer) usedLB.add(backer.id);
+    }
+  }
+  const blockedBlitz = new Map<string, ActionType>();
+  // A blocked LB blitz meets the forward zone step instead of passing through it.
+  for (const a of assignments.filter((a) => a.secondLevel)) {
+    const lb = a.release ?? (a.type === "climb" ? a.target : undefined);
+    const rush = actions.find(
+      (x) => x.player === lb && x.source === "zone" && x.label === "blitz",
+    );
+    if (rush) {
+      rush.to[1] = 0.8;
+      blockedBlitz.set(lb!, rush);
     }
   }
   const owns = (id: string) => assignments.filter((a) => a.target === id);
@@ -301,12 +353,32 @@ export function planZone(input: ScenarioType): ZoneResult {
     ]);
     a.note =
       a.type === "combo"
-        ? `${a.partner} ile ${a.target} combo. ${a.release ? `DL kontrol altına alınınca ${a.release} için ikinci seviyeye çık.` : "Aktif LB yok; DL’de combo ve bölge kontrolünü sürdür."}`
+        ? `UNCOVERED: zone yönündeki ${a.partner} ile ${a.target} combo. ${a.release ? `DL kontrol altına alınınca ${a.release} için ikinci seviyeye çık.` : "Kısa yardımdan sonra ikinci seviyeye çık ve bölgedeki LB’yi ara."}`
         : a.type === "climb"
-          ? `Önünde DL yok: ${a.target} ikinci seviyesine çık.`
+          ? `UNCOVERED: zone yönünde yardım gerekmiyor; doğrudan ikinci seviyeye çık${a.target ? ` ve ${a.target}’yi al` : "; bölgedeki LB’yi ara"}.`
           : a.target
-            ? `${alignment(s, s.players.find((q) => q.id === a.target)!.at[0]).technique} hizasındaki ${a.target}: ${a.type === "cutoff" ? "backside cutoff; arkadan takibi kes" : cfg.variant === "outside" ? "playside omuz için reach ve geniş akış" : "field zone adımı, denge ve ileri drive"}.`
+            ? `COVERED: ${alignment(s, s.players.find((q) => q.id === a.target)!.at[0]).technique} hizasındaki kendi adamın ${a.target}: ${a.type === "cutoff" ? "backside cutoff; arkadan takibi kes" : cfg.variant === "outside" ? "playside omuz için reach ve geniş akış" : "field zone adımı, denge ve ileri drive"}.`
             : "Zone bölgeni koru ve LB akışını oku.";
+  }
+  const climbPoints = new Map<string, [number, number]>();
+  for (const a of assignments.filter((a) => a.secondLevel)) {
+    const p = ol.find((p) => p.id === a.player)!,
+      target = a.release ?? (a.type === "climb" ? a.target : undefined),
+      at = target
+        ? blockedBlitz.has(target)
+          ? [blockedBlitz.get(target)!.to[0], 2.7]
+          : position({ ...s, actions }, target, fit)
+        : null;
+    const to: [number, number] = at
+      ? [at[0] + (p.at[0] < at[0] ? -0.15 : 0.15), at[1] - 0.55]
+      : [p.at[0] + sign * (cfg.variant === "outside" ? 0.65 : 0.45), 2.15];
+    climbPoints.set(p.id, to);
+    // With no combo to perform the second-level path begins straight after the first step.
+    if (a.type === "climb")
+      endPoints.set(
+        p.id,
+        target && blockedBlitz.has(target) ? [to[0], 0.75] : to,
+      );
   }
   // Stretch the phase, never a player's speed, for unusually wide manual alignments.
   for (const a of assignments) {
@@ -325,11 +397,10 @@ export function planZone(input: ScenarioType): ZoneResult {
   for (const a of assignments) {
     const p = ol.find((p) => p.id === a.player)!,
       from = endPoints.get(p.id)!,
-      target = a.release ?? (a.type === "climb" ? a.target : undefined),
-      at = target ? position({ ...s, actions }, target, fit) : null,
-      to = at
-        ? [at[0] + (p.at[0] < at[0] ? -0.15 : 0.15), at[1] - 0.55]
-        : [from[0] + sign * (cfg.variant === "outside" ? 0.95 : 0.45), 1.35];
+      to = climbPoints.get(p.id) ?? [
+        from[0] + sign * (cfg.variant === "outside" ? 0.95 : 0.45),
+        1.35,
+      ];
     driveEnd = Math.max(
       driveEnd,
       secured +
@@ -376,19 +447,13 @@ export function planZone(input: ScenarioType): ZoneResult {
       target: a.target,
       gaze: a.release ?? a.target,
     });
-    if (a.release || a.type === "climb") {
-      const target = a.release ?? a.target;
-      const at = target
-        ? position({ ...s, actions }, target, fit)
-        : [p.at[0], 2];
-      const toLB: [number, number] = [
-        at[0] + (p.at[0] < at[0] ? -0.15 : 0.15),
-        at[1] - 0.55,
-      ];
+    if (a.secondLevel) {
+      const target = a.release ?? (a.type === "climb" ? a.target : undefined);
+      const toLB = climbPoints.get(p.id)!;
       actions.push({
         source: "zone",
         player: p.id,
-        label: "climb",
+        label: a.type === "climb" ? "zone-drive" : "climb",
         assignment: "zone",
         start: secured,
         end: driveEnd,
@@ -433,6 +498,34 @@ export function planZone(input: ScenarioType): ZoneResult {
         target: a.target,
       });
     }
+  }
+  for (const [id, rush] of blockedBlitz) {
+    actions.push(
+      {
+        source: "zone",
+        player: id,
+        label: "block-resist",
+        start: fit,
+        end: secured,
+        to: [rush.to[0], 1.3],
+      },
+      {
+        source: "zone",
+        player: id,
+        label: "block-resist",
+        start: secured,
+        end: driveEnd,
+        to: [rush.to[0], 2.7],
+      },
+      {
+        source: "zone",
+        player: id,
+        label: "block-resist",
+        start: driveEnd,
+        end: finish,
+        to: [rush.to[0], 2.7],
+      },
+    );
   }
   for (const defender of dl) {
     if (
@@ -646,7 +739,7 @@ export function planZone(input: ScenarioType): ZoneResult {
         detail: blockers
           .map(
             (a) =>
-              `${a.player} · ${a.release === p.id ? "combo sonrası climb" : a.type}`,
+              `${a.player} · ${a.release === p.id ? "combo sonrası climb" : a.type === "combo" ? "ilk temas yardımı → ikinci seviye" : a.type}`,
           )
           .join(", "),
         status:
@@ -661,14 +754,14 @@ export function planZone(input: ScenarioType): ZoneResult {
     });
   s.actions = actions;
   s.playbook =
-    "Standart field zone taslağı · koç kurallarına göre düzenlenebilir";
+    "Takım field zone · covered kendi adamı / uncovered field yardım → ikinci seviye";
   s.blitz = "none";
   s.rules = [
     {
       id: "field-zone",
       blitz: "none",
       title: `Field ${cfg.variant} zone`,
-      note: "Covered OL DL’sini alır; uygun komşu uncovered OL combo kurar ve kontrol sonrası LB’ye çıkar. Backside cutoff, RB field okuması. Takıma özel kurallar ayrıca düzenlenmelidir.",
+      note: "Covered OL başlangıçta karşısındaki DL’yi alır ve adamında kalır. Uncovered OL yalnız zone yönündeki komşusuna gerekiyorsa yardım eder, sonra ikinci seviyeye çıkar; yardım gerekmiyorsa doğrudan ikinci seviyeye çıkar. Backside cutoff, RB field okuması.",
       assign: Object.fromEntries(
         assignments
           .filter((a) => a.type !== "carry")
@@ -694,7 +787,7 @@ export function planZone(input: ScenarioType): ZoneResult {
       title: "Front / covered–uncovered oku",
       start: 0,
       end: snap,
-      description: `${frontLabel(s)}. Field ${sign > 0 ? "sağ" : "sol"}. Standart, koç tarafından düzenlenebilir zone taslağı.`,
+      description: `${frontLabel(s)}. Field ${sign > 0 ? "sağ" : "sol"}. Covered kendi adamını alır; uncovered field yönünde yardım veya doğrudan ikinci seviye.`,
       notes,
       focus: dl.map((p) => p.id),
       calls: s.players.some((p) => p.id === "C")
@@ -726,7 +819,7 @@ export function planZone(input: ScenarioType): ZoneResult {
       title: "Drive / LB’ye climb / RB okuması",
       start: secured,
       end: driveEnd,
-      description: `Covered oyuncu DL’de kalır, uygun yardımcı LB’ye çıkar. RB: ${read}`,
+      description: `Covered oyuncu kendi DL’sinde kalır. Uncovered, zone yönündeki yardımdan sonra veya doğrudan ikinci seviyeye çıkar. RB: ${read}`,
       notes,
       focus: activeLB.map((p) => p.id),
     },

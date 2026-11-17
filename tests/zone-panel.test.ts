@@ -60,6 +60,14 @@ test("zone paylaşım tablosu RB’yi taşıyıcı, QB’yi mesh olarak ve ekstr
     root.querySelector('[data-blocker="QB"]')!.textContent!,
     /HANDOFF/,
   );
+  assert.match(
+    root.querySelector('[data-blocker="C"] small')!.textContent!,
+    /^UNCOVERED/,
+  );
+  assert.match(
+    root.querySelector('[data-blocker="RG"] small')!.textContent!,
+    /^COVERED/,
+  );
   assert.match(root.textContent!, /BLOK DIŞI \/ TAKİP/);
   assert.ok(!root.textContent!.includes("HOT"));
   assert.ok(!root.textContent!.includes("ALERT"));

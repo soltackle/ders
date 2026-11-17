@@ -1,12 +1,13 @@
 # Field zone
 
-Kullanıcının isteğiyle pas korumasından ayrı yeni field zone senaryosu eklendi. **Inside** ve **outside/stretch** seçilebilir. Takıma özel zone kuralları henüz tarif edilmediği için varsayılan davranış koç tarafından düzenlenebilir standart taslak olarak etiketlenir.
+Kullanıcının isteğiyle pas korumasından ayrı yeni field zone senaryosu eklendi. **Inside** ve **outside/stretch** seçilebilir. Kullanıcının tarif ettiği takım kuralı iki zone türünde de uygulanır: covered kendi adamını alır; uncovered, zone yönünde gerekiyorsa yardım edip ardından ikinci seviyeye çıkar.
 
 ## Oyuncu paylaşımı
 
-- Beş OL ile savunmanın DL’leri yanal konumlara göre, tüm DL’ler değerlendirilerek eşleştirilir. Slant/stunt ile temas noktasındaki konum değişimi hesaba katılır.
-- DL’si olan OL adamını tutar. Önü açık OL, en fazla bir komşu asıl blokçunun DL’sine combo yardımcısı olur. Bir yardımcı ikinci bir yardımcıya bağlanmaz.
-- Yakın bölgesinde aktif LB varsa yardımcı, kontrollü temas aşamasından sonra LB’ye çıkar. Asıl blokçu DL’de kalır. Yardımcı uzaktaki dış blitz uğruna bütün hattı geçmez.
+- Covered/uncovered snap öncesindeki baş/omuz hizasından belirlenir. Covered OL kendi DL’sinde kalır; slant veya twist sonrası en yakın savunmacıya göre başka adama geçirilmez. Aynı OL çevresinde iki DL varsa en yakın adamı alır; kalan tehdit blok dışı gösterilir.
+- Uncovered OL yalnız zone yönündeki ilk komşusuna bakar. Komşu covered ise, DL yardım mesafesindeyse kısa combo yapar. Ters yöndeki komşuya dönmez ve açık komşuyu atlayıp uzaktaki adama koşmaz. Bir yardımcı ikinci yardımcıya bağlanmaz.
+- Yardım gerekiyorsa kontrollü temas sonrasında ikinci seviyeye çıkar. Yardım gerekmiyorsa ilk zone adımından sonra doğrudan çıkar. Bölgede aktif LB varsa onu alır; hedef LB bulunmasa bile ikinci seviyeye çıkar ve bölgesini okur. Covered blokçu DL’de kalır. Uzak dış blitz için bütün hat geçilmez.
+- Yardımın gerekip gerekmediği, temas anındaki DL’ye erişim mesafesinden hesaplanır. Bu geometrik eşik ve yakın LB seçimi uygulamanın taslak ayrıntılarıdır; takımın açıklamadığı özel combo çağrıları değildir. Bloke edilen iç blitz, ileri adımla karşılanıp ikinci seviyeye drive edilir; diğer fit LB’si aynı blitz koridorunu işgal etmez.
 - Backside OL cutoff yapar; outside ilk adımı daha geniştir ve playside omuza reach hedefler. İç zone daha kısa yanal adım ve ileri drive kullanır.
 - QB snap/mesh/handoff ve fake, RB ise mesh/okuma/carry yapar. RB, koşu senaryosunda altıncı blokçu sayılmaz. Beşten fazla DL veya kapatılamayan LB’ler blok dışı takipçi olarak görünür; pas korumasındaki QB hot kuralı uygulanmaz.
 
@@ -24,6 +25,6 @@ OL zone adımı öne gider; pas seti geri adımı kullanılmaz. Combo sonrasınd
 
 ## Sınırlar ve doğrulama
 
-Otomatik temel paylaşım standart covered/uncovered eğitim taslağıdır. Takımın Ace/Deuce/Trey iletişimi, TE/WR blokları, bütün stunt devirleri, özel LB fitleri, gerçek tackle ve güç fiziği tanımlı değildir. Özel yerleşimlerde olası yol çakışmaları analizde gösterilir.
+Covered/uncovered paylaşımı tarif edilen takım kuralıdır; konuma dayalı erişim ve LB hedef seçimi düzenlenebilir eğitim ayrıntılarıdır. Takımın Ace/Deuce/Trey iletişimi, TE/WR blokları, bütün stunt devirleri, özel LB fitleri, gerçek tackle ve güç fiziği tanımlı değildir. Özel yerleşimlerde olası yol çakışmaları analizde gösterilir.
 
-Otomatik testler her iki zone türünü, iki hash yönünü, 3–4/4–3/5/6 DL ve tüm blitz seçeneklerini kapsar. Ayrıca DL/LB reaksiyonları, combo sahibi–yardımcı ayrımı, RB hızları, teknik seçimi, manuel yollar, kütüphane kaydı, panel seçimleri ve sahnedeki top konumu doğrulanır. DOM ve Three.js sahne hesapları GPU ekran görüntüsüyle yapılan görsel incelemenin yerini tutmaz.
+Otomatik testler her iki zone türünü, iki hash yönünü, 3–4/4–3/5/6 DL ve tüm blitz seçeneklerini kapsar. Ayrıca slant/twist boyunca covered adamının korunması, yalnız zone yönünde yardım, yardımsız doğrudan çıkış, hedef LB bulunmadan da ikinci seviyeye çıkış, DL/LB reaksiyonları, combo sahibi–yardımcı ayrımı, RB hızları, teknik seçimi, manuel yollar, kütüphane kaydı, panel seçimleri ve sahnedeki top konumu doğrulanır. DOM ve Three.js sahne hesapları GPU ekran görüntüsüyle yapılan görsel incelemenin yerini tutmaz.
