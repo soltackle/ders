@@ -4,13 +4,13 @@ Bu tablo uygulanan davranışları izler. Görsel kalite iddiası veya fotogerç
 
 | Plan alanı | Uygulama |
 |---|---|
-| JSON şema, üç başlangıç Case’i | Zod; 4i, fazlı trap ve field blitz örnekleri |
+| JSON şema, üç başlangıç Case’i | Zod; takım pas koruması, 3–4 / 4–3 ve 5/6 kişilik hat seçenekleri |
 | Zaman tabanlı oynatıcı | Saf konum/poz hesapları, spline, ileri/geri sarma, adım, yavaş çekim, loop |
 | Üç görünüm | Ortografik tahta, arkadan orbit, oyuncu POV; yumuşak geçiş, HUD, mini harita, eller/top |
 | Alan ve diziliş | Hash/field/boundary; 5 OL + DL/LB; oyuncu ekleme/silme, snap ve teknik/gap etiketleri |
 | Görsel hareket editörü | Yol noktası ekleme, düğüm taşıma, aksiyon/atama etiketleri, pull/trap şablonu ve fazları |
 | Adım editörü | Zaman, not, odak halkası, snap öncesi çağrı okları; ekleme/silme |
-| Playbook | Field/boundary rolleri, man/gap/zone/slide/pull/combo/pass-off/pickup/watch; kural düzenleme ve Case üretimi |
+| Playbook | Field/boundary rolleri; boundary man önceliği; ALERT ve big-on-big; OL + RB adam paylaşımı; kural düzenleme ve Case üretimi |
 | Senaryo yönetimi | Undo/redo; JSON aktarımı; otomatik tarayıcı kaydı; şema/Case aramalı kütüphane |
 | Analiz | Teknik/gap, covered OL, rush sayıları, blitz, rol hedefleri, free rusher, overload, trap, pull boşluğu, çakışma |
 | AI | 2D PNG içeren paket; kullanıcı servis/anahtarıyla soru ve senaryo üretimi; şema doğrulama, öneri önizleme/kabul |

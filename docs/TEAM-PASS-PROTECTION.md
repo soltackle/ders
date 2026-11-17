@@ -1,41 +1,74 @@
-# Takım pas koruması — ilk ofans şablonu
+# Takım pas koruması
 
-## Kullanım
+## Saha ve savunma seçenekleri
 
-1. Sol menüde **Takım pas koruması · otomatik** seçin. Tasarla / 2D tahta açılır.
-2. Takım pas koruması panelinden 3, 4 veya 5 DL başlangıç front’unu seçin. Bu düğmeler savunmayı yeniler; daha sonra oyuncuları istediğiniz tekniklere sürükleyin.
-3. Bir LB / savunmacı seçip oyuncu panelindeki `intent` alanını kaydedin: `auto` yerleşim/manuel hareket, `blitz` gerçek blitz, `show` sadece blitz gösterme, `hold` bekleme. `auto` LB LOS’un 1.8 yard yakınına geldiğinde tehdit sayılır; derindeki LB izlenir, kendiliğinden blitz yaptırılmaz.
-4. RB varsa kutuyu işaretleyin; yoksa kaldırın. Topun hash’i field/boundary’yi belirler; ortada field yönü elle seçilir.
-5. **Oynat** atamaları o anki yerleşimden yeniden üretir ve korumayı baştan sona oynatır. **Sonraki** adım adım izletir. Oyuncu notu ve HUD kimin kimi aldığını gösterir. **Atamaları hesapla** animasyonu başlatmadan atama listesini açar.
+- **3–4:** 3 DL + 4 LB.
+- **4–3:** 4 DL + 3 LB.
+- **5 kişilik hat:** 5 DL + 2 LB başlangıcı.
+- **6 kişilik hat:** 6 DL + 1 LB başlangıcı.
 
-## Takım kuralı
+Diziliş seçimi hazır DL/LB yerleşimini yükler; sonra oyuncuları istediğiniz tekniklere sürükleyin. Seçilmiş sağ/sol/orta veya iki dış blitz yeni front’ta korunur. Blitz düğmeleri DL konumlarını değiştirmez. İki dış blitz için LB sayısı yetersizse ikinci LB eklenir; tabloda gerçek personel ve tehdit sayısı gösterilir.
 
-- Dış **field** blitz gösterilirse FT tehdide kayar ve **ALERT** çağırır. FG tackle’ın DL’ine, C guard’ın DL’ine geçer. Boundary tarafı kendi adam paylaşımında kalır. Field soldaysa zincir aynalanır.
-- Dış **boundary** blitz OL hedefi yapılmaz. RB varsa RB pickup yapar. RB yoksa QB hot tehdidi gözetir; QB’nin gözetmesi blok sayılmaz.
-- **İç tehditte** C guard’larla LB kimliğini paylaşır. Uygun 1-tech eşleşmesinde C ilgili guard ile combo yapar ve arkadaki LB’yi gözetir. Gerçek iç blitz’te C LB’ye çıkar, guard DL’de kalır. Sadece gösteren LB’ye otomatik çıkılmaz.
-- **3/4/5 DL** için temel DL paylaşımı konuma göre tekil eşleşmeyle kurulur. Serbest OL yardım edebilir; bir DL’nin yanlışlıkla iki ayrı bağımsız man bloğu olması önlenir. Combo açıkça işaretlenir.
+Hash, field/boundary yönünü belirler. Orta hash’te field yönü elle seçilir. Sağ/sol hücumun kendi bakış açısına göredir.
 
-## Uygulama kararları ve sınırlar
+Oyuncu niyeti: `auto` yerleşime/manuel yola göre; `blitz` gerçek blitz; `show` yalnız gösterme; `hold` bekleme. Otomatik LB LOS’un 1.8 yard yakınına geldiğinde tehdit sayılır. Derindeki LB kendiliğinden blitz yapmaz. RB kutusu arka alandaki blokçuyu ekler/kaldırır.
 
-- 1-tech yoksa var olan DL eşleşmesi korunur; serbest C iç tehdidi alır. 1-tech combo’su için guard başka DL’ye mecbursa, o DL sessizce boş bırakılmaz; uyarı gösterilir.
-- 5 DL + dış field blitz gibi sayı fazlasında, kural zincirinin açık bıraktığı rusher belirtilir. Uygulama beş OL’un altı adamı bloke ettiğini iddia etmez veya tanımlanmamış RB iç-yardım kuralı eklemez.
-- Birden fazla ek dış tehdit varsa ilk dış tehdit alınır; diğerleri açık rusher uyarısında yer alır.
-- Savunma oyuncularının yazar tarafından girilen başlangıç konumları korunur. Manuel savunma yolları `auto` niyetinde korunur; `show`/`hold` bunları bastırır. Önceki otomatik yollar sonraki hesaplamada yeniden üretilir.
-- Bu şablon yerel ve deterministiktir; AI anahtarı gerektirmez. Fizik motoru değildir, atama ve hareket öğreticisidir.
+## Adam paylaşımı — öncelik sırası
 
-## Savunma seçenekleri ve pas seti
+1. Boundary guard ve tackle’ın kendi taraflarındaki DL’leri önce eşleştirilir. Bu eşleşmeler field kayması için tekrar dağıtılmaz.
+2. Kalan DL’ler C / field guard / field tackle ve serbest blokçulara konumlarına göre paylaşılır. Fazladan DL varsa ilk beşi alıp sonuncuyu yok saymak yerine tüm DL’ler değerlendirilir.
+3. Seçilen koruma kuralı uygulanır. Eksik atama veya gerçek sayı fazlası tabloda açıkça görünür. QB’nin gözetimi blok değildir.
 
-Sahanın üstündeki **Savunma seçenekleri** bölümünde Blitz yok, Sol blitz, Orta blitz, Sağ blitz düğmeleri vardır. Sağ/sol hücumun kendi yönleridir; field/boundary karşılığı hash’e göre yanında gösterilir. Gerçek blitz veya sadece göster seçilebilir. Bu seçimler DL yerleşimini korur, seçilen LB tehdidini düzenler. Özel çoklu tehdit için LB’ler elle düzenlenebilir.
+### Normal field dış blitz
 
-Pas koruması animasyonunda OL gövdesi koşu yönüne dönmez; tehdide dönük kalır. Kick–slide–square aşamasından sonra ellerle temas ve anchor/blokta kalma gösterilir. Bir ayak kick atarken diğeri yere basar; temas sırasında dizler kırık ve ayaklar kademelidir.
+Daha hafif front’ta FT dış field tehdidine kayar ve **ALERT** çağırır. FG tackle’ın DL’sine, C field guard’ın DL’sine geçer. **Boundary guard ve tackle kendi DL’lerini bırakmaz.** C’nin field tarafında alacağı iç DL yoksa dış DE’ye kadar koşmaz; field A-gap bölgesini veya gelen iç tehdidi kontrol eder.
 
-Uygulamanın başlangıç senaryolarında ve eski tarayıcı kayıtlarında artık yalnız pas koruması tutulur. Trap ve bağımsız 4i başlangıç senaryoları kaldırılmıştır; mevcut pas koruması DL yerleşimleri korunur.
+Varsayılan 4–3 + sağ field blitz örneği:
 
-## Eğitim temposu ve hareket hızı
+| Blokçu | Sorumluluk |
+|---|---|
+| LT | DL1 · boundary man |
+| LG | DL2 · boundary man |
+| C | DL3 · field slide |
+| RG | DL4 · field slide |
+| RT | SAM · dış field blitz, ALERT |
 
-- İlk açılışta **0.5× Eğitim** seçilir. 0.25×, 0.75×, 1× ve 1.5× de seçilebilir; tercih tarayıcıda saklanır.
-- Senaryo süresi sabit 2.8 saniyeye sıkıştırılmaz. Hazırlık, mesafeye bağlı pas seti/karşılama, temas ve son blok kontrolü ayrı aşamalardır. Varsayılan hazır seçenekler eğitim hızında yaklaşık 12–16 saniye sürer; daha uzak bir RB’nin yolu uzarsa süre de uzar.
-- RB kontrollü koşuyla yaklaşır, temas öncesi gather yapar ve blokta kalır. Otomatik RB yolunun senaryo zamanındaki tepe hızı en fazla 3 yard/sn olacak şekilde süre hesaplanır. Bu bir eğitim temposudur; ölçülmüş oyuncu performansı iddiası değildir.
-- Eğri yolun hızı waypoint sayısına göre değil, gerçek yol mesafesine göre hesaplanır. Uzun bir parçada ani sıçrama oluşmaz.
-- Blokta kalma aşaması son pickup’tan sonra da sürer. Tam oyun Loop, son adımı değil ID aşamasından bütün korumayı tekrarlar. Animasyon bittikten sonra Oynat yeniden başlatır.
-- Dış blitz’in temas koridoru tackle’dan ayrıdır. Combo yardımlarında ve dar iç korumada OL sırası ve oyuncu aralıkları korunur.
+Field soldaysa kural aynalanır. Sağ/sol saha ismine sabitlenmez.
+
+### Boundary dış blitz
+
+Normal kuralda OL bu tehdide dokunmaz. RB varsa karşılar; RB yoksa QB hot tehdidini gözetir. Field ve boundary’den birlikte gelen baskıda field zinciri ve RB görevi birlikte uygulanır.
+
+### İç blitz ve C–guard iletişimi
+
+C guard’larla LB kimliğini paylaşır. Uygun 1-tech eşleşmesinde C ilgili guard ile combo yapar ve LB’yi gözetir. Gerçek iç blitz’te C ayrılır, guard 1-tech’te kalır. C veya guard başka bir DL’ye bağlıysa o DL boş bırakılarak combo yapılmaz. Serbest blokçu kendi bölgesindeki ek iç tehdidi alır. RB altı kişilik korumada kalan iç/field tehdidini de tamamlar.
+
+### Big-on-big — kalabalık 5/6 DL hatları
+
+5 veya daha fazla DL bulunan hatta en az altı tehdit olduğunda **BIG ON BIG** uygulanır:
+
+- OL kendi bölgesindeki DL’yi başka blitz uğruna bırakmaz.
+- Serbest OL ve RB önce sahipsiz DL’leri, ardından ek LB/rusher’ları bölgelerine göre paylaşır.
+- **5 DL + 1 LB:** beş OL DL’lerde, RB ek LB’de.
+- **6 DL:** beş OL beş DL’de, RB altıncı DL’de. Altıncı DL listeden düşmez.
+- **6 DL, RB yok:** beş DL bloke edilir; bir gerçek serbest rusher QB hot/gözetiminde gösterilir.
+- **6 DL + 1 gerçek LB blitz:** OL + RB altı kişiyi paylaşır, yedinci tehdit açıkça gösterilir.
+- **6 DL + 2 gerçek LB blitz:** sekiz tehdit vardır; altı blokçu ile iki kişi serbest kalır. İkisi de tabloda ve QB notunda görünür.
+
+Bir LB yalnız gösteriyorsa gerçek rusher sayılmaz; açık bir DL bırakılıp RB’nin yalnız blöfe gitmesi önlenir. Daha hafif 3–4 / 4–3 front’larda klasik field zinciri ve C–guard ID korunur; altı kişilik korumada RB ek iç/field tehdidini tamamlar.
+
+## Görünür dağılım ve oynatma
+
+Sahanın altındaki **Adam paylaşımı** tablosu, Oynat’a basmadan da her DL/LB’nin sorumlusunu gösterir. Boundary eşleşmeleri ayrıca işaretlidir. Combo sonrası LB’ye çıkış ve QB’nin yalnız gözetmesi açıkça yazılır. Gerçek serbest rusher turuncu HOT satırıdır.
+
+**Oynat** mevcut yerleşimden korumayı hesaplar ve tüm aşamaları oynatır. **Sonraki** adım adım izletir. Oyuncuyu seçerek notunu ve POV’ını inceleyin. Kayıtlı savunma konumları korunur; eski otomatik hareketler her hesaplamada yeniden üretilir.
+
+## Tempo ve animasyon
+
+İlk açılışta **0.5× Eğitim** seçilir. 0.25× / 0.75× / 1× / 1.5× de kullanılabilir; tercih saklanır. Yol uzadıkça süre uzar; RB sabit kısa sürede uzun mesafeyi koşmaz. Otomatik RB tepe hızı senaryo zamanında en fazla 3 yard/sn olacak şekilde hesaplanır.
+
+OL kick–slide–square sonrası temas ve anchor/blokta kalma yapar. Gövde geri hareket ederken savunmaya dönük kalır. RB kontrollü yaklaşır, gather yapıp blokta kalır. İç pickup’ta RB’nin temas noktası OL’un arkasında tutulur. Loop tüm oyunu ID aşamasından tekrarlar; bitişte Oynat yeniden başlatır.
+
+## Kontrol sınırı
+
+Bu araç fizik motoru değil, takım kuralına göre atama ve hareket öğreticisidir. Hazır front/blitz kombinasyonları için atama, sayı fazlası, hız ve yaklaşık çakışma kontrolleri testlidir. Elle çizilmiş olağandışı yollar antrenör tarafından doğrulanmalıdır. Paylaşılan tarayıcı açılamadığında GPU görüntüsü ve kullanıcı etkileşimi görsel olarak doğrulanmış sayılmaz.

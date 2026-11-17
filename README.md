@@ -42,9 +42,9 @@ MediaRecorder destekleyen tarayıcılarda saha videosu kaydedilebilir. Başlatma
 
 ## Takım pas koruması şablonu
 
-Başlangıçtaki **Pas koruması**, yerleştirdiğiniz savunmaya göre Oynat anında pas korumasını üretir. Field dış blitz’te FT ALERT → FG → C zinciri, boundary’de RB varsa pickup / yoksa QB hot gözetimi, iç tehditte C–guard 1-tech combo ve LB gözetimi uygulanır. 3/4/5 DL başlangıç front’ları vardır. [Takım kuralı ve kullanım](docs/TEAM-PASS-PROTECTION.md).
+Başlangıçtaki **Pas koruması**, yerleştirdiğiniz savunmaya göre Oynat anında pas korumasını üretir. Field dış blitz’te FT ALERT → FG → C zinciri, boundary’de RB varsa pickup / yoksa QB hot gözetimi, iç tehditte C–guard 1-tech combo ve LB gözetimi uygulanır. 3–4, 4–3, 5 ve 6 kişilik DL hatları vardır. Kalabalık 5/6 DL baskısında big-on-big paylaşımı uygulanır: OL kendi DL’sini bırakmaz; RB ek DL veya iç/field tehdidini alır. [Takım kuralı ve kullanım](docs/TEAM-PASS-PROTECTION.md).
 
-Savunma seçeneklerinden sağ/sol/orta blitz veya blitz yok seçilir; DL yerleşimi korunur. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir. Pas koruması dışındaki eski başlangıç senaryoları ve tarayıcı kütüphanesi girdileri kaldırılır.
+Savunma seçeneklerinden sağ/sol/orta, iki dış blitz veya blitz yok seçilir; DL yerleşimi korunur. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir. Sahanın altındaki Adam paylaşımı tablosu gerçek blokçu/tehdit ilişkilerini, boundary adamlarını ve QB hot gözetimini gösterir. Pas koruması dışındaki eski başlangıç senaryoları ve tarayıcı kütüphanesi girdileri kaldırılır.
 
 ## Doğrulama sınırları
 

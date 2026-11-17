@@ -1,0 +1,13 @@
+import type {ProtectionResult} from './protection.ts';
+const labels={blocked:'Eşleşti',hot:'SERBEST / HOT',show:'Blitz gösteriyor',watch:'Gözetiliyor',idle:'Blitz yok'};
+export function renderCoverage(host:HTMLElement,plan:ProtectionResult){
+ host.replaceChildren();host.classList.toggle('has-hot',plan.unblocked.length>0);
+ const heading=document.createElement('div');heading.className='coverage-heading';
+ const title=document.createElement('strong');title.textContent='ADAM PAYLAŞIMI';const mode=document.createElement('span');mode.textContent=`${plan.frontLabel} · ${plan.mode==='big-on-big'?'BIG ON BIG · OL + RB':plan.alert?'FIELD ALERT / BOUNDARY MAN':'TEMEL ADAM PAYLAŞIMI'}`;heading.append(title,mode);host.append(heading);
+ const olList=document.createElement('div');olList.className='coverage-ol';
+ for(const a of plan.assignments){const cell=document.createElement('div');cell.dataset.blocker=a.player;const strong=document.createElement('b');strong.textContent=a.player;const span=document.createElement('span');span.textContent=a.type==='watch'?`Gözetim → ${a.target??'alan'}`:`${a.target??'Yardım / alan'}${a.release?' → '+a.release:''}`;const lock=plan.boundaryLocks.find(x=>x.player===a.player);const small=document.createElement('small');small.textContent=lock?'BOUNDARY · ADAM ADAM':a.type==='combo'?'COMBO':a.type==='pickup'?'PICKUP':a.type==='watch'?'HOT / GÖZETİM':a.type==='slide'?'FIELD SLIDE':'ADAM ADAM';cell.title=a.note;cell.append(strong,span,small);olList.append(cell)}host.append(olList);
+ const details=document.createElement('details');details.open=true;const summary=document.createElement('summary');summary.textContent=`Savunma eşleşmeleri · ${plan.pressureCount} tehdit`;details.append(summary);
+ const table=document.createElement('table');const head=document.createElement('thead');const row=document.createElement('tr');for(const label of ['Savunma','Teknik','Blokçu / sorumlu','Durum']){const th=document.createElement('th');th.textContent=label;row.append(th)}head.append(row);table.append(head);const body=document.createElement('tbody');
+ for(const c of plan.coverage){const tr=document.createElement('tr');tr.dataset.defender=c.defender;tr.classList.toggle('hot',c.status==='hot');const responsible=c.blockers.length?c.detail:c.watchers.length?`${c.watchers.join(', ')} (gözetim; blok değil)`:'—';for(const value of [c.defender,c.technique??c.position,responsible,labels[c.status]]){const td=document.createElement('td');td.textContent=value;tr.append(td)}body.append(tr)}table.append(body);details.append(table);host.append(details);
+ if(plan.warnings.length){const notes=document.createElement('p');notes.className='coverage-warning';notes.textContent=plan.warnings.join(' ');host.append(notes)}
+}
