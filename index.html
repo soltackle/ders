@@ -3,12 +3,13 @@
 [data-learning][aria-pressed="true"]{border-color:var(--orange);color:var(--orange);background:#302d29}.step-card p{white-space:pre-wrap}
 
 .study-mode .layout{display:block}.study-mode main{max-width:1600px;margin:auto}.study-mode .intro{margin-bottom:12px}.study-mode .intro p,.study-mode .intro>.badge,.study-mode .side-note{display:none}.study-mode .workspace{grid-template-columns:minmax(0,1fr) 350px}.study-mode .field-card{position:sticky;top:12px}.study-mode .inspector{max-height:82vh}.study-mode .inspector>.card-head{padding:10px}.study-mode .tabs{padding:6px}.study-mode .drawer,.study-mode #gamesPanel{border:1px solid var(--line);border-radius:9px;padding:12px;margin:10px 0;background:var(--panel)}.study-mode #gamesPanel{max-width:1550px;margin:10px auto}.study-mode #gamesPanel aside{border:0;display:block}.study-mode #inspector .step-card{display:none}.study-mode #inspector .step-card.active{display:block}.study-mode .step-card.active summary{font-size:16px}.study-mode .mechanics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mechanics>p{margin:0;border:1px solid var(--line);border-radius:6px;padding:10px;font-size:12px;line-height:1.7}.mechanics>p>b{color:var(--orange)}.mechanics>.muted{grid-column:1/-1;border:0;padding:0}.study-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:12px;color:var(--muted)}.player-tools{padding:10px;border-bottom:1px solid var(--line)}summary{cursor:pointer}.sources{max-width:1550px;margin:16px auto!important;font-size:11px}.study-mode .topbar{position:relative}.study-mode #focusBtn[aria-pressed=true]{border-color:var(--orange);color:var(--orange)}@media(max-width:900px){.study-mode .workspace{grid-template-columns:1fr}.study-mode .field-card{position:static}.study-mode .inspector{max-height:none}.study-mode .mechanics{grid-template-columns:1fr 1fr}.study-mode main{padding:12px}}@media(max-width:430px){.study-mode .mechanics{grid-template-columns:1fr}.top-actions{width:100%}}
+.simulation-status{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;color:var(--muted);font-size:11px}.simulation-status span{color:var(--orange)}#focusBtn{width:17px;height:17px;accent-color:var(--orange)}
 </style></head><body>
 <header class="topbar"><div class="brand"><div class="brand-mark">OL</div><div><b>OL <span>ATÖLYE</span></b><small>OYUN · GÖREV · SAVUNMA EDİTÖRÜ</small></div></div><div class="row top-actions"><button data-panel="gamesPanel" aria-expanded="false">Oyunlar</button><button data-panel="defensePanel" aria-expanded="false">Savunma</button><button data-panel="toolsPanel" aria-expanded="false">Saha araçları</button><button data-panel="editorPanel" aria-expanded="false">Oyun düzenle / paylaşım</button><span class="save-status" id="saveStatus">Yerel kayıt hazır</span><button id="libraryBtn">Adım şablonları</button><button id="backupBtn">Yedek / HTML</button><button id="helpBtn" aria-label="Kullanım rehberi">Rehber</button></div></header>
 <div class="layout"><details id="gamesPanel"><summary>Oyunlarım / yeni oyun</summary><aside><div class="side-create"><div class="side-title">OYUNLARIM <span id="playCount" class="count">0</span></div><div class="create-row"><input id="newPlayName" placeholder="Yeni oyunun adı…" aria-label="Yeni oyunun adı" maxlength="160"><button class="primary" id="newPlayBtn" aria-label="Yeni oyun ekle">＋</button></div><button id="createEmptyBtn" style="width:100%;margin-bottom:8px">＋ Görüşülen Empty oyununu ekle</button><input id="playSearch" placeholder="Oyun ara…" aria-label="Oyun ara"></div><nav class="play-nav" id="playNav" aria-label="Oyunlarım"></nav><div class="side-note"><b>Oyunları siz belirleyin.</b><p>Yeni oyun, boş görevlerle açılır. Şablonlar öğretim örneğidir; takım kuralı ve son açıklama koça aittir.</p><p>● Hücum <span style="color:var(--cyan)">●</span><br>▲ Savunma <span style="color:var(--red)">▲</span></p></div></aside></details>
 <main><section class="intro"><div><p class="eyebrow">TAKIMINIZIN ÇALIŞMA ALANI</p><h1 id="pageTitle">İlk oyununuzu ekleyin.</h1><p id="pageIntro">Oyunu adlandırın, oyuncuyu seçin ve görevlerini oluşturun. Savunmayı şimdi kurabilir, çizdiğiniz look’u bütün oyunlara karşı kullanabilirsiniz.</p></div><span class="badge">Tek HTML · çevrimdışı</span></section>
 <details id="defensePanel" class="drawer"><summary>Savunma, hash ve look ayarları</summary><section class="card def-controls" aria-label="Savunma ve hash"><div class="card-body"><div class="def-top"><label>Hazır front · düzenlenebilir örnek<select id="frontSelect"></select></label><label>Hazır savunma hareketi<select id="moveSelect"></select></label><label>Topun hash’i · hücuma göre<select id="ballSelect"><option value="left">Sol hash</option><option value="middle">Orta</option><option value="right">Sağ hash</option></select></label><label class="look-label">Look adı<input id="lookName" placeholder="Örn. Rakip · 1. hafta" maxlength="160"></label><button id="saveLookBtn" class="primary">Look kaydet</button></div><div class="ruleline"><span id="lookStatus" class="badge">Yeni savunma</span><span id="fieldRule"></span><button id="looksBtn">Kayıtlı look’lar <span id="lookCount">0</span></button></div></div></section>
-</details><div class="workspace"><section class="card field-card"><div class="study-bar"><span>Oyuncuya dokun → odağına geç</span><button id="focusBtn" aria-pressed="true">Oyuncu odağı</button></div><details id="toolsPanel"><summary>Yol çizimi ve saha araçları</summary><div class="field-toolbar"><div class="segmented" aria-label="Saha aracı"><button data-mode="select" aria-pressed="true">Seç / taşı</button><button data-mode="draw" aria-pressed="false">＋ Yol çiz</button><button data-mode="erase" aria-pressed="false">Nokta sil</button></div><div class="row"><label class="inline-check"><input type="checkbox" id="pathsToggle" checked>Yollar</label><label class="inline-check"><input type="checkbox" id="targetsToggle" checked>Paylaşım</label><button id="undoBtn" title="Son düzenlemeyi geri al">↶ Geri al</button></div></div></details><div class="field-wrap"><svg id="field" viewBox="0 0 1000 630" role="img" aria-label="Oyuncular ve düzenlenebilir hareket yolları"></svg></div><div class="field-caption" id="fieldHint">Oyuncuyu seçin. Yol çiz modunda sahaya dokunarak ara noktalar ekleyin; noktaları sürükleyerek düzeltin.</div><div class="transport"><div class="row"><button id="prevBtn" aria-label="Önceki adım">◀</button><button class="play-button" id="playBtn" aria-label="Hareketleri oynat">▶</button><button id="nextBtn" aria-label="Sonraki adım">▶|</button><input id="progress" type="range" min="0" max="5" step="1" value="0" aria-label="Geçerli adım"><span id="phaseCount" class="muted">0 / 5</span><select id="speedSelect" aria-label="Oynatma hızı" style="width:73px"><option value="1600">Yavaş</option><option value="950" selected>Normal</option><option value="500">Hızlı</option></select></div><div id="phaseLabel" class="phase-label"></div><div id="phaseButtons" class="phase-buttons"></div></div><div class="field-caption legend"><span>Hücum</span><span class="def">Savunma</span><span class="target">Blok hedefi / sonra hedef</span></div></section>
+</details><div class="workspace"><section class="card field-card"><div class="study-bar"><span>Oyuncuyu seç · odağı kutudan aç</span><label class="inline-check"><input id="focusBtn" type="checkbox">Oyuncu odağı</label></div><details id="toolsPanel"><summary>Yol çizimi ve saha araçları</summary><div class="field-toolbar"><div class="segmented" aria-label="Saha aracı"><button data-mode="select" aria-pressed="true">Seç / taşı</button><button data-mode="draw" aria-pressed="false">＋ Yol çiz</button><button data-mode="erase" aria-pressed="false">Nokta sil</button></div><div class="row"><label class="inline-check"><input type="checkbox" id="pathsToggle" checked>Yollar</label><label class="inline-check"><input type="checkbox" id="targetsToggle" checked>Paylaşım</label><button id="undoBtn" title="Son düzenlemeyi geri al">↶ Geri al</button></div></div></details><div class="simulation-status"><b>Pas koruması · temas modeli</b><span id="contactStatus" aria-live="polite">Hiza</span></div><div class="field-wrap"><svg id="field" viewBox="0 0 1000 630" role="img" aria-label="Oyuncular ve düzenlenebilir hareket yolları"></svg></div><div class="field-caption" id="fieldHint">Oyuncuyu seçin. Yol çiz modunda sahaya dokunarak ara noktalar ekleyin; noktaları sürükleyerek düzeltin.</div><div class="transport"><div class="row"><button id="prevBtn" aria-label="Önceki adım">◀</button><button class="play-button" id="playBtn" aria-label="Hareketleri oynat">▶</button><button id="nextBtn" aria-label="Sonraki adım">▶|</button><input id="progress" type="range" min="0" max="5" step="1" value="0" aria-label="Geçerli adım"><span id="phaseCount" class="muted">0 / 5</span><select id="speedSelect" aria-label="Oynatma hızı" style="width:73px"><option value="1600">Yavaş</option><option value="950" selected>Normal</option><option value="500">Hızlı</option></select></div><div id="phaseLabel" class="phase-label"></div><div id="phaseButtons" class="phase-buttons"></div></div><div class="field-caption legend"><span>Hücum</span><span class="def">Savunma</span><span class="target">Blok hedefi / sonra hedef</span></div></section>
 <section class="card inspector" aria-label="Seçili oyuncu editörü"><div class="card-head"><div class="row" id="actorChips"></div></div><details class="player-tools"><summary>Oyuncuyu / adımları / yolu düzenle</summary><div class="tabs"><button data-inspector-tab="task" class="active">Oyuncu / görev</button><button data-inspector-tab="steps">Adımlar</button><button data-inspector-tab="path">Yol noktaları</button></div></details><div class="card-body" id="inspector"></div></section></div>
 <details id="editorPanel" class="drawer"><summary>Oyun düzenle / adam paylaşımı</summary><div class="lower-grid"><section class="card"><div class="card-head"><h2>Oyun ve formasyon</h2><div class="row"><button id="copyPlayBtn">Kopyala</button><button id="deletePlayBtn" class="danger">Oyunu sil</button></div></div><div class="card-body" id="playEditor"></div></section><section class="card"><div class="card-head"><h2>Adam paylaşımı ve açık hedefler</h2><span class="badge">Elle seçim öncelikli</span></div><div class="card-body" id="assignments"></div></section></div></details><footer class="bottom-line">Yönler hücuma göredir · Her düzenleme tarayıcıya kaydedilir. Dosya veya tarayıcı değiştirirken JSON yedeğini ya da güncel HTML’yi indirin. <button id="archiveBtn">Eski kayıt arşivi</button></footer>
 </main></div>
@@ -642,7 +643,7 @@ const OLEmpty = (() => {
    const taskTemplate=p.emptyTexts?.[oldKey]??tasks[role];
    const list=p.emptyCurriculum?.[role]??banks[role];
    jobs[a.id]={role,values,task:a.source==='manual'?a.task:format(taskTemplate,values),target:target?.id||'',secondary:a.secondary||'',gap:a.source==='manual'?a.gap:fi>=0?values.gap:'',source:a.source==='manual'?'manual':'suggestion',readTargets:a.position==='QB'?boundaryLB.map(d=>d.id):[],steps:list.map((s,i)=>Object.fromEntries(Object.entries({...(!['qb','receiver'].includes(role)?OLTechnique.get(role,i):{}),...s}).map(([k,v])=>[k,typeof v==='string'?format(v,values):v])))};
-   if(p.illustrateProtection!==false&&['LT','LG','C','RG','RT'].includes(a.position)&&!(a.path||[]).length){const clamp=(v,max)=>Math.max(0,Math.min(max,v)),travel=role==='centerCombo'?(one.x<a.x?-1:1):fi>=0?sign:target?Math.sign(target.x-a.x):0,cx=target?Math.max(a.x-110,Math.min(a.x+110,entry(target))):a.x+travel*22;const points=[[a.x,a.y],[a.x+travel*12,a.y-7],[a.x+travel*22,a.y-15],[cx,Math.min(a.y,312)],[cx,Math.min(a.y,308)],[cx,Math.min(a.y,306)]];jobs[a.id].steps.forEach((s,i)=>{const point=points[Math.min(i,5)];s.x=clamp(point[0],1000);s.y=clamp(point[1],630);});}
+   if(p.illustrateProtection!==false&&['LT','LG','C','RG','RT'].includes(a.position)&&!(a.path||[]).length){const clamp=(v,max)=>Math.max(0,Math.min(max,v)),travel=role==='centerCombo'?(one.x<a.x?-1:1):fi>=0?sign:target?Math.sign(target.x-a.x):0,cx=target?Math.max(a.x-110,Math.min(a.x+110,entry(target))):a.x+travel*22;const setX=a.x+Math.max(-42,Math.min(42,cx-a.x));const points=[[a.x,a.y],[a.x+travel*8,a.y+7],[a.x+travel*15,a.y+14],[setX,a.y+21],[setX,a.y+26],[setX,a.y+30]];jobs[a.id].steps.forEach((s,i)=>{const point=points[Math.min(i,5)];s.x=clamp(point[0],1000);s.y=clamp(point[1],630);});}
 
   }
   return {jobs,warnings,open:open.map(d=>d.id),boundaryReads:boundaryLB.map(d=>d.id),field:fieldSide,targets};
@@ -650,6 +651,55 @@ const OLEmpty = (() => {
  function newPlay(){const p=OLModel.newPlay('Empty');p.emptyProtection=true;p.formation='Empty · 5 OL + QB + X/U/H/Y/Z';p.players=p.players.filter(a=>a.position!=='RB');for(const [label,x,y] of [['X',210,330],['U',240,380],['H',645,390],['Y',815,330],['Z',935,380]]){const a=OLModel.actor(label,x,y);a.position='WR';p.players.push(a);}const paths={X:[[250,265],[300,165],[335,65]],U:[[150,375],[130,380],[140,70],[105,105]],H:[[720,390],[830,360],[925,300],[975,150]],Y:[[815,240],[815,150],[815,65]],Z:[[850,340],[730,285],[660,250]]};p.players.forEach(a=>{a.stepMode='auto';if(paths[a.label])a.path=paths[a.label].map(([x,y])=>({x,y}));});p.emptyCurriculum=clone(banks);p.notes='Koçla doğrulandı: field yönüne kayma; boundary MAN; boundary LB blitz’ini QB görüp hareket eder. Empty’de RB yok. Slant, stunt ve fazla baskıya verilen cevaplar bu mantıktan üretilen düzenlenebilir taktik önerileridir. Receiver rota ayrıntıları görsel ve oyuncu notlarıyla düzenlenir.';return p;}
  return {roles,banks,tasks,format,analyze,newPlay};
 })();
+
+/* Renderer-independent deterministic planar contact model. Diagram units, not calibrated athlete biomechanics. */
+class OLSimulation {
+  constructor(model,sample){
+    this.model=model;this.sample=sample;this.rate=60;this.max=Math.max(1,model.maxPhase||5);
+    this.actors=[...(model.players||[]).map(a=>({...a,side:'offense'})),...(model.defenders||[]).map(a=>({...a,side:'defense'}))];
+    this.bodies=this.actors.map(a=>({id:a.id,radius:a.level==='DL'?24:20,mass:['LT','LG','C','RG','RT'].includes(a.position)?12:a.level==='DL'?8:6,height:72}));
+    this.frames=[this.actors.map(a=>({...sample(a,0,this.max)}))];
+  }
+  resolve(points){
+    for(let iteration=0;iteration<36;iteration++){
+      let worst=0;
+      for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){
+        const a=points[i],b=points[j],aa=this.bodies[i],bb=this.bodies[j];let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);const minimum=aa.radius+bb.radius;
+        if(d>=minimum)continue;const overlap=minimum-d;worst=Math.max(worst,overlap);
+        if(d<1e-8){dx=i%2?1:-1;dy=0;d=1;}const nx=dx/d,ny=dy/d,wa=1/aa.mass,wb=1/bb.mass,total=wa+wb;
+        a.x-=nx*(overlap+.00001)*wa/total;a.y-=ny*(overlap+.00001)*wa/total;b.x+=nx*(overlap+.00001)*wb/total;b.y+=ny*(overlap+.00001)*wb/total;
+      }
+      if(worst<.0001)break;
+    }
+    return points;
+  }
+  ensure(index){
+    while(this.frames.length<=index){
+      const step=this.frames.length,previous=this.frames[step-1],phase=Math.min(this.max,step/this.rate);
+      const points=this.actors.map((a,i)=>{const desired=this.sample(a,phase,this.max),old=previous[i];let dx=desired.x-old.x,dy=desired.y-old.y;const d=Math.hypot(dx,dy),cap=6;if(d>cap){dx*=cap/d;dy*=cap/d;}return {x:old.x+dx,y:old.y+dy};});
+      this.frames.push(this.resolve(points));
+    }
+  }
+  frame(phase){
+    const time=Math.max(0,Math.min(this.max,Number(phase)||0))*this.rate,index=Math.floor(time),fraction=time-index;
+    this.ensure(index+(fraction>1e-9?1:0));let points=this.frames[index].map((p,i)=>{const next=this.frames[index+1]?.[i]||p;return{x:p.x+(next.x-p.x)*fraction,y:p.y+(next.y-p.y)*fraction};});
+    if(time>0)this.resolve(points);
+    const positions=new Map(this.actors.map((a,i)=>[a.id,points[i]])),contacts=[],states=new Map();
+    for(let i=0;i<this.actors.length;i++){
+      const a=this.actors[i],p=points[i],desired=this.sample(a,phase,this.max);let state=phase===0?'Hiza':a.side==='offense'&&['LT','LG','C','RG','RT'].includes(a.position)?'Set':'Hareket';
+      for(let j=0;j<this.actors.length;j++){
+        const b=this.actors[j];if(a.side===b.side)continue;
+        const q=points[j],distance=Math.hypot(q.x-p.x,q.y-p.y);
+        if(distance<=this.bodies[i].radius+this.bodies[j].radius+.4&&phase>0){state=p.y>desired.y+7&&a.side==='offense'?'Geri itilme':'Temas / dengede';if(i<j)contacts.push({a:a.id,b:b.id,point:{x:(p.x+q.x)/2,y:(p.y+q.y)/2},normal:{x:(q.x-p.x)/(distance||1),y:(q.y-p.y)/(distance||1)}});}
+      }
+      if(a.side==='offense'&&a.target){const target=positions.get(a.target);if(target&&target.y>p.y+this.bodies[i].radius+20&&Math.abs(target.x-p.x)>40)state='Kenar kaybı';}
+      states.set(a.id,state);
+    }
+    const world=this.actors.map((a,i)=>{const p=points[i],target=positions.get(a.target);return {id:a.id,side:a.side,position:{x:p.x,y:0,z:p.y},heading:target?Math.atan2(target.x-p.x,p.y-target.y):a.side==='offense'?0:Math.PI,collider:{type:'upright',radius:this.bodies[i].radius,height:this.bodies[i].height},state:states.get(a.id)};});
+    return {phase,positions,contacts,states,world};
+  }
+  cameraAnchor(id,phase){const actor=this.frame(phase).world.find(a=>a.id===id);return actor?{position:{...actor.position,y:65},heading:actor.heading}:null;}
+}
 
 /* Editable football field. All coordinates remain in the SVG's 1000 × 630 space. */
 class OLField {
@@ -773,19 +823,36 @@ class OLField {
     else{near(defense,2);near(offense.filter(a=>a.id!==selected.id),1);}
     return ids;
   }
+  prepareSimulation(model){
+    if(typeof OLSimulation==='undefined'||model.simulation!==true){this.simulation=null;return;}
+    const key=JSON.stringify({max:model.maxPhase,actors:[...(model.players||[]),...(model.defenders||[])].map(a=>({id:a.id,x:a.x,y:a.y,position:a.position,level:a.level,rush:a.rush,target:a.target,path:a.path,steps:(a.steps||[]).map(s=>({x:s.x,y:s.y}))}))});
+    if(this.simulationKey!==key){this.simulationKey=key;this.simulation=new OLSimulation(model,(actor,phase,max)=>this.animatedPosition(actor,phase,max));}
+    else if(!this.simulation)this.simulation=new OLSimulation(model,(actor,phase,max)=>this.animatedPosition(actor,phase,max));
+  }
+  poses(phase){
+    if(this.simulation){this.lastFrame=this.simulation.frame(phase);this.model.onSimulationState?.(this.lastFrame);return this.lastFrame.positions;}
+    const all=[...(this.model.players||[]),...(this.model.defenders||[])];return new Map(all.map(a=>[a.id,this.animatedPosition(a,phase,this.model.maxPhase)]));
+  }
+  paintContacts(positions){
+    const contacts=(this.simulation?this.lastFrame?.contacts:[])||[];
+    for(let i=0;i<(this.handNodes||[]).length;i++){const node=this.handNodes[i],contact=contacts[Math.floor(i/2)];if(!contact){node.setAttribute('visibility','hidden');continue;}
+      const a=positions.get(contact.a),b=positions.get(contact.b),dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d,offset=i%2?6:-6;
+      for(const [k,v] of Object.entries({x1:a.x+nx*18-ny*offset,y1:a.y+ny*18+nx*offset,x2:b.x-nx*22-ny*offset,y2:b.y-ny*22+nx*offset}))node.setAttribute(k,String(v));node.setAttribute('visibility','visible');
+    }
+  }
   animate(phase){
-    if(!this.model)return;const all=[...(this.model.players||[]),...(this.model.defenders||[])],positions=new Map(all.map(a=>[a.id,this.animatedPosition(a,phase,this.model.maxPhase)]));
+    if(!this.model)return;const positions=this.poses(phase);this.paintContacts(positions);
     for(const node of this.actorNodes||[]){const point=positions.get(node.dataset.actorId);if(point)node.setAttribute('transform',`translate(${point.x} ${point.y})`);}
     for(const line of this.targetLines||[]){const a=positions.get(line.dataset.from),b=positions.get(line.dataset.to);if(a&&b)for(const [k,v] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y}))line.setAttribute(k,String(v));}
     const selected=positions.get(this.model.selectedId);if(this.gazeNode&&selected)this.gazeNode.setAttribute('transform',`translate(${selected.x} ${selected.y})`);
   }
   render(model) {
-    this.model = model;
+    this.model = model;this.prepareSimulation(model);
     const esc = value => this.escape(value);
     const players = model.players || [], defenders = model.defenders || [];
     const phase = this.number(model.phase), maxPhase = Math.max(1, this.number(model.maxPhase, 5));
     const focus=this.focusIds(model);
-    const rendered = new Map([...players, ...defenders].map(actor => [actor.id, this.animatedPosition(actor, phase, maxPhase)]));
+    const rendered=this.poses(phase);
     let output = `<defs>
       <filter id="ol-context-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><pattern id="ol-turf" width="1000" height="120" patternUnits="userSpaceOnUse"><rect width="1000" height="60" fill="#102e2c"/><rect y="60" width="1000" height="60" fill="#123330"/></pattern>
       <marker id="ol-arrow-offense" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#7dd9e4" stroke-width="1.5"/></marker>
@@ -823,6 +890,7 @@ class OLField {
       }
     }
     const gaze=rendered.get(model.selectedId);if(model.focus&&gaze)output+=`<g data-gaze="true" transform="translate(${gaze.x} ${gaze.y})" pointer-events="none"><path d="M0 0 L-160 -200 Q0 -310 160 -200 Z" fill="#7dd9e4" opacity=".055" stroke="#7dd9e4" stroke-opacity=".5" stroke-dasharray="6 8"/></g><text x="500" y="26" text-anchor="middle" fill="#c6deda" font-size="11" font-family="system-ui" pointer-events="none">Görev odağı · gerçek görüş / kör nokta ölçümü değildir</text>`;
+    output+='<g data-contacts="true" pointer-events="none">'+Array.from({length:48},()=>'<line data-hand-contact="true" stroke="#ffb56f" stroke-width="4" stroke-linecap="round" visibility="hidden"/>').join('')+'</g>';
     const claimed = new Set(players.flatMap(actor => [actor.target, actor.secondary]).filter(Boolean));
     for (const [side, actors] of [['defense', defenders], ['offense', players]]) {
       for (const actor of actors) {
@@ -850,7 +918,7 @@ class OLField {
     if (model.mode === 'draw') output += `<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">${selected ? 'Boş alana dokun: yol noktası ekle · Noktaları sürükleyerek düzelt' : 'Yol çizmek için bir oyuncu seç'}</text>`;
     if (model.mode === 'erase') output += '<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">Silmek için bir yol noktasına dokun</text>';
     this.svg.innerHTML = output;
-    this.actorNodes=this.svg.querySelectorAll?.('[data-moving]')||[];this.targetLines=this.svg.querySelectorAll?.('[data-from]')||[];this.gazeNode=this.svg.querySelector?.('[data-gaze]');
+    this.actorNodes=this.svg.querySelectorAll?.('[data-moving]')||[];this.targetLines=this.svg.querySelectorAll?.('[data-from]')||[];this.gazeNode=this.svg.querySelector?.('[data-gaze]');this.handNodes=this.svg.querySelectorAll?.('[data-hand-contact]')||[];this.paintContacts(rendered);
   }
   pointerDown(event) {
     if (!this.model || event.button !== 0 && event.button !== undefined) return;
@@ -950,7 +1018,7 @@ const App = (() => {
  let db, storageOK=true;
  try{const embedded=JSON.parse($('embeddedBackup').textContent),local=JSON.parse(localStorage.getItem(key)||'null');db=M.validate(embedded)?embedded:M.validate(local)?local:M.fresh();if(M.validate(embedded)&&M.validate(local)&&embedded.id===local.id&&local.updatedAt>embedded.updatedAt)db=local;const old=JSON.parse(localStorage.getItem('ol-atolye-takim-v2')||'null');if(old?.version===2)M.migrate(db,old);}catch(e){storageOK=false;db??=M.fresh();}
  const supplied=JSON.parse($('suppliedPlays')?.textContent||'[]');db.seedImports??=[];for(const p of supplied){if(!db.seedImports.includes(p.seedKey)){if(!db.plays.some(old=>old.seedKey===p.seedKey))db.plays.push(copy(p));db.seedImports.push(p.seedKey);if(!db.selectedPlayId)db.selectedPlayId=p.id;}}
- const S={side:db.plays.length?'offense':'defense',id:db.plays[0]?.players[0]?.id||db.defenders[0]?.id,tab:db.plays.find(p=>p.id===db.selectedPlayId)?.emptyProtection?'steps':'task',phase:0,mode:'select',pointIndex:-1,scope:'auto',variantId:'',playing:false,focus:true,visualPhase:0,raf:null,search:'',history:[],templateId:'',lessonRole:'field',timer:null};
+ const S={side:db.plays.length?'offense':'defense',id:db.plays[0]?.players[0]?.id||db.defenders[0]?.id,tab:db.plays.find(p=>p.id===db.selectedPlayId)?.emptyProtection?'steps':'task',phase:0,mode:'select',pointIndex:-1,scope:'auto',variantId:'',playing:false,focus:db.playerFocus===true,visualPhase:0,raf:null,search:'',history:[],templateId:'',lessonRole:'field',timer:null};
  if(!db.plays.some(p=>p.id===db.selectedPlayId))db.selectedPlayId=db.plays[0]?.id||'';
  const play=()=>db.plays.find(p=>p.id===db.selectedPlayId);
  function variant(){const p=play();if(!p||S.scope==='base')return null;const k=M.variantKey(db,p),v=db.variants.filter(v=>v.playId===p.id&&v.key===k);return v.find(v=>v.id===S.variantId)||v.at(-1)||null;}
@@ -961,7 +1029,7 @@ const App = (() => {
  function stop(keepPosition=false){clearInterval(S.timer);cancelAnimationFrame(S.raf);S.playing=false;if(keepPosition!==true)S.visualPhase=S.phase;$('playBtn').textContent='▶';}
  function commit(fn,{render=true,reset=false}={}){stop();const before=copy(db);try{fn();if(!M.validate(db))throw Error('Alan veya kayıt sınırı aşıldı. Düzenleme geri alındı.');}catch(err){db=before;renderAll();toast(err.message||'Düzenleme uygulanamadı.');return false;}S.history.push(before);if(S.history.length>35)S.history.shift();if(reset)S.phase=0;persist();if(render)renderAll();return true;}
  function ensureSelected(){if(!selected()){S.side=actors().length?'offense':'defense';S.id=(S.side==='offense'?actors():db.defenders)[0]?.id;S.pointIndex=-1;}}
- function selectActor(side,id){stop();S.side=side;S.id=id;S.tab=side==='defense'?'task':'steps';S.focus=true;S.pointIndex=-1;renderAll();}
+ function selectActor(side,id){stop();S.side=side;S.id=id;S.tab=side==='defense'?'task':'steps';S.pointIndex=-1;renderAll();}
  function autoSteps(a){return !!play()?.emptyProtection&&a.stepMode!=='manual'&&(a.stepMode==='auto'||a.steps.length===6&&!a.steps.some(s=>s.text||s.direction||s.target||s.condition));}
  function lessonSteps(a){return autoSteps(a)?M.suggestions(db,{...play(),players:actors()})[a.id]?.steps||a.steps:a.steps;}
  function coachCopy(a){if(autoSteps(a)){if(a.steps.some(s=>s.text)){a.stepHistory??=[];a.stepHistory.push(copy(a.steps));}a.steps=copy(lessonSteps(a));}a.stepMode='manual';}
@@ -978,8 +1046,8 @@ const App = (() => {
   pointSelect:i=>{S.pointIndex=i;renderInspector();renderField();}
  });
  function renderField(){
-  field.render({players:actors().map(a=>({...a,...effective(a),steps:lessonSteps(a)})),defenders:db.defenders,selectedId:S.id,selectedSide:S.side,phase:S.phase,maxPhase:maxPhase(),mode:S.mode,pathsVisible:$('pathsToggle').checked,assignmentsVisible:$('targetsToggle').checked,pointIndex:S.pointIndex,focus:S.focus});
-  $('focusBtn').setAttribute('aria-pressed',String(S.focus));const n=maxPhase();$('progress').max=n;$('progress').value=S.phase;$('phaseCount').textContent=`${S.phase} / ${n}`;
+  field.render({players:actors().map(a=>({...a,...effective(a),steps:lessonSteps(a)})),defenders:db.defenders,selectedId:S.id,selectedSide:S.side,phase:Math.floor(S.visualPhase)===S.phase?S.visualPhase:S.phase,maxPhase:maxPhase(),mode:S.mode,pathsVisible:$('pathsToggle').checked,assignmentsVisible:$('targetsToggle').checked,pointIndex:S.pointIndex,focus:S.focus,simulation:play()?.emptyProtection===true||play()?.halfSlide===true,onSimulationState:frame=>{const a=selected();$('contactStatus').textContent=a?(frame.states.get(a.id)||'Hiza'):'';}});
+  $('focusBtn').checked=S.focus;const n=maxPhase();$('progress').max=n;$('progress').value=S.phase;$('phaseCount').textContent=`${S.phase} / ${n}`;
   const a=selected();$('phaseLabel').textContent=`${S.phase} — ${S.side==='offense'?((a?lessonSteps(a):[])[S.phase]?.title||'Bu oyuncuda bu adım yok'):OLStepTitles[S.phase]||'Hareketin devamı'}`;
   $('phaseButtons').innerHTML=Array.from({length:n+1},(_,i)=>`<button data-phase="${i}" class="${i===S.phase?'active':''}" aria-label="Adım ${i}">${i}</button>`).join('');
   $('prevBtn').disabled=S.phase===0;$('nextBtn').disabled=S.phase>=n;$('undoBtn').disabled=!S.history.length;
@@ -1063,7 +1131,7 @@ const App = (() => {
  };
  function applyTemplate(replace,id){if(S.side!=='offense'||!selected()){toast('Önce bir hücum oyuncusu seçin.');return;}const t=db.templates.find(t=>t.id===(id||$('actorTemplate')?.value));if(!t){toast('Önce bir şablon seçin.');return;}if(replace&&selected().steps.some(s=>s.text)&&!confirm('Bu oyuncunun mevcut adımlarını şablonla değiştirmek istiyor musunuz?'))return;commit(()=>{coachCopy(selected());if(replace)selected().steps=copy(t.steps);else selected().steps.push(...copy(t.steps));S.tab='steps';S.phase=0;});toast('Şablon kopyalandı; her adımı değiştirebilirsiniz.');}
  document.addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;if(b.id==='focusBtn'){S.focus=!S.focus;renderField();return;}if(b.dataset.panel){const panel=document.getElementById(b.dataset.panel);panel.open=!panel.open;b.setAttribute('aria-expanded',String(panel.open));return;}
+  const b=e.target.closest('button');if(!b)return;if(b.dataset.panel){const panel=document.getElementById(b.dataset.panel);panel.open=!panel.open;b.setAttribute('aria-expanded',String(panel.open));return;}
   if(b.dataset.learning){commit(()=>{db.learningLevel=b.dataset.learning;});return;}
   if(b.hasAttribute('data-close')){b.closest('dialog').close();return;}
   if(b.dataset.play){loadPlay(b.dataset.play);return;}
@@ -1119,6 +1187,7 @@ const App = (() => {
  const advance=i=>{stop();S.phase=Math.max(0,Math.min(maxPhase(),i));renderInspector();renderField();};$('prevBtn').onclick=()=>advance(S.phase-1);$('nextBtn').onclick=()=>advance(S.phase+1);$('progress').oninput=e=>advance(+e.target.value);
  $('playBtn').onclick=()=>{if(S.playing){stop(true);return;}if(S.phase>=maxPhase()){S.phase=0;S.visualPhase=0;}S.playing=true;S.visualPhase=Math.floor(S.visualPhase)===S.phase?S.visualPhase:S.phase;$('playBtn').textContent='Ⅱ';renderField();field.animate(S.visualPhase);let last;
  const tick=now=>{if(!S.playing)return;if(last===undefined)last=now;const elapsed=Math.min(80,now-last);last=now;S.visualPhase=Math.min(maxPhase(),S.visualPhase+elapsed/Number($('speedSelect').value));const next=Math.floor(S.visualPhase+1e-8);if(next!==S.phase){S.phase=next;renderInspector();$('phaseCount').textContent=S.phase+' / '+maxPhase();$('progress').value=S.phase;$('phaseLabel').textContent=S.phase+' — '+(selected()&&S.side==='offense'?lessonSteps(selected())[S.phase]?.title||'Devam':OLStepTitles[S.phase]||'Devam');$('phaseButtons').querySelectorAll('button').forEach(b=>b.classList.toggle('active',+b.dataset.phase===S.phase));}field.animate(S.visualPhase);if(S.visualPhase>=maxPhase()){stop();renderField();return;}S.raf=requestAnimationFrame(tick);};S.raf=requestAnimationFrame(tick);};$('speedSelect').onchange=stop;
+ $('focusBtn').onchange=e=>{S.focus=e.target.checked;db.playerFocus=S.focus;persist();renderField();};
  $('pathsToggle').onchange=renderField;$('targetsToggle').onchange=renderField;
  document.addEventListener('change',e=>{if(e.target.id==='lessonRole'){S.lessonRole=e.target.value;renderLessonEditor();}if(e.target.id==='defenderPicker'&&e.target.value)selectActor('defense',e.target.value);if(e.target.id==='variantPicker'){S.variantId=e.target.value;S.scope='auto';renderAll();}});
  document.addEventListener('keydown',e=>{if(e.defaultPrevented||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||document.querySelector('dialog[open]'))return;if(e.key==='ArrowRight'){e.preventDefault();advance(S.phase+1);}if(e.key==='ArrowLeft'){e.preventDefault();advance(S.phase-1);}});

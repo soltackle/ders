@@ -48,7 +48,7 @@ function pass(name) {report.push(name);console.log('PASS '+name);}
 (async()=>{
  const q=open(fs.readFileSync(INPUT,'utf8')), {app,click,el}=q;
  for(const id of ['gamesPanel','defensePanel','toolsPanel','editorPanel'])assert.equal(el('#'+id).open,false);
- const c=app.actors().find(a=>a.position==='C');click('[data-select-id="'+c.id+'"]');assert.equal(app.S.focus,true);
+ const c=app.actors().find(a=>a.position==='C');click('[data-select-id="'+c.id+'"]');assert.equal(app.S.focus,false);click('#focusBtn');assert.equal(app.S.focus,true);
  assert(el('#field [data-actor-id="'+c.id+'"]').getAttribute('data-context')==='clear');
  const qb=app.actors().find(a=>a.position==='QB');assert.equal(el('#field [data-actor-id="'+qb.id+'"]').getAttribute('data-context'),'clear');
  assert(q.d.querySelectorAll('[data-context="blurred"]').length>0);
@@ -56,6 +56,6 @@ function pass(name) {report.push(name);console.log('PASS '+name);}
  const node=el('#field [data-moving][data-actor-id="'+c.id+'"]'),before=node.getAttribute('transform');click('#playBtn');
  const stable=el('#field [data-moving][data-actor-id="'+c.id+'"]');await new Promise(resolve=>setTimeout(resolve,220));
  assert(app.S.visualPhase>0&&app.S.visualPhase<1);assert.equal(app.S.phase,0);assert.equal(el('#field [data-moving][data-actor-id="'+c.id+'"]'),stable);assert.notEqual(stable.getAttribute('transform'),before);click('#playBtn');assert.equal(app.S.playing,false);
- click('#focusBtn');assert.equal(q.d.querySelectorAll('[data-context="blurred"]').length,0);
+ click('#focusBtn');assert.equal(q.d.querySelectorAll('[data-context="blurred"]').length,0);const qb2=app.actors().find(a=>a.position==='QB');click('[data-select-id="'+qb2.id+'"]');assert.equal(app.S.focus,false,'selection must not turn focus back on');
  q.clean();for(const doc of openDocuments)doc.window.close();console.log('PASS collapsed panels, role focus, QB context, blur, five technique fields and fractional RAF motion without replacing actor nodes');
 })().catch(e=>{console.error(e.stack);for(const doc of openDocuments)doc.window.close();process.exitCode=1;});

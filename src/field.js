@@ -120,19 +120,36 @@ class OLField {
     else{near(defense,2);near(offense.filter(a=>a.id!==selected.id),1);}
     return ids;
   }
+  prepareSimulation(model){
+    if(typeof OLSimulation==='undefined'||model.simulation!==true){this.simulation=null;return;}
+    const key=JSON.stringify({max:model.maxPhase,actors:[...(model.players||[]),...(model.defenders||[])].map(a=>({id:a.id,x:a.x,y:a.y,position:a.position,level:a.level,rush:a.rush,target:a.target,path:a.path,steps:(a.steps||[]).map(s=>({x:s.x,y:s.y}))}))});
+    if(this.simulationKey!==key){this.simulationKey=key;this.simulation=new OLSimulation(model,(actor,phase,max)=>this.animatedPosition(actor,phase,max));}
+    else if(!this.simulation)this.simulation=new OLSimulation(model,(actor,phase,max)=>this.animatedPosition(actor,phase,max));
+  }
+  poses(phase){
+    if(this.simulation){this.lastFrame=this.simulation.frame(phase);this.model.onSimulationState?.(this.lastFrame);return this.lastFrame.positions;}
+    const all=[...(this.model.players||[]),...(this.model.defenders||[])];return new Map(all.map(a=>[a.id,this.animatedPosition(a,phase,this.model.maxPhase)]));
+  }
+  paintContacts(positions){
+    const contacts=(this.simulation?this.lastFrame?.contacts:[])||[];
+    for(let i=0;i<(this.handNodes||[]).length;i++){const node=this.handNodes[i],contact=contacts[Math.floor(i/2)];if(!contact){node.setAttribute('visibility','hidden');continue;}
+      const a=positions.get(contact.a),b=positions.get(contact.b),dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,nx=dx/d,ny=dy/d,offset=i%2?6:-6;
+      for(const [k,v] of Object.entries({x1:a.x+nx*18-ny*offset,y1:a.y+ny*18+nx*offset,x2:b.x-nx*22-ny*offset,y2:b.y-ny*22+nx*offset}))node.setAttribute(k,String(v));node.setAttribute('visibility','visible');
+    }
+  }
   animate(phase){
-    if(!this.model)return;const all=[...(this.model.players||[]),...(this.model.defenders||[])],positions=new Map(all.map(a=>[a.id,this.animatedPosition(a,phase,this.model.maxPhase)]));
+    if(!this.model)return;const positions=this.poses(phase);this.paintContacts(positions);
     for(const node of this.actorNodes||[]){const point=positions.get(node.dataset.actorId);if(point)node.setAttribute('transform',`translate(${point.x} ${point.y})`);}
     for(const line of this.targetLines||[]){const a=positions.get(line.dataset.from),b=positions.get(line.dataset.to);if(a&&b)for(const [k,v] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y}))line.setAttribute(k,String(v));}
     const selected=positions.get(this.model.selectedId);if(this.gazeNode&&selected)this.gazeNode.setAttribute('transform',`translate(${selected.x} ${selected.y})`);
   }
   render(model) {
-    this.model = model;
+    this.model = model;this.prepareSimulation(model);
     const esc = value => this.escape(value);
     const players = model.players || [], defenders = model.defenders || [];
     const phase = this.number(model.phase), maxPhase = Math.max(1, this.number(model.maxPhase, 5));
     const focus=this.focusIds(model);
-    const rendered = new Map([...players, ...defenders].map(actor => [actor.id, this.animatedPosition(actor, phase, maxPhase)]));
+    const rendered=this.poses(phase);
     let output = `<defs>
       <filter id="ol-context-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><pattern id="ol-turf" width="1000" height="120" patternUnits="userSpaceOnUse"><rect width="1000" height="60" fill="#102e2c"/><rect y="60" width="1000" height="60" fill="#123330"/></pattern>
       <marker id="ol-arrow-offense" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#7dd9e4" stroke-width="1.5"/></marker>
@@ -170,6 +187,7 @@ class OLField {
       }
     }
     const gaze=rendered.get(model.selectedId);if(model.focus&&gaze)output+=`<g data-gaze="true" transform="translate(${gaze.x} ${gaze.y})" pointer-events="none"><path d="M0 0 L-160 -200 Q0 -310 160 -200 Z" fill="#7dd9e4" opacity=".055" stroke="#7dd9e4" stroke-opacity=".5" stroke-dasharray="6 8"/></g><text x="500" y="26" text-anchor="middle" fill="#c6deda" font-size="11" font-family="system-ui" pointer-events="none">Görev odağı · gerçek görüş / kör nokta ölçümü değildir</text>`;
+    output+='<g data-contacts="true" pointer-events="none">'+Array.from({length:48},()=>'<line data-hand-contact="true" stroke="#ffb56f" stroke-width="4" stroke-linecap="round" visibility="hidden"/>').join('')+'</g>';
     const claimed = new Set(players.flatMap(actor => [actor.target, actor.secondary]).filter(Boolean));
     for (const [side, actors] of [['defense', defenders], ['offense', players]]) {
       for (const actor of actors) {
@@ -197,7 +215,7 @@ class OLField {
     if (model.mode === 'draw') output += `<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">${selected ? 'Boş alana dokun: yol noktası ekle · Noktaları sürükleyerek düzelt' : 'Yol çizmek için bir oyuncu seç'}</text>`;
     if (model.mode === 'erase') output += '<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">Silmek için bir yol noktasına dokun</text>';
     this.svg.innerHTML = output;
-    this.actorNodes=this.svg.querySelectorAll?.('[data-moving]')||[];this.targetLines=this.svg.querySelectorAll?.('[data-from]')||[];this.gazeNode=this.svg.querySelector?.('[data-gaze]');
+    this.actorNodes=this.svg.querySelectorAll?.('[data-moving]')||[];this.targetLines=this.svg.querySelectorAll?.('[data-from]')||[];this.gazeNode=this.svg.querySelector?.('[data-gaze]');this.handNodes=this.svg.querySelectorAll?.('[data-hand-contact]')||[];this.paintContacts(rendered);
   }
   pointerDown(event) {
     if (!this.model || event.button !== 0 && event.button !== undefined) return;

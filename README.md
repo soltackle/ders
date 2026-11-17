@@ -9,7 +9,7 @@ Amerikan futbolunda OL, QB ve receiver görevlerini anlatmak için Türkçe, çe
 
 ## Sade çalışma görünümü
 
-Başlangıçta saha, seçili oyuncu ve geçerli adım görünür. Oyunlar, savunma, çizim araçları ve düzenleme bölümleri üst düğmelerle gerektiğinde açılır. Oyuncu odağı seçilen oyuncuyu, hedeflerini, komşularını ve görevle ilgili çevresini açık bırakır; diğer oyuncuları bulanıklaştırır. Bu bir dikkat filtresidir; gerçek görüş alanı veya kör nokta hesabı değildir. Odağı kapatarak tüm sahayı görebilirsiniz.
+Başlangıçta saha, seçili oyuncu ve geçerli adım görünür. Oyunlar, savunma, çizim araçları ve düzenleme bölümleri üst düğmelerle gerektiğinde açılır. **Oyuncu odağı** ayrı bir işaret kutusudur; başlangıçta kapalıdır ve oyuncu seçimi bu ayarı değiştirmez. Oyuncu odağı seçilen oyuncuyu, hedeflerini, komşularını ve görevle ilgili çevresini açık bırakır; diğer oyuncuları bulanıklaştırır. Bu bir dikkat filtresidir; gerçek görüş alanı veya kör nokta hesabı değildir. Odağı kapatarak tüm sahayı görebilirsiniz.
 
 Oynatma, ekran yenilemelerine bağlı kesintisiz ara konumlarla ilerler; duraklatma aynı konumu korur. El, ayak, göz, temas ve gövde açıklamaları her adımda ayrı alanlardır ve düzenlenebilir. Genel RB tekniği başka oyunlarda kullanılabilir; Empty kadrosuna RB eklenmez.
 
@@ -62,3 +62,13 @@ Testler; 756 front/hash/teknik/taraf/blitz birleşimini, rookie/normal anlatım�
 ## Önceki repo içeriği
 
 Aktarım öncesindeki içerik `backup/before-ol-atolye-2026-11-17` dalında ve Git geçmişinde korunmuştur. Ana dalın dosyaları bu projeyle değiştirilmiştir.
+
+## Temaslı pas koruması modeli
+
+Empty ve half-slide korumasında hareketler `src/simulation.js` üzerinden hesaplanır. Otomatik OL örneği rakibe yürümek yerine geri set alır. Oyuncu hacimleri, sabit alt adımlar, temasta ayrıştırma ve dengeli ağırlık paylaşımı oyuncuların birbirinin içinden geçmesini önler. İki OL aynı hedefe yardım edebilir. Savunmacı kenardan dolaşabiliyorsa ilerler; hedef çizgisi tek başına başarılı blok kabul edilmez. Durum alanında hiza, set, temas, geri itilme ve kenar kaybı gösterilir. Temasta kısa el bağlantıları görünür.
+
+Çizilmiş yollar ve kullanıcı adım koordinatları hareket niyetidir; temas motoru gösterilen konumu ayırarak hesaplar, kaydedilmiş yol ve metinleri değiştirmez. Bu, kalibre edilmiş kuvvet, insan biyomekaniği veya ragdoll simülasyonu olmayan bir 2D öğretim modelidir.
+
+Motor SVG’den bağımsızdır. `frame(phase)` konum, temas, yön ve gövde ölçülerini; `cameraAnchor(playerId, phase)` gelecekteki göz hizası kamerasının bağlantı noktasını verir. Dünya koordinatları çizim birimindedir, metre değildir. Birinci şahıs modu henüz kullanıcı arayüzüne eklenmemiştir. Three.js gibi bir 3D görüntüleyici aynı durumları daha sonra kullanabilir. [Three.js fizik belgesi](https://threejs.org/manual/pages/physics.html), görüntüleme ile fizik zamanlamasını ayırır; [Rapier karakter denetleyicisi](https://rapier.rs/docs/user_guides/javascript/character_controller/) ileride 3D çarpışma için değerlendirilebilir.
+
+Temas testleri 108 front/hash/hareket sahnesini, combo, hızlı kafa kafaya hareket, kenardan geçiş, deterministik geri sarma ve kaynak verinin değişmemesini kapsar.

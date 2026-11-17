@@ -7,7 +7,7 @@ const App = (() => {
  let db, storageOK=true;
  try{const embedded=JSON.parse($('embeddedBackup').textContent),local=JSON.parse(localStorage.getItem(key)||'null');db=M.validate(embedded)?embedded:M.validate(local)?local:M.fresh();if(M.validate(embedded)&&M.validate(local)&&embedded.id===local.id&&local.updatedAt>embedded.updatedAt)db=local;const old=JSON.parse(localStorage.getItem('ol-atolye-takim-v2')||'null');if(old?.version===2)M.migrate(db,old);}catch(e){storageOK=false;db??=M.fresh();}
  const supplied=JSON.parse($('suppliedPlays')?.textContent||'[]');db.seedImports??=[];for(const p of supplied){if(!db.seedImports.includes(p.seedKey)){if(!db.plays.some(old=>old.seedKey===p.seedKey))db.plays.push(copy(p));db.seedImports.push(p.seedKey);if(!db.selectedPlayId)db.selectedPlayId=p.id;}}
- const S={side:db.plays.length?'offense':'defense',id:db.plays[0]?.players[0]?.id||db.defenders[0]?.id,tab:db.plays.find(p=>p.id===db.selectedPlayId)?.emptyProtection?'steps':'task',phase:0,mode:'select',pointIndex:-1,scope:'auto',variantId:'',playing:false,focus:true,visualPhase:0,raf:null,search:'',history:[],templateId:'',lessonRole:'field',timer:null};
+ const S={side:db.plays.length?'offense':'defense',id:db.plays[0]?.players[0]?.id||db.defenders[0]?.id,tab:db.plays.find(p=>p.id===db.selectedPlayId)?.emptyProtection?'steps':'task',phase:0,mode:'select',pointIndex:-1,scope:'auto',variantId:'',playing:false,focus:db.playerFocus===true,visualPhase:0,raf:null,search:'',history:[],templateId:'',lessonRole:'field',timer:null};
  if(!db.plays.some(p=>p.id===db.selectedPlayId))db.selectedPlayId=db.plays[0]?.id||'';
  const play=()=>db.plays.find(p=>p.id===db.selectedPlayId);
  function variant(){const p=play();if(!p||S.scope==='base')return null;const k=M.variantKey(db,p),v=db.variants.filter(v=>v.playId===p.id&&v.key===k);return v.find(v=>v.id===S.variantId)||v.at(-1)||null;}
@@ -18,7 +18,7 @@ const App = (() => {
  function stop(keepPosition=false){clearInterval(S.timer);cancelAnimationFrame(S.raf);S.playing=false;if(keepPosition!==true)S.visualPhase=S.phase;$('playBtn').textContent='▶';}
  function commit(fn,{render=true,reset=false}={}){stop();const before=copy(db);try{fn();if(!M.validate(db))throw Error('Alan veya kayıt sınırı aşıldı. Düzenleme geri alındı.');}catch(err){db=before;renderAll();toast(err.message||'Düzenleme uygulanamadı.');return false;}S.history.push(before);if(S.history.length>35)S.history.shift();if(reset)S.phase=0;persist();if(render)renderAll();return true;}
  function ensureSelected(){if(!selected()){S.side=actors().length?'offense':'defense';S.id=(S.side==='offense'?actors():db.defenders)[0]?.id;S.pointIndex=-1;}}
- function selectActor(side,id){stop();S.side=side;S.id=id;S.tab=side==='defense'?'task':'steps';S.focus=true;S.pointIndex=-1;renderAll();}
+ function selectActor(side,id){stop();S.side=side;S.id=id;S.tab=side==='defense'?'task':'steps';S.pointIndex=-1;renderAll();}
  function autoSteps(a){return !!play()?.emptyProtection&&a.stepMode!=='manual'&&(a.stepMode==='auto'||a.steps.length===6&&!a.steps.some(s=>s.text||s.direction||s.target||s.condition));}
  function lessonSteps(a){return autoSteps(a)?M.suggestions(db,{...play(),players:actors()})[a.id]?.steps||a.steps:a.steps;}
  function coachCopy(a){if(autoSteps(a)){if(a.steps.some(s=>s.text)){a.stepHistory??=[];a.stepHistory.push(copy(a.steps));}a.steps=copy(lessonSteps(a));}a.stepMode='manual';}
@@ -35,8 +35,8 @@ const App = (() => {
   pointSelect:i=>{S.pointIndex=i;renderInspector();renderField();}
  });
  function renderField(){
-  field.render({players:actors().map(a=>({...a,...effective(a),steps:lessonSteps(a)})),defenders:db.defenders,selectedId:S.id,selectedSide:S.side,phase:S.phase,maxPhase:maxPhase(),mode:S.mode,pathsVisible:$('pathsToggle').checked,assignmentsVisible:$('targetsToggle').checked,pointIndex:S.pointIndex,focus:S.focus});
-  $('focusBtn').setAttribute('aria-pressed',String(S.focus));const n=maxPhase();$('progress').max=n;$('progress').value=S.phase;$('phaseCount').textContent=`${S.phase} / ${n}`;
+  field.render({players:actors().map(a=>({...a,...effective(a),steps:lessonSteps(a)})),defenders:db.defenders,selectedId:S.id,selectedSide:S.side,phase:Math.floor(S.visualPhase)===S.phase?S.visualPhase:S.phase,maxPhase:maxPhase(),mode:S.mode,pathsVisible:$('pathsToggle').checked,assignmentsVisible:$('targetsToggle').checked,pointIndex:S.pointIndex,focus:S.focus,simulation:play()?.emptyProtection===true||play()?.halfSlide===true,onSimulationState:frame=>{const a=selected();$('contactStatus').textContent=a?(frame.states.get(a.id)||'Hiza'):'';}});
+  $('focusBtn').checked=S.focus;const n=maxPhase();$('progress').max=n;$('progress').value=S.phase;$('phaseCount').textContent=`${S.phase} / ${n}`;
   const a=selected();$('phaseLabel').textContent=`${S.phase} — ${S.side==='offense'?((a?lessonSteps(a):[])[S.phase]?.title||'Bu oyuncuda bu adım yok'):OLStepTitles[S.phase]||'Hareketin devamı'}`;
   $('phaseButtons').innerHTML=Array.from({length:n+1},(_,i)=>`<button data-phase="${i}" class="${i===S.phase?'active':''}" aria-label="Adım ${i}">${i}</button>`).join('');
   $('prevBtn').disabled=S.phase===0;$('nextBtn').disabled=S.phase>=n;$('undoBtn').disabled=!S.history.length;
@@ -120,7 +120,7 @@ const App = (() => {
  };
  function applyTemplate(replace,id){if(S.side!=='offense'||!selected()){toast('Önce bir hücum oyuncusu seçin.');return;}const t=db.templates.find(t=>t.id===(id||$('actorTemplate')?.value));if(!t){toast('Önce bir şablon seçin.');return;}if(replace&&selected().steps.some(s=>s.text)&&!confirm('Bu oyuncunun mevcut adımlarını şablonla değiştirmek istiyor musunuz?'))return;commit(()=>{coachCopy(selected());if(replace)selected().steps=copy(t.steps);else selected().steps.push(...copy(t.steps));S.tab='steps';S.phase=0;});toast('Şablon kopyalandı; her adımı değiştirebilirsiniz.');}
  document.addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;if(b.id==='focusBtn'){S.focus=!S.focus;renderField();return;}if(b.dataset.panel){const panel=document.getElementById(b.dataset.panel);panel.open=!panel.open;b.setAttribute('aria-expanded',String(panel.open));return;}
+  const b=e.target.closest('button');if(!b)return;if(b.dataset.panel){const panel=document.getElementById(b.dataset.panel);panel.open=!panel.open;b.setAttribute('aria-expanded',String(panel.open));return;}
   if(b.dataset.learning){commit(()=>{db.learningLevel=b.dataset.learning;});return;}
   if(b.hasAttribute('data-close')){b.closest('dialog').close();return;}
   if(b.dataset.play){loadPlay(b.dataset.play);return;}
@@ -176,6 +176,7 @@ const App = (() => {
  const advance=i=>{stop();S.phase=Math.max(0,Math.min(maxPhase(),i));renderInspector();renderField();};$('prevBtn').onclick=()=>advance(S.phase-1);$('nextBtn').onclick=()=>advance(S.phase+1);$('progress').oninput=e=>advance(+e.target.value);
  $('playBtn').onclick=()=>{if(S.playing){stop(true);return;}if(S.phase>=maxPhase()){S.phase=0;S.visualPhase=0;}S.playing=true;S.visualPhase=Math.floor(S.visualPhase)===S.phase?S.visualPhase:S.phase;$('playBtn').textContent='Ⅱ';renderField();field.animate(S.visualPhase);let last;
  const tick=now=>{if(!S.playing)return;if(last===undefined)last=now;const elapsed=Math.min(80,now-last);last=now;S.visualPhase=Math.min(maxPhase(),S.visualPhase+elapsed/Number($('speedSelect').value));const next=Math.floor(S.visualPhase+1e-8);if(next!==S.phase){S.phase=next;renderInspector();$('phaseCount').textContent=S.phase+' / '+maxPhase();$('progress').value=S.phase;$('phaseLabel').textContent=S.phase+' — '+(selected()&&S.side==='offense'?lessonSteps(selected())[S.phase]?.title||'Devam':OLStepTitles[S.phase]||'Devam');$('phaseButtons').querySelectorAll('button').forEach(b=>b.classList.toggle('active',+b.dataset.phase===S.phase));}field.animate(S.visualPhase);if(S.visualPhase>=maxPhase()){stop();renderField();return;}S.raf=requestAnimationFrame(tick);};S.raf=requestAnimationFrame(tick);};$('speedSelect').onchange=stop;
+ $('focusBtn').onchange=e=>{S.focus=e.target.checked;db.playerFocus=S.focus;persist();renderField();};
  $('pathsToggle').onchange=renderField;$('targetsToggle').onchange=renderField;
  document.addEventListener('change',e=>{if(e.target.id==='lessonRole'){S.lessonRole=e.target.value;renderLessonEditor();}if(e.target.id==='defenderPicker'&&e.target.value)selectActor('defense',e.target.value);if(e.target.id==='variantPicker'){S.variantId=e.target.value;S.scope='auto';renderAll();}});
  document.addEventListener('keydown',e=>{if(e.defaultPrevented||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||document.querySelector('dialog[open]'))return;if(e.key==='ArrowRight'){e.preventDefault();advance(S.phase+1);}if(e.key==='ArrowLeft'){e.preventDefault();advance(S.phase-1);}});

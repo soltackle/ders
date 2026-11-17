@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'src'
 html = (SRC / 'shell.html').read_text(encoding='utf-8')
 code = '\n'.join((SRC / name).read_text(encoding='utf-8') for name in (
-    'templates.js', 'defense.js', 'model.js', 'technique.js', 'empty.js', 'field.js', 'app.js'))
+    'templates.js', 'defense.js', 'model.js', 'technique.js', 'empty.js', 'simulation.js', 'field.js', 'app.js'))
 html = html.replace('__LEGACY_CATALOG__', (SRC / 'legacy-catalog.json').read_text(encoding='utf-8').replace('<', '\\u003c'))
 html = html.replace('__SCRIPTS__', code)
 core = ROOT / '.test-output'
