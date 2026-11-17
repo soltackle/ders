@@ -72,3 +72,9 @@ OL kick–slide–square sonrası temas ve anchor/blokta kalma yapar. Gövde ger
 ## Kontrol sınırı
 
 Bu araç fizik motoru değil, takım kuralına göre atama ve hareket öğreticisidir. Hazır front/blitz kombinasyonları için atama, sayı fazlası, hız ve yaklaşık çakışma kontrolleri testlidir. Elle çizilmiş olağandışı yollar antrenör tarafından doğrulanmalıdır. Paylaşılan tarayıcı açılamadığında GPU görüntüsü ve kullanıcı etkileşimi görsel olarak doğrulanmış sayılmaz.
+
+## Oyuncu POV / baş kontrolü
+
+POV göz hizası seçili modelin başına bağlıdır. Yatay görüş açısı başlangıçta 100°; panelden 80–115° arası ayarlanır, dikey açı ekran oranına göre sınırlanır. Kalın kask çerçevesi yerine hafif kenar gölgesi kullanılır.
+
+Sahada fareyi basılı tutup sürükleyerek veya dokunmatik ekranda sürükleyerek başı çevirin. **Fareyle serbest bakış** imleci kilitler; fare hareketi doğrudan bakışı kontrol eder, Escape kilitten çıkar. Desteklenmezse sürükleme kullanılabilir. **R** veya **Bakışı sıfırla** öğretici hedef bakışına döner. Başka oyuncu seçildiğinde bakış sıfırlanır. Oyuncunun görevi, blok yönü ve elleri baş hareketinden bağımsızdır.
