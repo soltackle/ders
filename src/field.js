@@ -108,14 +108,33 @@ class OLField {
     return {x: base.x + before.x, y: base.y + before.y};
   }
 
+  focusIds(model){
+    const all=[...(model.players||[]),...(model.defenders||[])],selected=all.find(a=>a.id===model.selectedId),ids=new Set();if(!selected||!model.focus)return new Set(all.map(a=>a.id));ids.add(selected.id);
+    const add=a=>{if(a)ids.add(a.id);},near=(list,n)=>[...list].sort((a,b)=>Math.hypot(a.x-selected.x,a.y-selected.y)-Math.hypot(b.x-selected.x,b.y-selected.y)).slice(0,n).forEach(add);
+    const offense=model.players||[],defense=model.defenders||[];[selected.target,selected.secondary,...(selected.readTargets||[])].forEach(id=>add(all.find(a=>a.id===id)));
+    if(model.selectedSide==='defense'){near(offense,3);near(defense.filter(a=>a.id!==selected.id),2);return ids;}
+    offense.filter(a=>['QB','RB','FB'].includes(a.position)).forEach(add);
+    if(['LT','LG','C','RG','RT'].includes(selected.position)){offense.filter(a=>['LT','LG','C','RG','RT'].includes(a.position)&&Math.abs(a.x-selected.x)<=105).forEach(add);near(defense.filter(a=>a.level==='LB'),2);near(offense.filter(a=>a.position==='WR'||a.position==='TE'),1);near(defense.filter(a=>a.level==='DL'),1);}
+    else if(selected.position==='QB'){offense.forEach(add);defense.filter(a=>a.rush).forEach(add);}
+    else if(['RB','FB'].includes(selected.position)){near(offense.filter(a=>['LT','LG','C','RG','RT'].includes(a.position)),3);defense.filter(a=>a.level==='LB').forEach(add);near(offense.filter(a=>['WR','TE'].includes(a.position)),1);}
+    else{near(defense,2);near(offense.filter(a=>a.id!==selected.id),1);}
+    return ids;
+  }
+  animate(phase){
+    if(!this.model)return;const all=[...(this.model.players||[]),...(this.model.defenders||[])],positions=new Map(all.map(a=>[a.id,this.animatedPosition(a,phase,this.model.maxPhase)]));
+    for(const node of this.actorNodes||[]){const point=positions.get(node.dataset.actorId);if(point)node.setAttribute('transform',`translate(${point.x} ${point.y})`);}
+    for(const line of this.targetLines||[]){const a=positions.get(line.dataset.from),b=positions.get(line.dataset.to);if(a&&b)for(const [k,v] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y}))line.setAttribute(k,String(v));}
+    const selected=positions.get(this.model.selectedId);if(this.gazeNode&&selected)this.gazeNode.setAttribute('transform',`translate(${selected.x} ${selected.y})`);
+  }
   render(model) {
     this.model = model;
     const esc = value => this.escape(value);
     const players = model.players || [], defenders = model.defenders || [];
     const phase = this.number(model.phase), maxPhase = Math.max(1, this.number(model.maxPhase, 5));
+    const focus=this.focusIds(model);
     const rendered = new Map([...players, ...defenders].map(actor => [actor.id, this.animatedPosition(actor, phase, maxPhase)]));
     let output = `<defs>
-      <pattern id="ol-turf" width="1000" height="120" patternUnits="userSpaceOnUse"><rect width="1000" height="60" fill="#102e2c"/><rect y="60" width="1000" height="60" fill="#123330"/></pattern>
+      <filter id="ol-context-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter><pattern id="ol-turf" width="1000" height="120" patternUnits="userSpaceOnUse"><rect width="1000" height="60" fill="#102e2c"/><rect y="60" width="1000" height="60" fill="#123330"/></pattern>
       <marker id="ol-arrow-offense" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#7dd9e4" stroke-width="1.5"/></marker>
       <marker id="ol-arrow-defense" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L7 3 L0 6" fill="none" stroke="#f08485" stroke-width="1.5"/></marker>
       <marker id="ol-arrow-target" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L6 3 L0 6" fill="none" stroke="#ffac65" stroke-width="1.3"/></marker>
@@ -135,7 +154,7 @@ class OLField {
         const from = rendered.get(player.id);
         for (const [target, secondary] of [[player.target, false], [player.secondary, true]]) {
           const to = rendered.get(target);
-          if (to) output += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="${secondary ? '#b2ce9b' : '#ffac65'}" stroke-opacity=".85" stroke-width="2" stroke-dasharray="${secondary ? '3 6' : '8 5'}" marker-end="url(#ol-arrow-target)" pointer-events="none"/>`;
+          if (to&&(model.focus?focus.has(player.id):true)) output += `<line data-from="${esc(player.id)}" data-to="${esc(target)}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="${secondary ? '#b2ce9b' : '#ffac65'}" stroke-opacity=".85" stroke-width="2" stroke-dasharray="${secondary ? '3 6' : '8 5'}" marker-end="url(#ol-arrow-target)" pointer-events="none"/>`;
         }
       }
     }
@@ -144,12 +163,13 @@ class OLField {
         for (const actor of actors) {
           const path = actor.path || [];
           if (!path.length) continue;
-          const selected = side === model.selectedSide && actor.id === model.selectedId;
+          const selected = side === model.selectedSide && actor.id === model.selectedId;if(model.focus&&!focus.has(actor.id))continue;
           const coordinates = [actor, ...path].map(point => `${this.number(point.x, 500)},${this.number(point.y, 300)}`).join(' ');
           output += `<polyline points="${coordinates}" fill="none" stroke="${side === 'offense' ? '#7dd9e4' : '#f08485'}" stroke-opacity="${selected ? '.95' : '.5'}" stroke-width="${selected ? '3.5' : '2.3'}" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#ol-arrow-${side})" pointer-events="none"/>`;
         }
       }
     }
+    const gaze=rendered.get(model.selectedId);if(model.focus&&gaze)output+=`<g data-gaze="true" transform="translate(${gaze.x} ${gaze.y})" pointer-events="none"><path d="M0 0 L-160 -200 Q0 -310 160 -200 Z" fill="#7dd9e4" opacity=".055" stroke="#7dd9e4" stroke-opacity=".5" stroke-dasharray="6 8"/></g><text x="500" y="26" text-anchor="middle" fill="#c6deda" font-size="11" font-family="system-ui" pointer-events="none">Görev odağı · gerçek görüş / kör nokta ölçümü değildir</text>`;
     const claimed = new Set(players.flatMap(actor => [actor.target, actor.secondary]).filter(Boolean));
     for (const [side, actors] of [['defense', defenders], ['offense', players]]) {
       for (const actor of actors) {
@@ -158,7 +178,7 @@ class OLField {
         const x = this.number(position.x, 500), y = this.number(position.y, 300);
         const color = side === 'offense' ? '#7dd9e4' : '#f08485';
         const unassigned = side === 'defense' && model.assignmentsVisible && actor.rush && !claimed.has(actor.id);
-        output += `<g data-actor-id="${esc(actor.id)}" data-side="${side}" tabindex="0" role="button" aria-label="${side === 'offense' ? 'Hücum' : 'Savunma'} oyuncusu ${esc(actor.label)}${selected ? ', seçili' : ''}" transform="translate(${x} ${y})" style="cursor:${model.mode === 'draw' ? 'crosshair' : 'grab'}">`;
+        output += `<g data-moving="true" data-context="${focus.has(actor.id)?'clear':'blurred'}" ${model.focus&&!focus.has(actor.id)?'filter="url(#ol-context-blur)" opacity="0.22"':''} data-actor-id="${esc(actor.id)}" data-side="${side}" tabindex="0" role="button" aria-label="${side === 'offense' ? 'Hücum' : 'Savunma'} oyuncusu ${esc(actor.label)}${selected ? ', seçili' : ''}" transform="translate(${x} ${y})" style="cursor:${model.mode === 'draw' ? 'crosshair' : 'grab'}">`;
         if (selected) output += '<circle r="28" fill="none" stroke="#ffac65" stroke-width="2" stroke-dasharray="4 3"/>';
         if (unassigned) output += '<circle r="26" fill="none" stroke="#ffac65" stroke-width="1.7"/><text x="24" y="-21" fill="#ffac65" font-size="15" font-family="system-ui,sans-serif">!</text>';
         if (side === 'offense') output += `<circle class="ol-ring" r="19" fill="#173a43" stroke="${color}" stroke-width="2.2"/>`;
@@ -177,6 +197,7 @@ class OLField {
     if (model.mode === 'draw') output += `<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">${selected ? 'Boş alana dokun: yol noktası ekle · Noktaları sürükleyerek düzelt' : 'Yol çizmek için bir oyuncu seç'}</text>`;
     if (model.mode === 'erase') output += '<text x="500" y="605" text-anchor="middle" fill="#ffcf9e" font-family="system-ui,sans-serif" font-size="12" pointer-events="none">Silmek için bir yol noktasına dokun</text>';
     this.svg.innerHTML = output;
+    this.actorNodes=this.svg.querySelectorAll?.('[data-moving]')||[];this.targetLines=this.svg.querySelectorAll?.('[data-from]')||[];this.gazeNode=this.svg.querySelector?.('[data-gaze]');
   }
   pointerDown(event) {
     if (!this.model || event.button !== 0 && event.button !== undefined) return;

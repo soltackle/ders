@@ -49,7 +49,7 @@ const OLEmpty = (() => {
  make('Bitiriş: {routeFinish}. Top sana gelirse görüşünü topa getirip dengeli yakalama ve koçun bitiriş talimatını uygula. Top gelmezse izin ve takım aralığının devamını koru; tekrar sonunda başlangıç, çıkış, dönüş ve bitişi kendi sözlerinle anlat.','İzi bitir; topa ve oyuna hazır kal.','{routeFinish}','Rota son alanı','Topun gelişi ve oyunun bitişi.','Top gelmedi diye görevin ortasında durma.','Rotanı isim ezberlemeden baştan sona anlatabilir misin?')]
 
  };
- for(const list of Object.values(banks))list.forEach((s,i)=>s.title=titles[i]);
+ for(const [role,list] of Object.entries(banks))list.forEach((s,i)=>{s.title=titles[i];if(!['qb','receiver'].includes(role))Object.assign(s,OLTechnique.get(role,i));});
   const routeNotes={
  X:{start:'sol tarafta çizgi üzerinde',first:'sağa ve ileriye çapraz çıkış',second:'sağa çapraz yükselişi sürdür',break:'sert bir kırılma eklemeden çapraz yükselişi devam ettir',finish:'görseldeki çapraz izin üst noktasına devam et'},
  U:{start:'sol tarafta çizginin gerisinde',first:'görselde kesikli çizilen bölümle sola, dış kenara hareket',second:'sol kenara ulaştıktan sonra hücum yönünde dikey yükseliş',break:'üst noktada sola ve geriye açılan kısa yön değişimi',finish:'görseldeki son yön değişimini tamamla'},
@@ -87,7 +87,7 @@ const OLEmpty = (() => {
    const oldKey=role==='centerCombo'?'combo':role==='man'?'boundary':role==='guardCombo'?'field':role;
    const taskTemplate=p.emptyTexts?.[oldKey]??tasks[role];
    const list=p.emptyCurriculum?.[role]??banks[role];
-   jobs[a.id]={role,values,task:a.source==='manual'?a.task:format(taskTemplate,values),target:target?.id||'',secondary:a.secondary||'',gap:a.source==='manual'?a.gap:fi>=0?values.gap:'',source:a.source==='manual'?'manual':'suggestion',readTargets:a.position==='QB'?boundaryLB.map(d=>d.id):[],steps:list.map(s=>Object.fromEntries(Object.entries(s).map(([k,v])=>[k,typeof v==='string'?format(v,values):v])))};
+   jobs[a.id]={role,values,task:a.source==='manual'?a.task:format(taskTemplate,values),target:target?.id||'',secondary:a.secondary||'',gap:a.source==='manual'?a.gap:fi>=0?values.gap:'',source:a.source==='manual'?'manual':'suggestion',readTargets:a.position==='QB'?boundaryLB.map(d=>d.id):[],steps:list.map((s,i)=>Object.fromEntries(Object.entries({...(!['qb','receiver'].includes(role)?OLTechnique.get(role,i):{}),...s}).map(([k,v])=>[k,typeof v==='string'?format(v,values):v])))};
    if(p.illustrateProtection!==false&&['LT','LG','C','RG','RT'].includes(a.position)&&!(a.path||[]).length){const clamp=(v,max)=>Math.max(0,Math.min(max,v)),travel=role==='centerCombo'?(one.x<a.x?-1:1):fi>=0?sign:target?Math.sign(target.x-a.x):0,cx=target?Math.max(a.x-110,Math.min(a.x+110,entry(target))):a.x+travel*22;const points=[[a.x,a.y],[a.x+travel*12,a.y-7],[a.x+travel*22,a.y-15],[cx,Math.min(a.y,312)],[cx,Math.min(a.y,308)],[cx,Math.min(a.y,306)]];jobs[a.id].steps.forEach((s,i)=>{const point=points[Math.min(i,5)];s.x=clamp(point[0],1000);s.y=clamp(point[1],630);});}
 
   }

@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'src'
 html = (SRC / 'shell.html').read_text(encoding='utf-8')
 code = '\n'.join((SRC / name).read_text(encoding='utf-8') for name in (
-    'templates.js', 'defense.js', 'model.js', 'empty.js', 'field.js', 'app.js'))
+    'templates.js', 'defense.js', 'model.js', 'technique.js', 'empty.js', 'field.js', 'app.js'))
 html = html.replace('__LEGACY_CATALOG__', (SRC / 'legacy-catalog.json').read_text(encoding='utf-8').replace('<', '\\u003c'))
 html = html.replace('__SCRIPTS__', code)
 core = ROOT / '.test-output'
@@ -14,7 +14,7 @@ core.mkdir(exist_ok=True)
 (core / 'core.html').write_text(html.replace('__SUPPLIED_PLAYS__', '[]'), encoding='utf-8')
 seed_script = r"""
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-for(const f of ['templates','defense','model','empty'])
+for(const f of ['templates','defense','model','technique','empty'])
   vm.runInThisContext(fs.readFileSync(path.join(process.argv[1],f+'.js'),'utf8'));
 const p=OLEmpty.newPlay();
 p.id='supplied-empty';

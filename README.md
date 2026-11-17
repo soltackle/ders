@@ -7,6 +7,14 @@ Amerikan futbolunda OL, QB ve receiver görevlerini anlatmak için Türkçe, çe
 
 İndirilen `OL_Atolye_Editor.html` dosyasını tarayıcıda açın. Kurulum, sunucu ve internet bağlantısı gerektirmez. GitHub Pages yayını, mevcut `github-pages` ortamının izin verdiği `codex/study-app` dalından yapılır. `master` projenin ana dalıdır; iki dalda da testler çalışır. Ortam korumaları değiştirilmez.
 
+## Sade çalışma görünümü
+
+Başlangıçta saha, seçili oyuncu ve geçerli adım görünür. Oyunlar, savunma, çizim araçları ve düzenleme bölümleri üst düğmelerle gerektiğinde açılır. Oyuncu odağı seçilen oyuncuyu, hedeflerini, komşularını ve görevle ilgili çevresini açık bırakır; diğer oyuncuları bulanıklaştırır. Bu bir dikkat filtresidir; gerçek görüş alanı veya kör nokta hesabı değildir. Odağı kapatarak tüm sahayı görebilirsiniz.
+
+Oynatma, ekran yenilemelerine bağlı kesintisiz ara konumlarla ilerler; duraklatma aynı konumu korur. El, ayak, göz, temas ve gövde açıklamaları her adımda ayrı alanlardır ve düzenlenebilir. Genel RB tekniği başka oyunlarda kullanılabilir; Empty kadrosuna RB eklenmez.
+
+Teknik kaynaklar uygulamadaki **Teknik kaynaklar** bölümündedir: USA Football, Sam Pittman / Coaches Insider ve Kevin Smith / Glazier. Bunlar takım görevlerinden ayrı, düzenlenebilir öğretim önerileridir.
+
 ## Kullanım
 
 1. Empty oyununda oyuncuyu seçip **Adımlar** sekmesini açın. Rookie görünümünde açıklama, yön, hedef, karar koşulu, sık hata ve kontrol sorusu; normal görünümde kısa görev çağrıları gösterilir. 11 oyuncu için başlangıçta toplam 66 adım vardır.
