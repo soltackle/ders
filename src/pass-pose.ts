@@ -9,5 +9,5 @@ export function passBlockPose(s:ScenarioType,id:string,t:number){const p=s.playe
  let q:number;if(swing){const from=Math.max(0,(phase-1)/steps),to=(phase+1)/steps;const smooth=f*f*(3-2*f);const a=samplePath(start,track,from),b=samplePath(start,track,to);footAt=[a[0]+(b[0]-a[0])*smooth,a[1]+(b[1]-a[1])*smooth];lift=Math.sin(Math.PI*f)*.065}else {let completed=phase-1;if((completed+kickIndex)%2!==index)completed--;q=Math.max(0,(completed+1)/steps);footAt=samplePath(start,track,q)}}
  const outside=(p.at[0]<0?sign===-1:sign===1);const dx=footAt[0]+sign*.29-at[0],dz=footAt[1]+(outside?-.19:.04)-at[1];return {x:dx*Math.cos(heading)-dz*Math.sin(heading),z:dx*Math.sin(heading)+dz*Math.cos(heading),y:.065+lift}});
  const contact=!!action&&['punch','combo','pickup'].includes(action.label)&&Math.hypot(opponent[0]-at[0],opponent[1]-at[1])<1.35;const phase=action?.phases?.find(p=>t>=p.start&&t<=p.end)?.name??(contact?'anchor':'kick-slide');
- return {heading,feet,contact,phase,hip:.61,chest:.93,head:1.27,lean:contact?.14:.07};
+ const first=s.actions.filter(a=>a.player===id).sort((a,b)=>a.start-b.start)[0];const rise=Math.max(0,Math.min(1,(t-(first?.start??t))/.2));return {heading,feet,contact,phase,hip:.59+.02*rise,chest:.82+.11*rise,head:1.12+.15*rise,lean:contact?.14:.35-.28*rise};
 }
