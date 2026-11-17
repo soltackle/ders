@@ -40,13 +40,11 @@ Varsayılan, football duruşları için prosedürel eklemli modeldir. Hareketler
 
 MediaRecorder destekleyen tarayıcılarda saha videosu kaydedilebilir. Başlatmak ve durdurmak için aynı düğmeye basın; WebM indirilir. Yerleşik gerçekçi football motion-capture kütüphanesi sağlanmaz.
 
-## Açık takım kararları
+## Takım pas koruması şablonu
 
-- Blitz yokken LB’yi C mi, guard mı gözetir?
-- Mid blitz durumunda OL sorumlulukları nelerdir?
-- 1-tech yoksa combo kuralı nasıl uygulanır?
+Sol senaryo menüsündeki **Takım pas koruması · otomatik**, yerleştirdiğiniz savunmaya göre Oynat anında pas korumasını üretir. Field dış blitz’te FT ALERT → FG → C zinciri, boundary’de RB varsa pickup / yoksa QB hot gözetimi, iç tehditte C–guard 1-tech combo ve LB gözetimi uygulanır. 3/4/5 DL başlangıç front’ları vardır. [Takım kuralı ve kullanım](docs/TEAM-PASS-PROTECTION.md).
 
-Uygulama bu kuralları uydurmaz. Antrenör playbook’a ekleyebilir.
+Diğer örnek Case’lerdeki genel playbook ayrıca düzenlenebilir. Otomatik takım şablonu kendi takım kuralını kullanır; sayı fazlasını ve çözülemeyen atamaları açıkça bildirir.
 
 ## Doğrulama sınırları
 

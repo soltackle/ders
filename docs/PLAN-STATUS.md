@@ -21,7 +21,7 @@ Bu tablo uygulanan davranışları izler. Görsel kalite iddiası veya fotogerç
 
 ## Dış bağımlılıklar ve doğrulama sınırları
 
-- Takımın üç açık kuralı kullanıcıdan gelmeden kesinleştirilmez; README’de listelenir.
+- Takımın pas koruması, kullanıcının sonraki açıklamasıyla netleştirildi; TEAM-PASS-PROTECTION.md dosyasında uygulanan kural ve sayı fazlası sınırları açıklanır.
 - Gerçek AI yanıtı için API anahtarı ve tarayıcıdan isteğe izin veren servis gerekir. Harici sağlayıcıyla gerçek istek, anahtar sağlanmadan doğrulanmış sayılmaz.
 - Prosedürel football hareketleri ile skinli örnek insan modeli ayrı seçeneklerdir. Football’a özel gerçekçi mocap/glTF varlığı pakette yoktur; kullanıcı kendi lisanslı GLB’sini yükleyebilir. Cesium Man’in atıfları model dizinindedir.
 - Managed preview relay ve paylaşılan tarayıcı başlatılamadı. DOM ve sahne hesapları testlidir; GPU görüntüsü, mobil görünüm ve video görüntüsünün insan gözüyle kontrolü tamamlanmış sayılmaz.
