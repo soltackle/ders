@@ -1,20 +1,53 @@
 # O-Line Lab
 
-Ofansif hat oyuncuları için senaryo tabanlı eğitim aracı. Vite, TypeScript, Three.js, Zustand ve Zod kullanır. GitHub Actions, `master` dalına yapılan değişiklikleri GitHub Pages'e yayınlar.
+Ofansif hat eğitim editörü ve oynatıcısı. **Canlı uygulama:** https://soltackle.github.io/ders/
 
-## Çalıştırma
+## Başlatma
+
+Node.js 22.13+ veya 24 gerekir.
 
 ```sh
 npm ci
 npm run dev
+npm test
+npm run build
 ```
 
-`npm run build` derleme ve tip kontrolü, `npm test` veri modeli kontrolleridir. Statik çıktı `dist/` altındadır.
+`dist/` statik çıktıdır. Bağıl varlık yolları GitHub Pages alt dizinlerini destekler. Pages ortamı yalnızca `codex/study-app` dalını kabul eder. `master` kaynak dalıdır; yayına gönderilecek commit bu dala da push edilmelidir. İş akışı test, tip kontrolü ve derleme geçmeden dağıtım yapmaz.
 
-## Kullanım
+## Eğitim akışı
 
-Örnek senaryolardan birini seçin, oyuncuya tıklayın ve adımları oynatın. Tasarla modunda oyuncuları 2D sahada taşıyın; aksiyon, pull ve adım ekleyin, analiz yapın veya JSON düzenleyicisinden bütün veriyi düzenleyin. Case'ler ve aktif senaryo tarayıcının yerel depolamasına kaydedilir; JSON ile dosyaya aktarılabilir. Video kaydı tarayıcı desteğine bağlıdır. AI özelliği, kullanıcının girdiği OpenAI uyumlu API adresi, model ve anahtarla doğrudan istek gönderir; anahtar uygulama tarafından kaydedilmez. Sağlayıcıya senaryo ve analiz gönderilir. AI çıktısı antrenör tarafından doğrulanmalıdır.
+1. Bir örnek Case seçin; LT/LG/C/RG/RT’ye tıklayarak POV’a geçin.
+2. Sonraki düğmesi aktif adımın sonuna kadar oynatır ve durur. Önceki, tekrar, yavaş çekim, loop ve zaman çizelgesi kullanılabilir. Boşluk tuşu oynatır/durdurur.
+3. POV HUD oyuncunun aktif aksiyon/fazını, atamasını ve hedefini gösterir. Mini harita konumunu gösterir. Omuz arkası düğmesi kendi bedenini görmeyi sağlar.
+4. Karar adımının sonunda yanıt seçin. Seçeneğe kayıtlı Case adı atanmışsa o Case açılır; doğru yanıt belirtilmişse tahmin geri bildirimi gösterilir.
 
-## Kapsam ve sınırlamalar
+## Tasarım akışı
 
-Teknik ve çakışma tespitleri yaklaşık hesaplamalardır. Pas korumasındaki belirsiz kurallar açık bırakılmıştır. Oyuncu modeli basit stilizedir; gelişmiş rig ve IK, gerçekçi model, animasyonlu eller, görsel waypoint sürükleme, otomatik kuraldan case üretimi, AI önerisinin sahneye uygulanması, karar dallarında case geçişi ve tahmin modu henüz uygulanmadı. Çizilen taktiklerin doğruluğu antrenör tarafından doğrulanmalıdır.
+**Tasarla** modunda panelleri açın. 2D’de oyuncular taşınabilir; DL’ler ayarlara göre omuz/baş hizasına yapışır. Aksiyon kaydedildikten sonra altın yol düğümleri sürüklenebilir veya **2D’de yol noktası çiz** ile ara noktalar eklenebilir. Pull/trap şablonu `open → run → gather → strike` fazlarını ve yolunu üretir. Diğer etiketler ve atama tipleri panelden seçilir. Engage alanı bir oyuncunun temas sırasında diğeriyle birlikte taşınmasını sağlar; bakış hedefi bağımsızdır.
+
+Adım paneli oyuncu notları, odak, çağrı okları ve karar seçeneklerini düzenler. Playbook paneli JSON kurallarını doğrular ve her kuraldan Case iskeleti üretir. Case kütüphanesi ad/şema filtresi, kopyalama, açma ve silme destekler. Undo/redo ve Ctrl/Cmd+Z, senaryo değişikliklerini geri alır. JSON yükleme/dışa aktarma farklı cihazlara aktarım içindir. Aktif senaryo otomatik olarak bu tarayıcıya kaydedilir; kütüphane kaydı ayrıca yapılır.
+
+## Analiz ve AI
+
+Analiz; DL tekniği/gap’i, covered OL, field/boundary, çizimden blitz, rollerin oyunculara çözülmesi, eksik sorumlular, overload, pull boşluğu, trap hedefi ve olası çakışmaları hesaplar. Sonuçlar geometrik ve taktik bir yardımcıdır; fizik simülasyonu veya koç kararının yerine geçmez. Teknik adları, omuz mesafesi ve blitz etiketleri ayarlardan değiştirilebilir.
+
+AI paketi senaryoyu, playbook’u, analizi ve 2D PNG’yi içerir. API formu OpenAI uyumlu, tarayıcı isteklerini kabul eden bir servis, model ve kullanıcı anahtarı gerektirir. Anahtar kalıcı depolamaya yazılmaz ve istek sonrasında alandan temizlenir. Geçerli JSON önerisi önizlenebilir; **Senaryoya uygula** seçilene kadar mevcut Case değişmez. Şema dışı ve bilinmeyen oyunculu öneriler reddedilir. Doğal dil tarifiyle tam senaryo üretimi de aynı doğrulamadan geçer.
+
+## Görseller ve video
+
+Varsayılan, football duruşları için prosedürel eklemli modeldir. Hareketler senaryo zamanından hesaplanır; eğri yollar, mesafeye bağlı adım döngüsü, yumuşak kamera, hedefe uzanan eller, gölgeler, izler ve temas vurgusu kullanılır. Ayarlardan kendi `.glb` modelinizi yükleyebilirsiniz; skin ve animasyon klipleri desteklenir. Paketteki isteğe bağlı Cesium Man, skin/klip destekli insan modeli örneğidir; football motion-capture modeli değildir. Kaynak ve lisansı [ATTRIBUTION.md](public/models/ATTRIBUTION.md) dosyasındadır. Özel model oturumda kalır; JSON’a gömülmez.
+
+MediaRecorder destekleyen tarayıcılarda saha videosu kaydedilebilir. Başlatmak ve durdurmak için aynı düğmeye basın; WebM indirilir. Yerleşik gerçekçi football motion-capture kütüphanesi sağlanmaz.
+
+## Açık takım kararları
+
+- Blitz yokken LB’yi C mi, guard mı gözetir?
+- Mid blitz durumunda OL sorumlulukları nelerdir?
+- 1-tech yoksa combo kuralı nasıl uygulanır?
+
+Uygulama bu kuralları uydurmaz. Antrenör playbook’a ekleyebilir.
+
+## Doğrulama sınırları
+
+Veri modeli, taktik analiz ve editör akışları otomatik testlerle kapsanır. Paylaşılan tarayıcı/önizleme altyapısı çalışmadığında 3D görünüm, mobil düzen, video çıktısı ve gerçek sağlayıcıyla AI çağrısı etkileşimli olarak doğrulanmış sayılmaz. API erişimi ve kullanılan modelin lisansı kullanıcı tarafından sağlanır.
