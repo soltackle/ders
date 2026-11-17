@@ -2,7 +2,7 @@ name: Validate and publish OL Atölye
 
 on:
   push:
-    branches: [master]
+    branches: [master, codex/study-app]
   workflow_dispatch:
 
 permissions:
@@ -47,6 +47,7 @@ jobs:
           path: _site
 
   deploy:
+    if: github.ref == 'refs/heads/codex/study-app'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

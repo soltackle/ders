@@ -5,7 +5,7 @@ Amerikan futbolunda OL, QB ve receiver görevlerini anlatmak için Türkçe, çe
 - [Uygulamayı aç](https://soltackle.github.io/ders/)
 - [Tek HTML dosyasını indir](https://github.com/soltackle/ders/raw/refs/heads/master/OL_Atolye_Editor.html)
 
-İndirilen `OL_Atolye_Editor.html` dosyasını tarayıcıda açın. Kurulum, sunucu ve internet bağlantısı gerektirmez. GitHub Pages yayını için `github-pages` ortamının `master` dalından dağıtıma izin vermesi gerekir. Aktarım sırasında mevcut ortam koruması bu dalı reddetti; çevrimdışı HTML ve repo dosyaları kullanılabilir. Yayını açmak için repo ayarlarında **Environments → github-pages → Deployment branches and tags** bölümünden `master` dalına izin verin.
+İndirilen `OL_Atolye_Editor.html` dosyasını tarayıcıda açın. Kurulum, sunucu ve internet bağlantısı gerektirmez. GitHub Pages yayını, mevcut `github-pages` ortamının izin verdiği `codex/study-app` dalından yapılır. `master` projenin ana dalıdır; iki dalda da testler çalışır. Ortam korumaları değiştirilmez.
 
 ## Kullanım
 
@@ -49,7 +49,7 @@ Kaynaklar `src/`, taşınabilir derleme betiği `scripts/build.py`, testler `tes
 
 Testler; 756 front/hash/teknik/taraf/blitz birleşimini, rookie/normal anlatımı, metin düzenlemeyi, manuel önceliğini, fare/dokunmatik yol olaylarını, look kayıtlarını ve JSON/HTML geri yüklemeyi kapsar. DOM ve veri testleri canlı tarayıcıdaki görsel kontrolün yerine geçmez.
 
-`master` dalındaki değişiklikler `.github/workflows/publish-pages.yml` üzerinden mevcut GitHub Pages yayınına aktarılır.
+`.github/workflows/publish-pages.yml` her iki dalda derleme ve testleri çalıştırır. Yalnız `codex/study-app` dalı mevcut GitHub Pages ortamına yayın yapar. Yeni bir `master` güncellemesini yayımlamak için `codex/study-app` dalını `master` ile ileri alın ve GitHub’a gönderin; bu, ortamın mevcut dal iznini kullanır.
 
 ## Önceki repo içeriği
 
