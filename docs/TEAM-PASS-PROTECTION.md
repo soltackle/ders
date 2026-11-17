@@ -78,3 +78,9 @@ Bu araç fizik motoru değil, takım kuralına göre atama ve hareket öğretici
 POV göz hizası seçili modelin başına bağlıdır. Yatay görüş açısı başlangıçta 100°; panelden 80–115° arası ayarlanır, dikey açı ekran oranına göre sınırlanır. Kalın kask çerçevesi yerine hafif kenar gölgesi kullanılır.
 
 Sahada fareyi basılı tutup sürükleyerek veya dokunmatik ekranda sürükleyerek başı çevirin. **Fareyle serbest bakış** imleci kilitler; fare hareketi doğrudan bakışı kontrol eder, Escape kilitten çıkar. Desteklenmezse sürükleme kullanılabilir. **R** veya **Bakışı sıfırla** öğretici hedef bakışına döner. Başka oyuncu seçildiğinde bakış sıfırlanır. Oyuncunun görevi, blok yönü ve elleri baş hareketinden bağımsızdır.
+
+## DL tekniğini seçerek diziliş kurma
+
+Saha üstündeki **DL TEKNİKLERİ** panelinde her DL için sol/sağ ve **0, 1, 2i, 2, 3, 4i, 4, 5** seçilebilir. 0/1 center, 2i/2/3 guard, 4i/4/5 tackle referanslıdır. İç/dış omuz hücumun kendi tarafından hesaplanır. Seçim yalnız ilgili DL’nin yanal konumunu değiştirir, derinliğini ve diğer oyuncuların yerlerini korur. Yeni dizilişte Oynat’a basınca koruma tekrar hesaplanır.
+
+Bir konum başka savunmacıyla doluysa seçim uygulanmaz ve oyuncu adıyla uyarı gösterilir. Önce o oyuncuyu başka konuma taşıyın. Elle sürüklenmiş, tam bir teknik hizasına oturmayan oyuncuda **Serbest** gösterilir. TE referanslı 6/7/9 teknikleri bu beş OL panelinde bulunmaz.

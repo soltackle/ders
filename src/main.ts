@@ -1,3 +1,4 @@
+import {mountTechniquePanel} from './technique-panel';
 import {renderCoverage} from './coverage-panel';
 import {advancePlayback,initialPlaybackSpeed,atEnd} from './timing';
 import {initializeProtectionStorage} from './library';
@@ -82,3 +83,5 @@ $('#reset-look').onclick=()=>fieldScene.resetLook();$('#lock-look').onclick=asyn
 $('#head-fov').oninput=e=>{fieldScene.horizontalFov=Number((e.target as HTMLInputElement).value);$('#head-fov-value').textContent=`${fieldScene.horizontalFov}°`};
 function syncHeadControls(){const pov=store.getState().view==='pov';headControls.hidden=!pov;renderer.domElement.classList.toggle('head-look-enabled',pov);if(!pov){headDrag=null;if(document.pointerLockElement===renderer.domElement)document.exitPointerLock()}}
 store.subscribe(syncHeadControls);syncHeadControls();document.addEventListener('keydown',e=>{if(e.code==='KeyR'&&!(e.target as HTMLElement).matches('input,textarea,select'))fieldScene.resetLook()});
+
+const techniqueHost=document.createElement('section');defense.after(techniqueHost);mountTechniquePanel(techniqueHost,{get:()=>store.getState().scenario,set:s=>setScenario(s),subscribe:fn=>{store.subscribe(fn)}});
