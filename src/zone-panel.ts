@@ -107,7 +107,7 @@ export function mountZonePanel(
           cfg[key],
           (value) => {
             const next = structuredClone(api.get());
-            next.zone = { ...cfg, [key]: value };
+            next.zone = { ...cfg, [key]: value };if(next.ravens&&key==='variant')next.ravens.blocking=value as 'inside'|'outside';
             apply(next);
           },
         ),

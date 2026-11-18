@@ -1,3 +1,4 @@
+import {planRavens} from './ravens.ts';
 import {planZone,zoneCovered} from './zone.ts';
 import {analysis,position,config,activeRule,type ScenarioType} from './model.ts';
 import {alignment,classifyBlitz,resolvedAssignments} from './tactics.ts';
@@ -5,7 +6,7 @@ import {planProtection} from './protection.ts';
 export type Finding={level:'info'|'warning',text:string};
 type Resolved={role:string;player:string;type:string;targets:string[];present:boolean;target?:string;toward?:string;note?:string;partner?:string};
 export function inspectScenario(input:ScenarioType){
- const team=input.zone?.enabled?planZone(input):input.protection?.enabled?planProtection(input):null,s=team?.scenario??input;
+ const team=input.ravens&&input.ravens.enabled!==false?planRavens(input):input.zone?.enabled?planZone(input):input.protection?.enabled?planProtection(input):null,s=team?.scenario??input;
  const base=analysis(s),ol=s.players.filter(p=>p.side==='OFF'&&['LT','LG','C','RG','RT'].includes(p.pos));
  const defenders=s.players.filter(p=>p.side==='DEF').map(p=>{const a=alignment(s,p.at[0]),action=s.actions.find(a=>a.player===p.id);return {id:p.id,position:p.pos,technique:p.pos==='DL'?a.technique:null,nearestOL:a.nearest,gap:action?.gap??a.gap,action:action?.label??null,alignment:p.at}});
  const coveredIDs=s.zone?.enabled?zoneCovered(s):null;

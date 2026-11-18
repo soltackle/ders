@@ -11,7 +11,8 @@
       "ES2022",
       "DOM",
       "DOM.Iterable"
-    ]
+    ],
+    "resolveJsonModule": true
   },
   "include": [
     "src"

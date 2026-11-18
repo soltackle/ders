@@ -1,3 +1,4 @@
+import { planRavens } from "./ravens.ts";
 import type { ScenarioType } from "./model.ts";
 import {
   planProtection,
@@ -9,9 +10,11 @@ import {
 } from "./protection.ts";
 import { planZone } from "./zone.ts";
 export const automaticTraining = (s: ScenarioType) =>
-  !!(s.zone?.enabled || s.protection?.enabled);
+  s.ravens
+    ? s.ravens.enabled !== false
+    : !!(s.zone?.enabled || s.protection?.enabled);
 export function planTraining(s: ScenarioType) {
-  return s.zone ? planZone(s) : planProtection(s);
+  return s.ravens ? planRavens(s) : s.zone ? planZone(s) : planProtection(s);
 }
 function preserveZone(previous: ScenarioType, next: ScenarioType) {
   if (!previous.zone) return next;
@@ -46,12 +49,24 @@ function preserveZone(previous: ScenarioType, next: ScenarioType) {
   return next;
 }
 export function trainingFront(s: ScenarioType, n: FrontCount) {
-  return preserveZone(s, protectionFront(s, n));
+  return preserveRavens(s, preserveZone(s, protectionFront(s, n)));
 }
 export function trainingDefense(
   s: ScenarioType,
   side: DefenseSide,
   intent: "blitz" | "show",
 ) {
-  return preserveZone(s, setDefenseOption(s, side, intent));
+  return preserveRavens(s, preserveZone(s, setDefenseOption(s, side, intent)));
+}
+
+function preserveRavens(previous: ScenarioType, next: ScenarioType) {
+  if (!previous.ravens) return next;
+  next.ravens = structuredClone(previous.ravens);
+  next.name = previous.name;
+  next.scheme = "Ravens · MOST";
+  next.protection = {
+    enabled: previous.ravens.blocking === "pass",
+    showDepth: previous.protection?.showDepth ?? 1.8,
+  };
+  return next;
 }

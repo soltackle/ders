@@ -56,6 +56,14 @@ Covered OL başlangıçta karşısındaki adamı alır ve adamında kalır. Unco
 
 Covered/uncovered paylaşımı kullanıcının tarif ettiği takım kuralını uygular. Yardımın erişilebilirliği ve ikinci seviye LB seçimi konumlara göre hesaplanır; özel stunt devirleri ve RB okumaları ayrıca düzenlenebilir. [Uygulanan zone kuralları ve sınırlar](docs/FIELD-ZONE.md).
 
+## Ravens · MOST
+
+Üst bölümdeki **Ravens · MOST** sekmesi, kullanıcı tarafından sağlanan Playmaker X HTML çiziminden aktarılan **35 ofans oyununu** içerir. Kartlarda kaynak yerleşimi ve rotalar görünür; adla arama ve zone/counter/option/pistol/bunch filtresi kullanılabilir. Bir kart seçildiğinde oyun aynı 2D/3D/POV sahnesinde açılır. [Doğrudan Ravens bölümü](https://soltackle.github.io/ders/#ravens).
+
+**OL blok şeması** seçimi çizimdeki yollar, takım pas koruması, field inside zone ve field outside/stretch seçeneklerini sunar. Çizim modunda özel counter/option görevleri kaynakta çizildiği şekilde oynatılır; karar okuması veya top hedefi uydurulmaz. Pas ve zone seçimlerinde takım kuralları OL ve ilgili RB/QB görevlerini hesaplar; diğer kaynak rotaları korunur. Savunma kaynakta bulunmadığı için çalışma front’u olarak eklenir ve değiştirilebilir.
+
+Q kaynak harfi QB’ye, arka alandaki uygun H RB’ye eşlenir; Empty dizilişinde H otomatik RB yapılmaz. Konumların oranları korunur, ölçek OL aralığına göre normalize edilir. Kesik çizgiler snap öncesi motion olarak oynar. Motion/rota hızları ve snap zamanı eğitim amaçlı ayarlanır. Her Ravens oyununun taslağı ve OL Antrenman bölümü ayrı saklanır. [Aktarım ve sınırlar](docs/RAVENS-MOST.md).
+
 ## Doğrulama sınırları
 
 Veri modeli, taktik analiz ve editör akışları otomatik testlerle kapsanır. Paylaşılan tarayıcı/önizleme altyapısı çalışmadığında 3D görünüm, mobil düzen, video çıktısı ve gerçek sağlayıcıyla AI çağrısı etkileşimli olarak doğrulanmış sayılmaz. API erişimi ve kullanılan modelin lisansı kullanıcı tarafından sağlanır.
