@@ -104,39 +104,48 @@ test("10 rollout field FT/FG/C slide yapar, boundary kendi DL’sinde kalır ve 
 });
 test("31 field guard tackle arkasından lead,32 boundary guard wrap yapar; kendi OL yolları çakışmaz", () => {
   for (const n of [31, 32])
-    for (const hash of ["left", "right"] as const) {
-      const s = scenario(n);
-      s.hash = hash;
-      const p = planRavens(s),
-        sign = fieldSide(s) === "right" ? 1 : -1,
-        guard = n === 31 ? (sign > 0 ? "RG" : "LG") : sign > 0 ? "LG" : "RG",
-        tackle = n === 31 ? (sign > 0 ? "RT" : "LT") : sign > 0 ? "LT" : "RT";
-      const pull = p.scenario.actions.find(
-        (a) => a.player === guard && a.label === "pull",
-      )!;
-      assert.ok(pull);
-      assert.ok(pull.path!.some((p) => p[1] < -0.7));
-      assert.ok(
-        !p.scenario.actions.some(
-          (a) => a.player === guard && a.label === "zone-step",
-        ),
-      );
-      if (n === 32) {
-        const base = planProtection(s);
-        assert.equal(
-          p.assignments.find((a) => a.player === guard)!.target,
-          base.assignments.find((a) => a.player === tackle)!.target,
+    for (const front of [3, 4, 5, 6] as const)
+      for (const hash of ["left", "right"] as const) {
+        const s = trainingFront(scenario(n), front);
+        s.hash = hash;
+        const p = planRavens(s),
+          sign = fieldSide(s) === "right" ? 1 : -1,
+          guard = n === 31 ? (sign > 0 ? "RG" : "LG") : sign > 0 ? "LG" : "RG",
+          tackle = n === 31 ? (sign > 0 ? "RT" : "LT") : sign > 0 ? "LT" : "RT";
+        const pull = p.scenario.actions.find(
+          (a) => a.player === guard && a.label === "pull",
+        )!;
+        assert.ok(pull);
+        assert.ok(pull.path!.some((p) => p[1] < -0.7));
+        assert.ok(
+          !p.scenario.actions.some(
+            (a) => a.player === guard && a.label === "zone-step",
+          ),
         );
-        assert.ok(passBlockPose(p.scenario, guard, pull.end - 0.05));
-      }
-      assert.deepEqual(
-        inspectScenario(p.scenario).findings.filter((f) =>
+        if (n === 32) {
+          const base = planProtection(s);
+          assert.equal(
+            p.assignments.find((a) => a.player === guard)!.target,
+            base.assignments.find((a) => a.player === tackle)!.target,
+          );
+          assert.ok(passBlockPose(p.scenario, guard, pull.end - 0.05));
+        }
+        const collisions = inspectScenario(p.scenario).findings.filter((f) =>
           /çakışma/.test(f.text),
-        ),
-        [],
-        `${n}/${hash}`,
-      );
-    }
+        );
+        const line = p.scenario.players
+          .filter((p) => ["LT", "LG", "C", "RG", "RT"].includes(p.pos))
+          .map((p) => p.id);
+        assert.deepEqual(
+          collisions.filter(
+            (f) => line.filter((id) => f.text.includes(id)).length >= 2,
+          ),
+          [],
+          `${n}/${hash}/${front} OL`,
+        );
+        if (front === 4)
+          assert.deepEqual(collisions, [], `${n}/${hash} hazır durum`);
+      }
 });
 test("840 hazır durumda geçerli zaman, sabit savunma başlangıcı ve tekrar hesaplamada aynı yollar", () => {
   for (const p of ravensCatalog)

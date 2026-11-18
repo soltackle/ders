@@ -331,12 +331,20 @@ export function boundaryWrap(plan: ProtectionResult, source: ScenarioType) {
   ];
   const end = Math.max(finish(plan), track.end + 1.8);
   appendHold(s, bg.id, track, end, oldT);
-  const inner: [number, number] = [
-      oldG
-        ? s.players.find((p) => p.id === oldG)!.at[0] - sign * 0.35
-        : bt.at[0] + sign * 0.5,
-      -0.65,
-    ],
+  let innerX = oldG
+    ? s.players.find((p) => p.id === oldG)!.at[0] - sign * 0.35
+    : bt.at[0] + sign * 0.5;
+  for (const helper of plan.assignments.filter(
+    (a) =>
+      a.player !== bg.id &&
+      a.player !== bt.id &&
+      a.target === oldG &&
+      a.type !== "watch",
+  )) {
+    const at = position(s, helper.player, end);
+    if (Math.abs(innerX - at[0]) < 0.72) innerX = at[0] - sign * 0.72;
+  }
+  const inner: [number, number] = [innerX, -0.65],
     inside: ActionType = {
       source: "ravens",
       player: bt.id,
@@ -522,6 +530,57 @@ export function fieldGuardLead(plan: ZoneResult, source: ScenarioType) {
         to: [at[0], at[1] + 0.55],
       },
     );
+  }
+  const rb = s.players.find((p) => p.side === "OFF" && p.pos === "RB"),
+    cut = s.actions.find((a) => a.player === rb?.id && a.label === "read-cut"),
+    carry = s.actions.find((a) => a.player === rb?.id && a.label === "carry");
+  if (rb && cut && carry && (s.zone?.rbRead ?? "auto") === "auto") {
+    const original = cut.to[0],
+      offset = carry.to[0] - original,
+      oldPath = structuredClone(cut.path ?? []);
+    let best = original,
+      room = -Infinity;
+    function lane(x: number) {
+      cut!.to[0] = x;
+      cut!.path = oldPath.map((p, i) =>
+        i === oldPath.length - 1 ? [x, p[1]] : p,
+      );
+      carry!.to[0] = x + offset;
+      let minimum = 5;
+      for (let t = cut!.start + 0.5; t <= carry!.end; t += 0.1) {
+        const at = position(s, rb!.id, t);
+        for (const p of s.players.filter(
+          (p) => p.side === "OFF" && p.id !== rb!.id && p.pos !== "QB",
+        )) {
+          const other = position(s, p.id, t);
+          minimum = Math.min(
+            minimum,
+            Math.hypot(at[0] - other[0], at[1] - other[1]),
+          );
+        }
+      }
+      return minimum;
+    }
+    for (const dx of [0, 0.3, -0.3, 0.6, -0.6, 0.9, -0.9, 1.2, -1.2]) {
+      const x = original + sign * dx,
+        score = lane(x) - Math.abs(dx) * 0.02;
+      if (score > room) {
+        room = score;
+        best = x;
+      }
+    }
+    lane(best);
+    if (Math.abs(best - original) > 0.05) {
+      const oldRead = plan.read;
+      plan.read = `LEAD KORİDORU · x ${best.toFixed(2)}`;
+      const role = plan.assignments.find((a) => a.player === rb.id);
+      if (role)
+        role.note =
+          role.note.replace(oldRead, plan.read) +
+          " Guard lead/pin paylaşımına göre otomatik koşu koridoru güncellendi.";
+      for (const step of s.steps)
+        step.description = step.description.replace(oldRead, plan.read);
+    }
   }
   extend(s, end);
   return update(
