@@ -1,3 +1,4 @@
+import { ravensProfile } from "./ravens-catalog.ts";
 import { planRavens } from "./ravens.ts";
 import type { ScenarioType } from "./model.ts";
 import {
@@ -61,11 +62,24 @@ export function trainingDefense(
 
 function preserveRavens(previous: ScenarioType, next: ScenarioType) {
   if (!previous.ravens) return next;
+  if (
+    previous.ravens.blocking === "team" &&
+    !["pass", "pass-wrap", "rollout"].includes(
+      ravensProfile(previous.ravens.id).kind,
+    )
+  )
+    for (const p of next.players.filter(
+      (p) => p.side === "DEF" && p.pos === "LB" && p.intent === "hold",
+    )) {
+      const old = previous.players.find((q) => q.id === p.id);
+      p.intent = old?.intent === "hold" ? "hold" : "auto";
+      if (p.intent === "auto" && p.at[1] <= 1.8) p.at[1] = 3.3;
+    }
   next.ravens = structuredClone(previous.ravens);
   next.name = previous.name;
   next.scheme = "Ravens · MOST";
   next.protection = {
-    enabled: previous.ravens.blocking === "pass",
+    enabled: previous.protection?.enabled ?? false,
     showDepth: previous.protection?.showDepth ?? 1.8,
   };
   return next;

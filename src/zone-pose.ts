@@ -1,13 +1,32 @@
 import { motion, position, samplePath, type ScenarioType } from "./model.ts";
 import { fieldSide } from "./model.ts";
 export function zoneBlockPose(s: ScenarioType, id: string, t: number) {
-  if (!s.zone?.enabled) return null;
+  if (!s.zone?.enabled && s.ravens?.blocking !== "team") return null;
   const p = s.players.find((p) => p.id === id);
-  if (!p || p.side !== "OFF" || !["LT", "LG", "C", "RG", "RT"].includes(p.pos))
-    return null;
+  if (!p || p.side !== "OFF") return null;
   const m = motion(s, id, t),
     a = m.action;
   if (!a) return null;
+  const isLine = ["LT", "LG", "C", "RG", "RT"].includes(p.pos),
+    tush = /special-(tush|qb-surge|qb-finish|follow)/.test(a.label),
+    pull =
+      a.assignment === "pull" ||
+      a.label === "pull" ||
+      a.label === "source-pull";
+  if (!isLine && !tush) return null;
+  if (
+    pull &&
+    !a.phases?.some(
+      (phase) =>
+        ["gather", "strike"].includes(phase.name) &&
+        t >= phase.start &&
+        t <= phase.end,
+    ) &&
+    a.label !== "special-hold"
+  )
+    return null;
+  if (!s.zone?.enabled && !/^(source-down|source-climb|special-)/.test(a.label))
+    return null;
   const target = a.target ? position(s, a.target, t) : [m.at[0], m.at[1] + 1];
   const heading =
     a.label === "climb"
@@ -73,9 +92,9 @@ export function zoneBlockPose(s: ScenarioType, id: string, t: number) {
       a.label !== "climb" &&
       Math.hypot(target[0] - m.at[0], target[1] - m.at[1]) < 1.4,
     phase: a.label,
-    hip: 0.59,
-    chest: 0.88,
-    head: 1.2,
-    lean: a.label === "climb" ? 0.22 : 0.32,
+    hip: tush ? 0.46 : 0.59,
+    chest: tush ? 0.71 : 0.88,
+    head: tush ? 1.0 : 1.2,
+    lean: tush ? 0.48 : a.label === "climb" ? 0.22 : 0.32,
   };
 }

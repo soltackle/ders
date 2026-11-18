@@ -1,8 +1,10 @@
+import { ravensProfile, ravensMatchesGroup } from "./ravens-catalog.ts";
 import {
   ravensPlays,
   drawingRoster,
   ravensScenario,
   planRavens,
+  migrateRavensScenario,
   blockingLabels,
   changeRavensBlocking,
   type Blocking,
@@ -78,7 +80,7 @@ export function mountRavens(
 ) {
   host.className = "ravens-page";
   host.innerHTML =
-    '<div class="ravens-heading"><div><span class="eyebrow">RAVENS PLAYBOOK · MOST</span><h2>Ravens ofans oyunları</h2><p>35 kaynak çizim · 11 ofans oyuncusu · motion ve rotalar</p></div><span class="ravens-count" role="status"></span></div><details open class="ravens-library"><summary>Oyun kütüphanesi</summary><div class="ravens-filters"><label>Oyun ara<input type="search" aria-label="Ravens oyun ara" placeholder="Oyun adı, zone, pistol, bunch…"></label><label>Grup<select aria-label="Ravens grup"><option value="all">Bütün oyunlar</option><option value="zone">Zone</option><option value="counter">Counter</option><option value="option">Option</option><option value="pistol">Pistol</option><option value="bunch">Bunch</option></select></label></div><div class="ravens-grid"></div></details><div class="ravens-active"><strong class="ravens-selected"></strong><label>OL blok şeması<select aria-label="Ravens blok şeması"></select></label><p>Kaynakta savunma çizilmemiştir; aşağıdaki savunma çalışma için eklenmiştir. Çizimdeki yollar modunda özel counter/option kararları varsayılmaz. Pas ve zone modlarında OL ile ilgili RB/QB görevleri takım şemasından hesaplanır; kaynak çizim kartta korunur. Snap ve koşu hızları eğitim zamanlamasıdır.</p><p class="ravens-role"></p></div>';
+    '<div class="ravens-heading"><div><span class="eyebrow">RAVENS PLAYBOOK · MOST</span><h2>Ravens ofans oyunları</h2><p>35 numaralı oyun · takım oyun çağrıları · 11 ofans oyuncusu</p></div><span class="ravens-count" role="status"></span></div><details open class="ravens-library"><summary>Oyun kütüphanesi</summary><div class="ravens-filters"><label>Oyun ara<input type="search" aria-label="Ravens oyun ara" placeholder="Oyun numarası, adı veya türü…"></label><label>Grup<select aria-label="Ravens grup"><option value="all">Bütün oyunlar</option><option value="pass">Pas / koruma</option><option value="zone">Zone</option><option value="counter">Counter</option><option value="option">Speed option</option><option value="trap">Trap</option><option value="screen">Screen</option><option value="special">Özel oyunlar</option><option value="pistol">Pistol</option><option value="bunch">Bunch</option></select></label></div><div class="ravens-grid"></div></details><div class="ravens-active"><strong class="ravens-selected"></strong><label>OL blok şeması<select aria-label="Ravens blok şeması"></select></label><p>Oyun numaraları kaynak MOST sırasını korur. Takımın pas, zone ve özel oyun çağrıları bu numaralara bağlıdır. Savunma çalışma için eklenmiştir; front ve teknik değişince görevler yeniden hesaplanır. Snap ve koşu hızları eğitim zamanlamasıdır.</p><p class="ravens-team-note"></p><div class="ravens-special-controls" hidden><label>Top taşıyıcı<select aria-label="Ravens top taşıyıcı"></select></label><label class="ravens-option-control" hidden>Option okuması<select aria-label="Ravens option okuması"><option value="pitch">Pitch / dışarı ver</option><option value="keep">Keep / QB tutar</option></select></label><label>Top devir anı (sn)<input type="number" aria-label="Ravens top devir anı" min="0.1" max="119" step="0.1"></label><p>OL görevleri takım çağrısına bağlıdır. Top taşıyıcı ve devir zamanı eğitim için ayarlanabilir; savunmanın otomatik karar verdiği varsayılmaz.</p></div><p class="ravens-role"></p></div>';
   const search = host.querySelector<HTMLInputElement>("input")!,
     filter = host.querySelector<HTMLSelectElement>(
       '[aria-label="Ravens grup"]',
@@ -86,6 +88,15 @@ export function mountRavens(
     grid = host.querySelector<HTMLElement>(".ravens-grid")!,
     mode = host.querySelector<HTMLSelectElement>(
       '[aria-label="Ravens blok şeması"]',
+    )!;
+  const carrier = host.querySelector<HTMLSelectElement>(
+      '[aria-label="Ravens top taşıyıcı"]',
+    )!,
+    optionRead = host.querySelector<HTMLSelectElement>(
+      '[aria-label="Ravens option okuması"]',
+    )!,
+    transferAt = host.querySelector<HTMLInputElement>(
+      '[aria-label="Ravens top devir anı"]',
     )!;
   for (const [value, text] of Object.entries(blockingLabels))
     mode.add(
@@ -114,24 +125,36 @@ export function mountRavens(
   let previous: ScenarioType | undefined;
   function cards() {
     grid.replaceChildren();
-    const term = search.value.toLocaleLowerCase("tr");
-    const list = ravensPlays.filter(
-      (p) =>
-        (!term || p.name.toLocaleLowerCase("tr").includes(term)) &&
-        (filter.value === "all" ||
-          p.name.toLocaleLowerCase("tr").includes(filter.value)),
-    );
+    const term = search.value.trim().toLocaleLowerCase("tr");
+    const numeric = /^\d+$/.test(term) ? Number(term) : null;
+    const list = ravensPlays.filter((p) => {
+      const profile = ravensProfile(p.id);
+      return (
+        (numeric !== null
+          ? profile.number === numeric
+          : !term ||
+            `${p.name} ${profile.label}`
+              .toLocaleLowerCase("tr")
+              .includes(term)) && ravensMatchesGroup(profile, filter.value)
+      );
+    });
     host.querySelector(".ravens-count")!.textContent =
       `${list.length} / 35 oyun`;
     for (const p of list) {
       const b = document.createElement("button");
       b.className = "ravens-card";
+      const profile = ravensProfile(p.id);
       b.dataset.ravensPlay = p.id;
+      b.dataset.ravensNumber = String(profile.number);
+      b.dataset.ravensKind = profile.kind;
       b.setAttribute("aria-pressed", String(api.get().ravens?.id === p.id));
       b.append(ravensThumbnail(p));
       const title = document.createElement("strong");
-      title.textContent = p.name;
-      b.append(title);
+      title.textContent = `${profile.number}. ${p.name}`;
+      const type = document.createElement("small");
+      type.className = "ravens-play-kind";
+      type.textContent = profile.label;
+      b.append(title, type);
       b.onclick = () => {
         saveDraft();
         const next = loadDraft("ol-ravens-" + p.id);
@@ -152,7 +175,12 @@ export function mountRavens(
   function loadDraft(key: string) {
     try {
       const raw = localStorage.getItem(key);
-      return raw ? Scenario.parse(JSON.parse(raw)) : undefined;
+      if (!raw) return undefined;
+      const parsed = Scenario.parse(JSON.parse(raw));
+      const migrated = parsed.ravens ? migrateRavensScenario(parsed) : parsed;
+      return migrated !== parsed && migrated.ravens
+        ? planRavens(migrated).scenario
+        : migrated;
     } catch {
       return undefined;
     }
@@ -173,10 +201,49 @@ export function mountRavens(
       localStorage.setItem("ol-draft-training", JSON.stringify(previous));
     previous = s;
     if (s.ravens) saveDraft();
-    host.querySelector(".ravens-selected")!.textContent = s.ravens
-      ? s.name
+    const profile = s.ravens ? ravensProfile(s.ravens.id) : undefined;
+    host.querySelector(".ravens-selected")!.textContent = profile
+      ? `${profile.number}. ${s.name}`
+      : "";
+    host.querySelector(".ravens-team-note")!.textContent = profile
+      ? `${profile.label} · ${profile.note}`
       : "";
     mode.value = s.ravens?.blocking ?? "diagram";
+    const special = !!(
+      s.ravens?.blocking === "team" &&
+      profile &&
+      !["pass", "zone", "zone-lead", "rollout", "pass-wrap"].includes(
+        profile.kind,
+      )
+    );
+    host.querySelector<HTMLElement>(".ravens-special-controls")!.hidden =
+      !special;
+    host.querySelector<HTMLElement>(".ravens-option-control")!.hidden =
+      profile?.kind !== "speed-option";
+    carrier.disabled = profile?.kind === "tushpush";
+    transferAt.disabled = profile?.kind === "tushpush";
+    if (special) {
+      carrier.replaceChildren();
+      for (const p of s.players.filter(
+        (p) =>
+          p.side === "OFF" && !["LT", "LG", "C", "RG", "RT"].includes(p.pos),
+      )) {
+        const o = document.createElement("option");
+        o.value = p.id;
+        o.textContent = `${p.id} · ${p.pos}`;
+        carrier.add(o);
+      }
+      carrier.value =
+        s.ravens?.carrier ??
+        (profile?.kind === "tushpush"
+          ? "Q"
+          : s.players.some((p) => p.id === "H")
+            ? "H"
+            : "Q");
+      optionRead.value = s.ravens?.optionRead ?? "pitch";
+      transferAt.value =
+        s.ravens?.transferAt === undefined ? "" : String(s.ravens.transferAt);
+    }
     const rb = s.players.find((p) => p.side === "OFF" && p.pos === "RB");
     host.querySelector(".ravens-role")!.textContent = s.ravens
       ? `Kaynak harfler korunur. Q = QB${rb ? `; ${rb.id} = RB (arka alan hizası)` : "; otomatik RB atanmadı"}. Çizim ölçeği OL aralığına göre normalize edilir.`
@@ -223,10 +290,53 @@ export function mountRavens(
           .scenario,
       );
   };
+  carrier.onchange = () => {
+    const s = structuredClone(api.get());
+    if (!s.ravens) return;
+    const oldRead = s.ravens.optionRead;
+    s.ravens.carrier = carrier.value;
+    if (ravensProfile(s.ravens.id).kind === "speed-option")
+      s.ravens.optionRead =
+        carrier.value === s.players.find((p) => p.pos === "QB")?.id
+          ? "keep"
+          : "pitch";
+    if (s.ravens.optionRead !== oldRead) s.ravens.transferAt = undefined;
+    api.set(planRavens(s).scenario);
+  };
+  optionRead.onchange = () => {
+    const s = structuredClone(api.get());
+    if (!s.ravens) return;
+    if (s.ravens.optionRead !== optionRead.value)
+      s.ravens.transferAt = undefined;
+    s.ravens.optionRead = optionRead.value as "keep" | "pitch";
+    s.ravens.carrier =
+      optionRead.value === "keep"
+        ? s.players.find((p) => p.pos === "QB")?.id
+        : (s.players.find((p) => p.id === "H")?.id ??
+          s.players.find(
+            (p) =>
+              p.side === "OFF" &&
+              !["LT", "LG", "C", "RG", "RT", "QB"].includes(p.pos),
+          )?.id);
+    api.set(planRavens(s).scenario);
+  };
+  transferAt.onchange = () => {
+    const s = structuredClone(api.get());
+    if (!s.ravens) return;
+    const v = Number(transferAt.value);
+    if (!Number.isFinite(v) || v < 0.1 || v > 119) return;
+    s.ravens.transferAt = v;
+    api.set(planRavens(s).scenario);
+  };
   search.oninput = cards;
   filter.onchange = cards;
   api.subscribe(sync);
   window.addEventListener("hashchange", section);
+  const initial = api.get();
+  if (initial.ravens) {
+    const migrated = migrateRavensScenario(initial);
+    if (migrated !== initial) api.set(planRavens(migrated).scenario);
+  }
   cards();
   if (api.get().ravens && location.hash !== "#training")
     location.hash = "ravens";

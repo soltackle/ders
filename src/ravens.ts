@@ -1,6 +1,14 @@
+import { ravensProfile, RAVENS_PROFILE_REVISION } from "./ravens-catalog.ts";
+import { applyRavensSpecial } from "./ravens-special.ts";
+import {
+  rolloutProtection,
+  boundaryWrap,
+  fieldGuardLead,
+} from "./ravens-variants.ts";
 import source from "./data/ravens-most.json" with { type: "json" };
 import {
   Scenario,
+  fieldSide,
   pathLength,
   position,
   type ScenarioType,
@@ -12,9 +20,9 @@ import {
   frontLabel,
   type ProtectionResult,
 } from "./protection.ts";
-import { planZone } from "./zone.ts";
+import { planZone, type ZoneResult } from "./zone.ts";
 import { travelDuration } from "./timing.ts";
-export type Blocking = "diagram" | "pass" | "inside" | "outside";
+export type Blocking = "diagram" | "pass" | "inside" | "outside" | "team";
 export type DrawingPlay = {
   id: string;
   name: string;
@@ -28,6 +36,7 @@ export type DrawingPlay = {
 export const ravensPlays = source as DrawingPlay[];
 export const blockingLabels: Record<Blocking, string> = {
   diagram: "Çizimdeki yollar",
+  team: "Takım oyun kuralı",
   pass: "Takım pas koruması",
   inside: "Field inside zone",
   outside: "Field outside / stretch",
@@ -124,16 +133,83 @@ export function drawingRoster(play: DrawingPlay) {
   }));
 }
 export function suggestedBlocking(play: DrawingPlay): Blocking {
-  if (/OUTZONE/i.test(play.name)) return "outside";
-  if (/ZONE/i.test(play.name)) return "inside";
-  if (
-    !/PERDE/i.test(play.name) &&
-    play.players
-      .filter((p) => ["LT", "LG", "C", "RG", "RT"].includes(p.id))
-      .every((p) => !p.paths.length)
-  )
-    return "pass";
-  return "diagram";
+  return ravensProfile(play.id).defaultBlocking;
+}
+export function migrateRavensScenario(input: ScenarioType): ScenarioType {
+  if (!input.ravens || (input.ravens.revision ?? 0) >= RAVENS_PROFILE_REVISION)
+    return input;
+  const next = changeRavensBlocking(
+    input,
+    ravensProfile(input.ravens.id).defaultBlocking,
+  );
+  next.ravens!.revision = RAVENS_PROFILE_REVISION;
+  return next;
+}
+function runtimeRoster(play: DrawingPlay, s: ScenarioType) {
+  let roster = drawingRoster(play);
+  const profile = ravensProfile(play.id),
+    reflected =
+      s.ravens?.blocking !== "diagram" &&
+      profile.direction !== "drawing" &&
+      fieldSide(s) === "left";
+  if (reflected) {
+    const mirror: Record<string, string> = {
+      LT: "RT",
+      RT: "LT",
+      LG: "RG",
+      RG: "LG",
+    };
+    roster = roster.map((p) => ({
+      ...p,
+      id: mirror[p.id] ?? p.id,
+      paths: p.paths.map((a) => ({
+        ...a,
+        points: a.points.map(([x, z]) => [-x, z] as [number, number]),
+      })),
+    }));
+  }
+  // The original 32 motion line crosses the stationary QB icon. Keep its endpoints,
+  // but let the moving player pass behind the QB's body rather than through it.
+  if (profile.number === 32 && s.ravens?.blocking === "team")
+    for (const p of roster) {
+      const own = s.players.find((q) => q.id === p.id),
+        qb = s.players.find((q) => q.pos === "QB");
+      if (!own || !qb || own.id === qb.id) continue;
+      for (const path of p.paths.filter((a) => a.motion)) {
+        const points = path.points,
+          extra: [number, number][] = [];
+        for (let i = 0; i < points.length - 1; i++) {
+          const from = points[i],
+            to = points[i + 1],
+            dx = to[0] - from[0],
+            dz = to[1] - from[1],
+            qx = qb.at[0] - own.at[0],
+            qz = qb.at[1] - own.at[1],
+            u = Math.max(
+              0,
+              Math.min(
+                1,
+                ((qx - from[0]) * dx + (qz - from[1]) * dz) /
+                  (dx * dx + dz * dz || 1),
+              ),
+            );
+          extra.push(from);
+          if (
+            Math.abs(dx) > 0.7 &&
+            Math.hypot(from[0] + u * dx - qx, from[1] + u * dz - qz) < 0.6
+          ) {
+            const sign = Math.sign(dx);
+            extra.push(
+              [qx - sign * 0.75, qz - 0.8],
+              [qx + sign * 0.75, qz - 0.8],
+            );
+          }
+        }
+        extra.push(points.at(-1)!);
+        path.points = extra;
+      }
+    }
+  return roster;
 }
 export function ravensScenario(id: string, blocking?: Blocking): ScenarioType {
   const play = ravensPlays.find((p) => p.id === id);
@@ -163,16 +239,27 @@ export function ravensScenario(id: string, blocking?: Blocking): ScenarioType {
   s.scheme = "Ravens · MOST";
   s.ravens = {
     enabled: true,
+    revision: RAVENS_PROFILE_REVISION,
     id,
     source: "MOST",
     blocking: blocking ?? suggestedBlocking(play),
   };
-  s.protection = { enabled: s.ravens.blocking === "pass", showDepth: 1.8 };
+  s.protection = {
+    enabled:
+      s.ravens.blocking === "pass" ||
+      (s.ravens.blocking === "team" &&
+        ["rollout", "pass-wrap"].includes(ravensProfile(id).kind)),
+    showDepth: 1.8,
+  };
   s.zone = undefined;
-  if (s.ravens.blocking === "inside" || s.ravens.blocking === "outside")
+  if (
+    s.ravens.blocking === "inside" ||
+    s.ravens.blocking === "outside" ||
+    (s.ravens.blocking === "team" && ravensProfile(id).kind === "zone-lead")
+  )
     s.zone = {
       enabled: true,
-      variant: s.ravens.blocking,
+      variant: s.ravens.blocking === "outside" ? "outside" : "inside",
       dlReaction: "base",
       lbReaction: "fit",
       rbRead: "auto",
@@ -200,16 +287,22 @@ export function changeRavensBlocking(input: ScenarioType, blocking: Blocking) {
   const s = structuredClone(input);
   if (!s.ravens) throw Error("Ravens oyunu seçilmeli");
   s.ravens.blocking = blocking;
+  s.ravens.revision = RAVENS_PROFILE_REVISION;
   s.protection = {
-    enabled: blocking === "pass",
+    enabled:
+      blocking === "pass" ||
+      (blocking === "team" &&
+        ["rollout", "pass-wrap"].includes(ravensProfile(s.ravens.id).kind)),
     showDepth: s.protection?.showDepth ?? 1.8,
   };
   s.zone =
-    blocking === "inside" || blocking === "outside"
+    blocking === "inside" ||
+    blocking === "outside" ||
+    (blocking === "team" && ravensProfile(s.ravens.id).kind === "zone-lead")
       ? {
           ...s.zone,
           enabled: true,
-          variant: blocking,
+          variant: blocking === "outside" ? "outside" : "inside",
           dlReaction: s.zone?.dlReaction ?? "base",
           lbReaction: s.zone?.lbReaction ?? "fit",
           rbRead: s.zone?.rbRead ?? "auto",
@@ -256,26 +349,64 @@ function diagramPlan(s: ScenarioType): ProtectionResult {
     interiorThreats: [],
   };
 }
-export function planRavens(input: ScenarioType) {
-  const meta = input.ravens!,
-    play = ravensPlays.find((p) => p.id === meta.id);
+export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
+  input = migrateRavensScenario(input);
+  const play = ravensPlays.find((p) => p.id === input.ravens!.id);
   if (!play) throw Error("Ravens kaynağı bulunamadı");
-  const roster = drawingRoster(play),
+  const profile = ravensProfile(input.ravens!.id),
     s = structuredClone(input);
+  const desired =
+    s.ravens!.blocking !== "diagram" && profile.direction !== "drawing"
+      ? fieldSide(s)
+      : "right";
+  if ((s.ravens!.orientation ?? "right") !== desired) {
+    const c =
+        s.players.find((p) => p.side === "OFF" && p.pos === "C")?.at[0] ?? 0,
+      old = structuredClone(s.players),
+      map: Record<string, string> = { LT: "RT", RT: "LT", LG: "RG", RG: "LG" };
+    for (const p of s.players.filter((p) => p.side === "OFF")) {
+      const opposite = old.find(
+        (q) => q.side === "OFF" && q.pos === map[p.pos],
+      );
+      p.at = [2 * c - (opposite ?? p).at[0], (opposite ?? p).at[1]];
+    }
+  }
+  s.ravens!.orientation = desired;
+  const meta = s.ravens!,
+    roster = runtimeRoster(play, s);
+  const special =
+    meta.blocking === "team" &&
+    !["pass", "zone", "rollout", "pass-wrap", "zone-lead"].includes(
+      profile.kind,
+    );
+  const baseline =
+    meta.blocking === "team"
+      ? changeRavensBlocking(
+          s,
+          profile.kind === "zone"
+            ? (s.zone?.variant ?? profile.defaultBlocking)
+            : profile.kind === "zone-lead"
+              ? (s.zone?.variant ?? "inside")
+              : ["pass", "rollout", "pass-wrap"].includes(profile.kind)
+                ? "pass"
+                : "diagram",
+        )
+      : s;
+  baseline.ravens = { ...meta };
   const base =
-    meta.blocking === "diagram"
-      ? diagramPlan(s)
-      : s.zone
-        ? planZone(s)
-        : planProtection(s);
+    meta.blocking === "diagram" || special
+      ? diagramPlan(baseline)
+      : baseline.zone
+        ? planZone(baseline)
+        : planProtection(baseline);
   const out = base.scenario;
   const sourcePlayers = roster.filter((p) => {
     const player = out.players.find((q) => q.id === p.id);
     if (!player) return false;
-    if (meta.blocking === "diagram") return true;
+    if (meta.blocking === "diagram" || special) return true;
     if (!p.paths.length) return false;
     if (["LT", "LG", "C", "RG", "RT"].includes(player.pos)) return false;
-    if (s.zone && ["QB", "RB"].includes(player.pos)) return false;
+    if (baseline.zone && ["QB", "RB"].includes(player.pos)) return false;
     if (
       player.pos === "RB" &&
       base.assignments.some(
@@ -394,7 +525,7 @@ export function planRavens(input: ScenarioType) {
     st.notes = { ...st.notes, ...notes };
     if (st.end > finish) st.end = finish;
   }
-  if (meta.blocking === "diagram")
+  if (meta.blocking === "diagram" || special)
     out.steps = [
       {
         title: "Kaynak dizilişi / motion",
@@ -422,7 +553,7 @@ export function planRavens(input: ScenarioType) {
       " Ravens çizim rotalarıyla birlikte; savunma örnek çalışma front’udur.";
     out.steps.at(-1)!.end = finish;
   }
-  if (meta.blocking === "diagram") {
+  if (meta.blocking === "diagram" || special) {
     out.blitz = "none";
     out.rules = [
       {
@@ -438,5 +569,46 @@ export function planRavens(input: ScenarioType) {
   out.name = play.name;
   out.scheme = "Ravens · MOST";
   out.playbook = `Ravens MOST · ${blockingLabels[meta.blocking]}`;
-  return { ...base, scenario: Scenario.parse(out) };
+  let result = { ...base, scenario: Scenario.parse(out) };
+  if (meta.blocking === "team") {
+    if (special) return applyRavensSpecial(result.scenario, profile);
+    const sourceScenario = planRavens(
+      changeRavensBlocking(s, "diagram"),
+    ).scenario;
+    // Mirror the pure source OL paths for a left-field call, keeping live player positions.
+    if (profile.direction !== "drawing" && fieldSide(input) === "left") {
+      const map: Record<string, string> = {
+        LG: "RG",
+        RG: "LG",
+        LT: "RT",
+        RT: "LT",
+      };
+      for (const action of sourceScenario.actions) {
+        const oldId = action.player,
+          newId = map[oldId] ?? oldId,
+          old = sourceScenario.players.find((p) => p.id === oldId)!,
+          next = s.players.find((p) => p.id === newId);
+        if (!next) continue;
+        action.player = newId;
+        action.to = [next.at[0] - (action.to[0] - old.at[0]), action.to[1]];
+        action.path = action.path?.map((p) => [
+          next.at[0] - (p[0] - old.at[0]),
+          p[1],
+        ]);
+      }
+    }
+    if (profile.kind === "rollout")
+      return rolloutProtection(result as ReturnType<typeof planProtection>);
+    if (profile.kind === "pass-wrap")
+      return boundaryWrap(
+        result as ReturnType<typeof planProtection>,
+        sourceScenario,
+      );
+    if (profile.kind === "zone-lead")
+      return fieldGuardLead(
+        result as ReturnType<typeof planZone>,
+        sourceScenario,
+      );
+  }
+  return result;
 }
