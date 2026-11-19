@@ -64,6 +64,14 @@ Covered/uncovered paylaşımı kullanıcının tarif ettiği takım kuralını u
 
 Q kaynak harfi QB’ye, arka alandaki uygun H RB’ye eşlenir; Empty dizilişinde H otomatik RB yapılmaz. Konumların oranları korunur, ölçek OL aralığına göre normalize edilir. Kesik çizgiler snap öncesi motion olarak oynar. Motion/rota hızları ve snap zamanı eğitim amaçlı ayarlanır. Her Ravens oyununun taslağı ve OL Antrenman bölümü ayrı saklanır. [Aktarım ve sınırlar](docs/RAVENS-MOST.md).
 
+## Ravens · Rakip defans paketleri
+
+Ravens sahasının altındaki **Rakip defans paketi · Kocaeli** bölümü, hazır front/blitz seçeneklerinden ayrıdır. Sağlanan Playmaker X savunma çizimindeki **beş 4–3 çağrıyı ve 55 oyuncu yerleşimini** içerir: 2×2 spread 1&10, trips right 1&10, trips right 3&az, 2×2 spread 3&8 ve trips right 3&10. Paket değiştirmek ofans oyununu değiştirmez; Ravens kartı değiştirilince seçili rakip paketi ve reaksiyon modu korunur.
+
+**Ravens oyununa tepki** modunda DL/blitz baskısı, pas rotalarına coverage, koşuda LB fit/puller okuması, dış contain, screen teşhisi ve taşıyıcı takibi gecikme ve hız sınırlarıyla üretilir. Takımın pas koruması, big-on-big ve covered/uncovered zone paylaşımı geçerlidir. Savunmacı uzaktaki puller’a temas etmiş gibi bağlanmaz; elle kaydedilen savunma yolları önceliklidir. **Kaynakta çizilmiş hareketler** modunda yalnız savunma çizgileri oynatılır; çizgisiz savunmacı yerinde kalır.
+
+Kaynak coverage çağrısı/man-zone etiketi belirtmez. Adaptif coverage ve takip, çizimin açılışından sonra uygulanan eğitim kurallarıdır; rakibin gerçek coverage sistemi olarak sunulmaz. **Paketi kaldır** önceki savunmayı geri getirir; hazır front/blitz seçimi de paketten çıkar. [Kaynak aktarımı, tepkiler ve sınırlar](docs/OPPONENT-PACKAGES.md).
+
 ## Doğrulama sınırları
 
 Veri modeli, taktik analiz ve editör akışları otomatik testlerle kapsanır. Paylaşılan tarayıcı/önizleme altyapısı çalışmadığında 3D görünüm, mobil düzen, video çıktısı ve gerçek sağlayıcıyla AI çağrısı etkileşimli olarak doğrulanmış sayılmaz. API erişimi ve kullanılan modelin lisansı kullanıcı tarafından sağlanır.

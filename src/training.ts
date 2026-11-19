@@ -1,3 +1,4 @@
+import {removeOpponentPackage} from './opponent.ts';
 import { ravensProfile } from "./ravens-catalog.ts";
 import { planRavens } from "./ravens.ts";
 import type { ScenarioType } from "./model.ts";
@@ -50,6 +51,7 @@ function preserveZone(previous: ScenarioType, next: ScenarioType) {
   return next;
 }
 export function trainingFront(s: ScenarioType, n: FrontCount) {
+  if(s.opponent)s=removeOpponentPackage(s);
   return preserveRavens(s, preserveZone(s, protectionFront(s, n)));
 }
 export function trainingDefense(
@@ -57,6 +59,7 @@ export function trainingDefense(
   side: DefenseSide,
   intent: "blitz" | "show",
 ) {
+  if(s.opponent)s=removeOpponentPackage(s);
   return preserveRavens(s, preserveZone(s, setDefenseOption(s, side, intent)));
 }
 

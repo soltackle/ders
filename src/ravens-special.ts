@@ -113,7 +113,7 @@ export function applyRavensSpecial(
     lbs = s.players.filter(
       (p) =>
         p.side === "DEF" &&
-        p.pos !== "DL" &&
+        (p.pos === "LB"||p.intent==='blitz') &&
         p.intent !== "hold" &&
         p.intent !== "show",
     );
@@ -719,6 +719,7 @@ export function applyRavensSpecial(
   const reactionEnd = Math.max(snap + 1.3, Math.min(contact, snap + 2));
   const defenders = s.players.filter((p) => p.side === "DEF");
   for (const p of defenders) {
+    if (!['DL','LB'].includes(p.pos)&&p.intent!=='blitz')continue;
     if (
       authoredDEF.has(p.id) ||
       p.intent === "hold" ||

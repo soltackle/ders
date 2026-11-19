@@ -1,3 +1,4 @@
+import { applyOpponentPackage } from "./opponent.ts";
 import { ravensProfile, ravensMatchesGroup } from "./ravens-catalog.ts";
 import {
   ravensPlays,
@@ -156,13 +157,15 @@ export function mountRavens(
       type.textContent = profile.label;
       b.append(title, type);
       b.onclick = () => {
+        const current = api.get();
         saveDraft();
-        const next = loadDraft("ol-ravens-" + p.id);
-        api.set(
-          next?.ravens?.id === p.id
-            ? next
-            : planRavens(ravensScenario(p.id)).scenario,
-        );
+        const draft = loadDraft("ol-ravens-" + p.id);
+        let next = draft?.ravens?.id === p.id ? draft : ravensScenario(p.id);
+        if (current.opponent && current.ravens?.id !== p.id) {
+          next = applyOpponentPackage(next, current.opponent.id);
+          next.opponent!.mode = current.opponent.mode;
+        }
+        api.set(planRavens(next).scenario);
       };
       grid.append(b);
     }

@@ -134,7 +134,9 @@ export function planZone(input: ScenarioType): ZoneResult {
     dl = s.players.filter(
       (p) => p.side === "DEF" && p.pos === "DL" && p.intent !== "hold",
     ),
-    lbs = s.players.filter((p) => p.side === "DEF" && p.pos !== "DL"),
+    lbs = s.players.filter(
+      (p) => p.side === "DEF" && (p.pos === "LB" || p.intent === "blitz"),
+    ),
     rb = s.players.find((p) => p.side === "OFF" && p.pos === "RB"),
     qb = s.players.find((p) => p.side === "OFF" && p.pos === "QB");
   const center = ol.find((p) => p.pos === "C")?.at[0] ?? 0;
@@ -172,7 +174,11 @@ export function planZone(input: ScenarioType): ZoneResult {
     .filter((p) => (p.at[0] - center) * sign >= 0)
     .sort((a, b) => a.at[0] * sign - b.at[0] * sign)
     .slice(0, 2);
-  for (const p of s.players.filter((p) => p.side === "DEF")) {
+  for (const p of s.players.filter(
+    (p) =>
+      p.side === "DEF" &&
+      (p.pos === "DL" || p.pos === "LB" || p.intent === "blitz"),
+  )) {
     if (
       authored.has(p.id) ||
       p.intent === "hold" ||
@@ -714,6 +720,7 @@ export function planZone(input: ScenarioType): ZoneResult {
     .filter(
       (p) =>
         p.side === "DEF" &&
+        (p.pos === "DL" || p.pos === "LB" || p.intent === "blitz") &&
         p.intent !== "hold" &&
         p.intent !== "show" &&
         !["sail", "bait", "hold"].includes(reaction(p)) &&

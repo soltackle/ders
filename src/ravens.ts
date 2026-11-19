@@ -1,3 +1,5 @@
+import { prepareOpponent, restoreOpponentOwnership, opponentPackages } from "./opponent.ts";
+import { reactOpponent } from "./opponent-reaction.ts";
 import { ravensProfile, RAVENS_PROFILE_REVISION } from "./ravens-catalog.ts";
 import { applyRavensSpecial } from "./ravens-special.ts";
 import {
@@ -338,7 +340,7 @@ function diagramPlan(s: ScenarioType): ProtectionResult {
         technique: null,
         blockers: [],
         watchers: [],
-        detail: "Kaynakta savunma çizilmemiş",
+        detail: s.opponent ? "Rakip paketindeki kaynak savunma" : "Kaynakta savunma çizilmemiş",
         status: "idle",
       })),
     unblocked: [],
@@ -354,7 +356,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   const play = ravensPlays.find((p) => p.id === input.ravens!.id);
   if (!play) throw Error("Ravens kaynağı bulunamadı");
   const profile = ravensProfile(input.ravens!.id),
-    s = structuredClone(input);
+    s = prepareOpponent(structuredClone(input));
   const desired =
     s.ravens!.blocking !== "diagram" && profile.direction !== "drawing"
       ? fieldSide(s)
@@ -440,11 +442,16 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
       );
   const delay = Math.max(0, ...sourcePlayers.map((p) => motionTime(p))),
     snap = 1.1 + delay;
+  const authoredDefense = (a: ActionType) =>
+    (!a.source || a.source === "manual") &&
+    !a.kind?.startsWith("opponent-") &&
+    out.players.some((p) => p.id === a.player && p.side === "DEF");
   // Shift the team episode after the imported pre-snap motion.
   out.actions = out.actions.filter(
     (a) => !sourcePlayers.some((p) => p.id === a.player),
   );
   for (const a of out.actions) {
+    if (authoredDefense(a)) continue;
     a.start += delay;
     a.end += delay;
     for (const phase of a.phases ?? []) {
@@ -515,6 +522,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   for (const a of out.actions)
     if (
       a.source !== "ravens" &&
+      !authoredDefense(a) &&
       a.end >=
         Math.max(...base.scenario.steps.map((st) => st.end)) + delay - 0.01
     )
@@ -532,7 +540,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
         start: 0,
         end: snap,
         description:
-          "MOST çizimindeki 11 ofans oyuncusu. Eklenen savunma örnek yerleşimdir; blok/okuma kuralları kaynakta belirtilmemiştir.",
+          `MOST çizimindeki 11 ofans oyuncusu. ${out.opponent ? "Rakip savunma seçilen Kocaeli paketinden gelir." : "Eklenen savunma örnek yerleşimdir."} Blok/okuma kuralları kaynakta belirtilmemiştir.`,
         notes,
         focus: sourcePlayers
           .filter((p) => p.paths.some((a) => a.motion))
@@ -550,7 +558,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
     ];
   else {
     out.steps[0].description +=
-      " Ravens çizim rotalarıyla birlikte; savunma örnek çalışma front’udur.";
+      ` Ravens çizim rotalarıyla birlikte; ${out.opponent ? "savunma seçilen Kocaeli paketidir." : "savunma örnek çalışma front’udur."}`;
     out.steps.at(-1)!.end = finish;
   }
   if (meta.blocking === "diagram" || special) {
@@ -560,7 +568,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
         id: "ravens-source",
         blitz: "none",
         title: "Kaynak çizim",
-        note: "MOST kaynak yerleşimi ve yolları. Savunma çalışma front’udur; özel blok devirleri, QB okuması ve top hedefi kaynakta belirtilmemiştir.",
+        note: `MOST kaynak yerleşimi ve yolları. ${out.opponent ? "Savunma Kocaeli paketidir." : "Savunma çalışma front’udur."} Özel blok devirleri, QB okuması ve top hedefi kaynakta belirtilmemiştir.`,
         assign: {},
       },
     ];
@@ -570,11 +578,22 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   out.scheme = "Ravens · MOST";
   out.playbook = `Ravens MOST · ${blockingLabels[meta.blocking]}`;
   let result = { ...base, scenario: Scenario.parse(out) };
+  const complete = (p: ProtectionResult | ZoneResult) => {
+    if (!p.scenario.opponent) return p;
+    restoreOpponentOwnership(p.scenario);
+    if (p.scenario.opponent.mode === "source")
+      for (const a of p.scenario.actions)
+        if (a.engage && p.scenario.players.some((d) => d.side === "DEF" && d.id === a.engage))
+          a.engage = undefined;
+    const result = reactOpponent(p), pack = opponentPackages.find((x) => x.id === p.scenario.opponent!.id)!;
+    result.scenario.steps[0].description += ` Rakip: ${pack.name}. ${p.scenario.opponent.mode === "source" ? "Kaynak savunma yolları oynatılır; otomatik takip uygulanmaz." : "Coverage eşleşmeleri, koşu okuması ve takip tepkileri eğitim uyarlamasıdır; kaynakta coverage çağrısı belirtilmemiştir."}`;
+    return result;
+  };
   if (meta.blocking === "team") {
-    if (special) return applyRavensSpecial(result.scenario, profile);
-    const sourceScenario = planRavens(
-      changeRavensBlocking(s, "diagram"),
-    ).scenario;
+    if (special) return complete(applyRavensSpecial(result.scenario, profile));
+    const sourceInput = changeRavensBlocking(s, "diagram");
+    sourceInput.opponent = undefined;
+    const sourceScenario = planRavens(sourceInput).scenario;
     // Mirror the pure source OL paths for a left-field call, keeping live player positions.
     if (profile.direction !== "drawing" && fieldSide(input) === "left") {
       const map: Record<string, string> = {
@@ -598,17 +617,20 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
       }
     }
     if (profile.kind === "rollout")
-      return rolloutProtection(result as ReturnType<typeof planProtection>);
+      return complete(
+        rolloutProtection(result as ReturnType<typeof planProtection>),
+      );
     if (profile.kind === "pass-wrap")
-      return boundaryWrap(
-        result as ReturnType<typeof planProtection>,
-        sourceScenario,
+      return complete(
+        boundaryWrap(
+          result as ReturnType<typeof planProtection>,
+          sourceScenario,
+        ),
       );
     if (profile.kind === "zone-lead")
-      return fieldGuardLead(
-        result as ReturnType<typeof planZone>,
-        sourceScenario,
+      return complete(
+        fieldGuardLead(result as ReturnType<typeof planZone>, sourceScenario),
       );
   }
-  return result;
+  return complete(result);
 }
