@@ -2,7 +2,7 @@ import {
   eligiblePassTargets,
   isRavensPass,
   passWindow,
-  passTimeline,
+  passIntent,
   validatePassSelection,
 } from "./ravens-pass.ts";
 import { applyOpponentPackage } from "./opponent.ts";
@@ -260,13 +260,13 @@ export function mountRavens(
       passResult.disabled = !selected;
       passRelease.value = selected ? String(validation.releaseAt) : "";
       passResult.value = s.ravens?.passResult ?? "auto";
-      const timeline = selected ? passTimeline(s) : null;
+      const timeline = selected ? passIntent(s) : null;
       passStatus.textContent = !selected
         ? "Top QB’de kalır. Pas için rotadaki bir alıcıyı seç."
         : !validation.valid
           ? (validation.reason ?? "Pas seçimini kontrol et.")
           : timeline
-            ? `${selected.id} · Atış ${timeline.releaseAt.toFixed(1)} sn → ${timeline.outcome === "complete" ? "Yakalama" : "Topun varışı"} ${timeline.catchAt.toFixed(1)} sn · ${timeline.outcome === "complete" ? "Tamamlandı" : "Tamamlanmadı"}${timeline.reason ? " · " + timeline.reason : ""}`
+            ? `${selected.id} · Atış ${timeline.releaseAt.toFixed(1)} sn → Topun varışı ${timeline.catchAt.toFixed(1)} sn · ${(s.ravens?.passResult ?? "auto") === "auto" ? "Sonuç oynatmada savunma ve alıcı temasına göre belirlenir." : s.ravens?.passResult === "complete" ? "Tamamlandı (eğitim) · Alıcının pas noktasına yetişmesi gerekir." : "Tamamlanmadı (eğitim)."}`
             : "Pas için atış zamanını seç.";
     }
     const special = !!(
