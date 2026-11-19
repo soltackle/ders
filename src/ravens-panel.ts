@@ -181,6 +181,7 @@ export function mountRavens(
         saveDraft();
         const draft = loadDraft("ol-ravens-" + p.id);
         let next = draft?.ravens?.id === p.id ? draft : ravensScenario(p.id);
+        if (current.ravens?.id !== p.id && current.playerAI) next.playerAI=structuredClone(current.playerAI);
         if (current.opponent && current.ravens?.id !== p.id) {
           next = applyOpponentPackage(next, current.opponent.id);
           next.opponent!.mode = current.opponent.mode;

@@ -80,6 +80,14 @@ Antrenman görünümünde Ravens oyuncuları gövde mesafesini korur, takım ark
 
 Tasarla görünümü kaynak yollarını düzenler. 9 numaralı oyun ile **Kaynakta çizilmiş hareketler** modu kaynak gösterimini korur. Bu sistem rotaya bağlı gövde/temas yaklaşımıdır; oyuncu gücü, beceri puanları, ragdoll veya hakem sistemi içermez. [Uygulanan pas ve temas kuralları](docs/PLAY-DYNAMICS.md).
 
+## Saha AI · Oyuncu kararları
+
+Ravens'taki **Saha AI** bölümü, rol bazlı canlı oyuncu davranışlarını açıp kapatır. Varsayılan açıktır. **Kararları göster** seçilince seçili oyuncunun neyi okuduğu, gördüğü ve hatırladığı oyuncu sayısı HUD'da görünür. Karar görünümü mevcut zamanı korur; AI davranışını değiştirmek oyunu başlangıca alır. Ayarlar oyunlar arasında ve JSON/yerel kayıtta korunur.
+
+Her oyuncu gecikmeli gerçek saha konumlarını; görüş yönü, mesafe, oyuncu örtüşmesi, kısa hafıza ve yakın temas üzerinden okur. DL rush hattı/ellerle mücadele, LB guard/puller–pas seti okuması, DB alan/rota–top okuması; OL kendi adamını aynalama, QB pocket okuması ve taşıyıcı koridor seçimi uygular. QB ve backpedal yapan savunmacı geri giderken sahayı görmeye devam eder. Defans, seçtiğiniz pas hedefini veya görünmeyen koşucunun güncel yerini öğrenmez.
+
+Takım blok ataması, pull/mesh sırası, alıcı rotası, pas hedefi, option keep/pitch ve manuel yollar koç kararı olarak korunur. Ofansın yerel düzeltmesi oyun koridoruyla sınırlıdır. Kaynak/diagram gösteriminde Saha AI uygulanmaz. Bu yerel ve deterministik bir oyun AI'sidir; eğitilmiş bir insan oyuncu modeli veya tam maç motoru değildir. [Davranış, algı ve sınırlar](docs/PLAYER-AI.md).
+
 ## Doğrulama sınırları
 
 Veri modeli, taktik analiz ve editör akışları otomatik testlerle kapsanır. Paylaşılan tarayıcı/önizleme altyapısı çalışmadığında 3D görünüm, mobil düzen, video çıktısı ve gerçek sağlayıcıyla AI çağrısı etkileşimli olarak doğrulanmış sayılmaz. API erişimi ve kullanılan modelin lisansı kullanıcı tarafından sağlanır.
