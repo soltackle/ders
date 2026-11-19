@@ -507,6 +507,10 @@ export function decideFootballAi(
             const at = predicted(target, input.time);
             if (distance(own, at) <= 2.2) aim = [at[0], at[1] - 0.55];
           }
+        } else if (line.includes(p.pos)) {
+          phase = "line-route";
+          reason = "Henüz adam ataması yok: çağrılan hat, yardım veya çıkış koridorunu koru.";
+          aim = [...route];
         } else if (p.pos === "QB" && offensivePass) {
           phase = "qb-read";
           gaze = brain.scenario.ravens?.passTarget;
@@ -793,7 +797,7 @@ export function decideFootballAi(
         lookAt:
           gaze && memory.players.has(gaze)
             ? predicted(memory.players.get(gaze)!, input.time)
-            : phase === "qb-read"
+            : phase === "qb-read" || (p.side === "OFF" && line.includes(p.pos) && !["pull-route", "mesh"].includes(phase))
               ? [own[0], own[1] + 5]
               : p.side === "DEF" && memory.ball
                 ? [

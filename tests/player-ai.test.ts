@@ -296,3 +296,18 @@ test("DB drop landmark'a geri giderken görünmeyen hedef aramaz ve hücum taraf
   assert.deepEqual(d.seen, []);
   assert.ok(d.lookAt && d.lookAt[1] < i.positions.CB[1]);
 });
+
+test("ataması olmayan OL yakın savunmacıyı görse de WR jam ayrılması yapmaz", () => {
+  const s = fixture();
+  s.actions = s.actions.filter((a) => a.player !== "C");
+  const i = input(s, 3, (frame) => { frame.positions.D = [0, .9]; });
+  const d = decideFootballAi(createFootballAi(s), i).C;
+  assert.ok(d.seen.includes("D"), "yakındaki savunmacı gerçekten görülmeli");
+  assert.equal(d.phase, "line-route");
+  assert.deepEqual(d.aim, i.routePositions.C);
+  assert.deepEqual(d.velocityDelta, [0, 0]);
+  assert.ok(d.lookAt && d.lookAt[1] > i.positions.C[1]);
+  const receiver = structuredClone(s);
+  receiver.players.find((p) => p.id === "C")!.pos = "WR";
+  assert.equal(decideFootballAi(createFootballAi(receiver), i).C.phase, "route-release");
+});
