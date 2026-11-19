@@ -95,6 +95,100 @@ function localMatches(
   visit(0, new Set(), new Map(), 0);
   return best;
 }
+/** Early run exchange uses an actual backfield meeting, never the late finishing carry. */
+export function prepareRunHandoff(
+  s: ScenarioType,
+  carrierId: string,
+  legacyDefault: number,
+  warnings: string[],
+) {
+  const meta = s.ravens as
+    | (NonNullable<ScenarioType["ravens"]> & { transferManual?: boolean })
+    | undefined;
+  const qb = s.players.find((p) => p.side === "OFF" && p.pos === "QB"),
+    carrier = s.players.find((p) => p.side === "OFF" && p.id === carrierId),
+    snap = s.steps[0]?.end ?? 1.1;
+  if (!meta || !qb || !carrier) return undefined;
+  // Preserve explicit edits, including legacy custom times which differ from the old auto default.
+  const manual =
+    meta.transferManual === true ||
+    (meta.transferManual === undefined &&
+      meta.transferAt !== undefined &&
+      Math.abs(meta.transferAt - legacyDefault) > 1e-4);
+  if (manual) {
+    meta.transferManual = true;
+    return meta.transferAt;
+  }
+  meta.transferManual = false;
+  if (carrier.id === qb.id) return snap;
+  // Choose the closest early backfield meeting, not the first long arm's-reach pass.
+  // The contact layer retains body separation if the drawn center paths cross.
+  let closest: { time: number; distance: number } | undefined;
+  for (let t = snap + 0.45; t <= snap + 2.0001; t += 0.025) {
+    const q = position(s, qb.id, t),
+      r = position(s, carrier.id, t),
+      distance = pointDistance(q, r);
+    if (
+      q[1] <= 0.15 &&
+      r[1] <= 0.15 &&
+      (!closest || distance < closest.distance)
+    )
+      closest = { time: t, distance };
+  }
+  if (closest && closest.distance <= 1) return closest.time;
+  // Some source diagrams only contain fakes. Add a bounded approach before them,
+  // retaining every existing route waypoint/end point and delaying only this carrier.
+  const start = snap + 0.05,
+    from = position(s, carrier.id, snap);
+  for (let t = snap + 0.65; t <= snap + 2.0001; t += 0.05) {
+    const q = position(s, qb.id, t),
+      dx = from[0] - q[0],
+      dz = from[1] - q[1],
+      d = Math.hypot(dx, dz) || 1;
+    const to: [number, number] = [
+      q[0] + (dx / d) * 0.72,
+      q[1] + (dz / d) * 0.72,
+    ];
+    if (
+      q[1] > 0.15 ||
+      to[1] > 0.15 ||
+      travelDuration(pointDistance(from, to), 3) > t - start
+    )
+      continue;
+    const shift = t - snap;
+    for (const a of s.actions.filter(
+      (a) =>
+        a.player === carrier.id &&
+        a.label !== "motion" &&
+        a.start >= snap - 1e-6,
+    )) {
+      a.start += shift;
+      a.end += shift;
+      for (const phase of a.phases ?? []) {
+        phase.start += shift;
+        phase.end += shift;
+      }
+    }
+    s.actions.push({
+      source: "ravens",
+      player: carrier.id,
+      label: "special-mesh-approach",
+      start,
+      end: t,
+      to,
+    });
+    warnings.push(
+      `${carrier.id}: kaynak fake öncesine hız sınırlı kısa QB mesh yaklaşması eklendi; sonraki çizim noktaları korunur.`,
+    );
+    return t;
+  }
+  // Do not animate a handoff across the field if the chosen player cannot reach QB.
+  meta.carrier = qb.id;
+  warnings.push(
+    `${carrier.id}: ilk iki saniyede ulaşılabilir QB mesh yok; uzaktan top aktarımı yapılmadı, top QB’de kaldı. Taşıyıcı ve açık devir zamanı düzenlenebilir.`,
+  );
+  return snap;
+}
 /** Special runs use the imported OL tracks, then finish against the selected live defense. */
 export function applyRavensSpecial(
   input: ScenarioType,
@@ -113,7 +207,7 @@ export function applyRavensSpecial(
     lbs = s.players.filter(
       (p) =>
         p.side === "DEF" &&
-        (p.pos === "LB"||p.intent==='blitz') &&
+        (p.pos === "LB" || p.intent === "blitz") &&
         p.intent !== "hold" &&
         p.intent !== "show",
     );
@@ -633,11 +727,11 @@ export function applyRavensSpecial(
       finish = Math.max(finish, track.end + 0.6);
       notes[carrier.id] =
         `${title}: kaynak ilk fake/mesh adımlarından sonra çağrılan ${direction > 0 ? "sağ" : "sol"} koridoru, pull yapan blokçuların arkasından takip et.`;
-      if (s.ravens)
-        Object.assign(s.ravens, {
-          carrier: carrier.id,
-          transferAt: s.ravens.transferAt ?? start,
-        });
+      if (s.ravens) {
+        s.ravens.carrier = carrier.id;
+        s.ravens.transferAt = prepareRunHandoff(s, carrier.id, start, warnings);
+        finish = Math.max(finish, ...s.actions.map((a) => a.end + 0.1));
+      }
       if (profile.number === 28)
         warnings.push(
           "CT counter’da kaynak H yolu ters yöne gidiyor; sol akıştaki F taşıyıcı olarak gösterildi, H fake yolu korunuyor.",
@@ -687,14 +781,20 @@ export function applyRavensSpecial(
           finish - 0.1,
         ),
       );
-      if (s.ravens)
-        Object.assign(s.ravens, { carrier: carrier.id, transferAt });
+      if (s.ravens) {
+        s.ravens.carrier = carrier.id;
+        s.ravens.transferAt =
+          profile.number === 29
+            ? prepareRunHandoff(s, carrier.id, snap + 1, warnings)
+            : transferAt;
+        finish = Math.max(finish, ...s.actions.map((a) => a.end + 0.1));
+      }
       notes[carrier.id] =
         profile.kind === "screen"
           ? `Field screen alıcısı ${carrier.id}: gecikmeli çıkan RG/RT eskortunun arkasındaki field koridoruna devam et.`
           : `İki guard karşıt dış pull yaparken ${carrier.id} kaynak H/F sol akışını takip eder; Z arka alan fake/motion yolu korunur.`;
       warnings.push(
-        `${profile.kind === "screen" ? "Screen" : "29 özel oyun"} taşıyıcısı ${carrier.id}, top aktarımı ${transferAt.toFixed(1)} sn olarak eğitim gösteriminde seçildi; taşıyıcı/devir alanından değiştirilebilir.`,
+        `${profile.kind === "screen" ? "Screen" : "29 özel oyun"} taşıyıcısı ${carrier.id}, top aktarımı ${(s.ravens?.transferAt ?? transferAt).toFixed(1)} sn olarak eğitim gösteriminde seçildi; taşıyıcı/devir alanından değiştirilebilir.`,
       );
     }
     if (qb)
@@ -719,7 +819,7 @@ export function applyRavensSpecial(
   const reactionEnd = Math.max(snap + 1.3, Math.min(contact, snap + 2));
   const defenders = s.players.filter((p) => p.side === "DEF");
   for (const p of defenders) {
-    if (!['DL','LB'].includes(p.pos)&&p.intent!=='blitz')continue;
+    if (!["DL", "LB"].includes(p.pos) && p.intent !== "blitz") continue;
     if (
       authoredDEF.has(p.id) ||
       p.intent === "hold" ||

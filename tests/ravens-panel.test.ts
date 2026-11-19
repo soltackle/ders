@@ -151,6 +151,7 @@ test("özel takım oyununda taşıyıcı, option keep/pitch ve devir zamanı se�
   time.value = "3.7";
   time.dispatchEvent(new dom.window.Event("change"));
   assert.equal(state.ravens!.transferAt, 3.7);
+  assert.equal(state.ravens!.transferManual, true);
   root.querySelector<HTMLButtonElement>('[data-ravens-number="35"]')!.click();
   assert.equal(carrier.value, "Q");
   assert.equal(carrier.disabled, true);
@@ -203,6 +204,210 @@ test("önceki Ravens taslağı yeni takım çağrısına geçirilirken defans ye
   assert.match(
     document.querySelector(".ravens-team-note")!.textContent!,
     /3-tech trap/,
+  );
+  await new Promise((r) => setTimeout(r, 0));
+  dom.window.close();
+});
+
+test("pas alıcısı rotadaki WR’lerden seçilir; atış zamanı sınırlanır ve tamamlanmayan pas seçimi saklanır", async () => {
+  const { ravensScenario, planRavens } = await import("../src/ravens.ts"),
+    { passWindow, eligiblePassTargets, passTimeline, validatePassSelection } =
+      await import("../src/ravens-pass.ts");
+  const dom = new JSDOM("<section></section>", {
+    url: "https://example.com/ders/#ravens",
+  });
+  Object.assign(globalThis, {
+    window: dom.window,
+    document: dom.window.document,
+    localStorage: dom.window.localStorage,
+    location: dom.window.location,
+  });
+  let state = planRavens(ravensScenario(ravensPlays[0].id)).scenario;
+  const listeners: (() => void)[] = [];
+  const root = document.querySelector<HTMLElement>("section")!,
+    api = {
+      get: () => state,
+      set: (s: ScenarioType) => {
+        state = s;
+        listeners.forEach((f) => f());
+      },
+      subscribe: (f: () => void) => listeners.push(f),
+    };
+  mountRavens(root, api);
+  const controls = root.querySelector<HTMLElement>(".ravens-pass-controls")!,
+    target = root.querySelector<HTMLSelectElement>(
+      '[aria-label="Ravens pas alıcısı"]',
+    )!,
+    release = root.querySelector<HTMLInputElement>(
+      '[aria-label="Ravens pas atış anı"]',
+    )!,
+    result = root.querySelector<HTMLSelectElement>(
+      '[aria-label="Ravens pas sonucu"]',
+    )!;
+  assert.equal(controls.hidden, false);
+  assert.equal(release.disabled, true);
+  assert.equal(result.disabled, true);
+  assert.equal(target.value, "");
+  assert.match(target.options[0].textContent!, /QB/);
+  assert.deepEqual(
+    [...target.options].slice(1).map((o) => o.value),
+    eligiblePassTargets(state).map((p) => p.id),
+  );
+  assert.ok(
+    ![...target.options].some((o) =>
+      ["C", "LG", "RG", "LT", "RT", "Q"].includes(o.value),
+    ),
+  );
+  target.value = "X";
+  target.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.ravens!.passTarget, "X");
+  assert.equal(release.disabled, false);
+  assert.equal(result.disabled, false);
+  assert.ok(passTimeline(state));
+  assert.equal(Number(release.value), passTimeline(state)!.releaseAt);
+  assert.match(root.querySelector(".ravens-pass-status")!.textContent!, /Atış/);
+  const bounds = passWindow(state);
+  release.value = String(bounds.latest + 20);
+  release.dispatchEvent(new dom.window.Event("change"));
+  assert.ok(state.ravens!.passReleaseAt! <= bounds.latest + 1e-6);
+  assert.ok(state.ravens!.passReleaseAt! >= bounds.earliest);
+  result.value = "incomplete";
+  result.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.ravens!.passResult, "incomplete");
+  assert.equal(passTimeline(state)!.outcome, "incomplete");
+  assert.match(
+    root.querySelector(".ravens-pass-status")!.textContent!,
+    /Tamamlanmadı/,
+  );
+  target.value = "";
+  target.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.ravens!.passTarget, undefined);
+  assert.equal(release.disabled, true);
+  assert.equal(passTimeline(state), null);
+  assert.match(
+    root.querySelector(".ravens-pass-status")!.textContent!,
+    /QB’de/,
+  );
+  const stale = structuredClone(state);
+  stale.ravens!.passTarget = "C";
+  api.set(planRavens(stale).scenario);
+  assert.equal(target.value, "");
+  assert.equal(release.disabled, true);
+  await new Promise((r) => setTimeout(r, 0));
+  dom.window.close();
+});
+
+test("pas ayarları rakip paketini korur; başka Ravens oyunundan dönünce kendi alıcısı ve atış anı yüklenir", async () => {
+  const { ravensScenario, planRavens } = await import("../src/ravens.ts"),
+    { applyOpponentPackage, opponentPackages } =
+      await import("../src/opponent.ts"),
+    { passWindow } = await import("../src/ravens-pass.ts");
+  const dom = new JSDOM("<section></section>", {
+    url: "https://example.com/ders/#ravens",
+  });
+  Object.assign(globalThis, {
+    window: dom.window,
+    document: dom.window.document,
+    localStorage: dom.window.localStorage,
+    location: dom.window.location,
+  });
+  let state = planRavens(
+    applyOpponentPackage(
+      ravensScenario(ravensPlays[0].id),
+      opponentPackages[1].id,
+    ),
+  ).scenario;
+  const listeners: (() => void)[] = [];
+  const root = document.querySelector<HTMLElement>("section")!;
+  mountRavens(root, {
+    get: () => state,
+    set: (s) => {
+      state = s;
+      listeners.forEach((f) => f());
+    },
+    subscribe: (f) => listeners.push(f),
+  });
+  const target = root.querySelector<HTMLSelectElement>(
+      '[aria-label="Ravens pas alıcısı"]',
+    )!,
+    release = root.querySelector<HTMLInputElement>(
+      '[aria-label="Ravens pas atış anı"]',
+    )!;
+  target.value = "X";
+  target.dispatchEvent(new dom.window.Event("change"));
+  const bounds = passWindow(state),
+    chosen = (bounds.earliest + bounds.latest) / 2;
+  release.value = String(chosen);
+  release.dispatchEvent(new dom.window.Event("change"));
+  const originalTime = state.ravens!.passReleaseAt;
+  assert.equal(state.opponent!.id, opponentPackages[1].id);
+  assert.equal(state.ravens!.passTarget, "X");
+  root.querySelector<HTMLButtonElement>('[data-ravens-number="3"]')!.click();
+  assert.equal(state.ravens!.id, ravensPlays[2].id);
+  assert.equal(state.opponent!.id, opponentPackages[1].id);
+  root.querySelector<HTMLButtonElement>('[data-ravens-number="1"]')!.click();
+  assert.equal(state.ravens!.passTarget, "X");
+  assert.equal(state.ravens!.passReleaseAt, originalTime);
+  assert.equal(target.value, "X");
+  assert.equal(state.opponent!.id, opponentPackages[1].id);
+  await new Promise((r) => setTimeout(r, 0));
+  dom.window.close();
+});
+
+test("rollout, boundary wrap ve screen pas kontrollerini kullanır; koşu oyunları pas alıcısı alanını gizler", async () => {
+  const { ravensScenario, planRavens } = await import("../src/ravens.ts");
+  const dom = new JSDOM("<section></section>", {
+    url: "https://example.com/ders/#ravens",
+  });
+  Object.assign(globalThis, {
+    window: dom.window,
+    document: dom.window.document,
+    localStorage: dom.window.localStorage,
+    location: dom.window.location,
+  });
+  let state = planRavens(ravensScenario(ravensPlays[9].id)).scenario;
+  const listeners: (() => void)[] = [];
+  const root = document.querySelector<HTMLElement>("section")!;
+  const set = (s: ScenarioType) => {
+    state = s;
+    listeners.forEach((f) => f());
+  };
+  mountRavens(root, {
+    get: () => state,
+    set,
+    subscribe: (f) => listeners.push(f),
+  });
+  for (const n of [10, 21, 32]) {
+    set(planRavens(ravensScenario(ravensPlays[n - 1].id)).scenario);
+    assert.equal(
+      root.querySelector<HTMLElement>(".ravens-pass-controls")!.hidden,
+      false,
+      String(n),
+    );
+    assert.equal(
+      root.querySelector<HTMLElement>(".ravens-special-controls")!.hidden,
+      true,
+      String(n),
+    );
+  }
+  const { trainingDefense } = await import("../src/training.ts");
+  set(
+    planRavens(
+      trainingDefense(ravensScenario(ravensPlays[1].id), "left", "blitz"),
+    ).scenario,
+  );
+  const receivers = root.querySelector<HTMLSelectElement>(
+    '[aria-label="Ravens pas alıcısı"]',
+  )!;
+  assert.ok(
+    ![...receivers.options].some((o) => o.value === "H"),
+    "HPP içindeki pickup RB pas alıcısı olarak sunulmamalı",
+  );
+  assert.ok([...receivers.options].some((o) => o.value === "X"));
+  set(planRavens(ravensScenario(ravensPlays[5].id)).scenario);
+  assert.equal(
+    root.querySelector<HTMLElement>(".ravens-pass-controls")!.hidden,
+    true,
   );
   await new Promise((r) => setTimeout(r, 0));
   dom.window.close();

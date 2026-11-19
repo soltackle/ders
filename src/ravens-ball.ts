@@ -1,6 +1,16 @@
+import {
+  isRavensPass,
+  passState,
+  type PositionAccessor,
+} from "./ravens-pass.ts";
 import { position, type ScenarioType } from "./model.ts";
 /** Explicit training branch; never guesses a pitch from a defender's movement. */
-export function ravensBall(s: ScenarioType, t: number) {
+export function ravensBall(
+  s: ScenarioType,
+  t: number,
+  get: PositionAccessor = position,
+) {
+  if (isRavensPass(s)) return passState(s, t, get);
   if (
     s.zone?.enabled ||
     !s.ravens ||
@@ -19,8 +29,8 @@ export function ravensBall(s: ScenarioType, t: number) {
       carrier.id === qb.id
         ? 1
         : Math.max(0, Math.min(1, (t - (at - 0.35)) / 0.35));
-  const from = position(s, qb.id, t),
-    to = position(s, carrier.id, t);
+  const from = get(s, qb.id, t),
+    to = get(s, carrier.id, t);
   return {
     carrier: blend === 1 ? carrier.id : qb.id,
     blend,

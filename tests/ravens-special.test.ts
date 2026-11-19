@@ -1,7 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ravensPlays, ravensScenario, planRavens } from "../src/ravens.ts";
-import { applyRavensSpecial } from "../src/ravens-special.ts";
+import {
+  applyRavensSpecial,
+  prepareRunHandoff,
+} from "../src/ravens-special.ts";
 import { Scenario, position, type ScenarioType } from "../src/model.ts";
 function source(n: number) {
   return planRavens(ravensScenario(ravensPlays[n - 1].id, "diagram")).scenario;
@@ -240,4 +243,105 @@ test("GT12/30 ve CT28 geçerli yerel down blokları uzak eşleşme uğruna kaybe
   }
   const ct = planRavens(ravensScenario(ravensPlays[27].id));
   assert.equal(ct.assignments.find((a) => a.player === "LG")!.target, "DL2");
+});
+
+test("counter/dart/trap taşıyıcısı son carry segmentini beklemeden gerçek erken QB mesh ile topu alır", () => {
+  for (const n of [12, 13, 14, 19, 26, 28, 29, 30, 34]) {
+    const out = planRavens(ravensScenario(ravensPlays[n - 1].id)).scenario,
+      snap = out.steps[0].end,
+      at = out.ravens!.transferAt!,
+      id = out.ravens!.carrier!;
+    assert.ok(
+      at >= snap + 0.4 && at <= snap + 2,
+      `${n}: exchange first two seconds`,
+    );
+    const q = position(out, "Q", at),
+      r = position(out, id, at);
+    assert.ok(
+      Math.hypot(q[0] - r[0], q[1] - r[1]) <= 1.001,
+      `${n}: handoff must be within arm's reach`,
+    );
+    assert.ok(
+      q[1] <= 0.15 && r[1] <= 0.15,
+      `${n}: exchange before runner crosses LOS`,
+    );
+    assert.equal(out.ravens!.transferManual, false);
+    const again = planRavens(out).scenario;
+    assert.equal(again.ravens!.transferAt, at);
+    assert.deepEqual(
+      again.actions,
+      out.actions,
+      `${n}: no repeated approach insertion`,
+    );
+  }
+});
+test("eksik kaynak mesh için kısa yaklaşma hız sınırını ve sonraki kaynak fake noktalarını korur", () => {
+  for (const n of [12, 13, 14, 19, 28, 30]) {
+    const carrierId = n === 28 ? "F" : "H";
+    const input = source(n),
+      raw = input.actions.filter(
+        (a) => a.player === carrierId && a.label !== "motion",
+      ),
+      out = planRavens(ravensScenario(ravensPlays[n - 1].id)).scenario;
+    const approach = out.actions.find(
+      (a) => a.player === carrierId && a.label === "special-mesh-approach",
+    )!;
+    assert.ok(approach, `${n}: missing source mesh requires approach`);
+    let peak = 0;
+    for (let t = approach.start; t < approach.end; t += 0.005) {
+      const a = position(out, carrierId, t),
+        b = position(out, carrierId, Math.min(approach.end, t + 0.005));
+      peak = Math.max(peak, Math.hypot(b[0] - a[0], b[1] - a[1]) / 0.005);
+    }
+    assert.ok(peak <= 3.01, `${n}: approach speed ${peak}`);
+    const drawn = out.actions.filter(
+      (a) => a.player === carrierId && a.label === "kaynak-rota",
+    );
+    assert.deepEqual(
+      drawn.map((a) => a.to),
+      raw.map((a) => a.to),
+    );
+    assert.deepEqual(
+      drawn.map((a) => a.path),
+      raw.map((a) => a.path),
+    );
+    assert.ok(drawn.every((a) => a.start >= approach.end));
+    for (const id of ["C", "LG", "RG", "LT", "RT", "Q"])
+      assert.deepEqual(
+        out.players.find((p) => p.id === id)!.at,
+        input.players.find((p) => p.id === id)!.at,
+      );
+  }
+});
+test("açık kullanıcı devir zamanı korunur; eski otomatik carry-başlangıcı erken mesh ile yenilenir", () => {
+  for (const manual of [true, undefined]) {
+    const s = source(14);
+    s.ravens!.carrier = "H";
+    s.ravens!.transferAt = 3.7;
+    s.ravens!.transferManual = manual;
+    const warnings: string[] = [];
+    const at = prepareRunHandoff(s, "H", 8, warnings);
+    assert.equal(at, 3.7);
+    assert.equal(s.ravens!.transferManual, true);
+    assert.ok(!s.actions.some((a) => a.label === "special-mesh-approach"));
+  }
+  const s = source(14);
+  s.ravens!.carrier = "H";
+  s.ravens!.transferAt = 8;
+  const at = prepareRunHandoff(s, "H", 8, []);
+  assert.ok(at! < s.steps[0].end + 2);
+  assert.equal(s.ravens!.transferManual, false);
+});
+test("ulaşılamayan seçili taşıyıcıya saha boyunca handoff yapılmaz", () => {
+  const s = source(14);
+  s.ravens!.carrier = "H";
+  s.actions = s.actions.filter((a) => a.player !== "H");
+  s.players.find((p) => p.id === "H")!.at = [50, -4];
+  const before = structuredClone(s.actions),
+    warnings: string[] = [];
+  const at = prepareRunHandoff(s, "H", 8, warnings);
+  assert.equal(at, s.steps[0].end);
+  assert.equal(s.ravens!.carrier, "Q");
+  assert.deepEqual(s.actions, before);
+  assert.match(warnings.join(" "), /uzaktan top aktarımı yapılmadı/);
 });

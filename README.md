@@ -13,7 +13,7 @@ npm test
 npm run build
 ```
 
-`dist/` statik çıktıdır. Bağıl varlık yolları GitHub Pages alt dizinlerini destekler. Pages ortamı yalnızca `codex/study-app` dalını kabul eder. `master` kaynak dalıdır; yayına gönderilecek commit bu dala da push edilmelidir. İş akışı test, tip kontrolü ve derleme geçmeden dağıtım yapmaz.
+`dist/` statik çıktıdır. Bağıl varlık yolları GitHub Pages alt dizinlerini destekler. Pages ortamı ve dağıtım iş akışı `codex/study-app` dalını kullanır. `master` kaynak dalıdır; yayına gönderilecek commit iki dala da push edilir. Böylece kaynak dalındaki ikinci bir dağıtım aynı Pages çalışmasını iptal etmez. İş akışı test, tip kontrolü ve derleme geçmeden dağıtım yapmaz.
 
 ## Eğitim akışı
 
@@ -71,6 +71,14 @@ Ravens sahasının altındaki **Rakip defans paketi · Kocaeli** bölümü, haz�
 **Ravens oyununa tepki** modunda DL/blitz baskısı, pas rotalarına coverage, koşuda LB fit/puller okuması, dış contain, screen teşhisi ve taşıyıcı takibi gecikme ve hız sınırlarıyla üretilir. Takımın pas koruması, big-on-big ve covered/uncovered zone paylaşımı geçerlidir. Savunmacı uzaktaki puller’a temas etmiş gibi bağlanmaz; elle kaydedilen savunma yolları önceliklidir. **Kaynakta çizilmiş hareketler** modunda yalnız savunma çizgileri oynatılır; çizgisiz savunmacı yerinde kalır.
 
 Kaynak coverage çağrısı/man-zone etiketi belirtmez. Adaptif coverage ve takip, çizimin açılışından sonra uygulanan eğitim kurallarıdır; rakibin gerçek coverage sistemi olarak sunulmaz. **Paketi kaldır** önceki savunmayı geri getirir; hazır front/blitz seçimi de paketten çıkar. [Kaynak aktarımı, tepkiler ve sınırlar](docs/OPPONENT-PACKAGES.md).
+
+## Pas hedefi ve canlı temas
+
+Ravens pas oyunlarında **Pas alıcısı** alanından o oyunda rotaya çıkan alıcı seçilir. OL, QB ve pas korumasındaki RB hedef listesine girmez. Atış zamanı snap sonrası ve QB LOS'u geçmeden önceki oyun penceresinde tutulur; top QB'den sabit bir uçuşla alıcının oyun rotasındaki karşılama noktasına gider. Hedef seçilmezse top QB'de kalır. **Otomatik** pas sonucu; top yolundaki savunma temasına, alıcının noktaya yetişmesine ve yakın coverage'a göre tamamlanan/eksik pas üretir. Tamamlanan/eksik pas eğitim dalları da seçilebilir.
+
+Antrenman görünümünde Ravens oyuncuları gövde mesafesini korur, takım arkadaşıyla kesişen yolda kısa bir yana adımla yer açar ve gerçek yakın temas kurulmadan birbirine bağlanmaz. Blokta ilerleme direnç ve hız sınırına bağlıdır. Sürdürülen taşıyıcı teması tackle/sack, sideline ise saha dışı sonucu üretir; taşıyıcı durur, diğer oyuncular yavaşlar. HUD oyun sonucunu ve topun uçuşunu gösterir. Mini harita ve POV aynı çözümlenmiş konumları kullanır; geri sarma aynı sonucu verir.
+
+Tasarla görünümü kaynak yollarını düzenler. 9 numaralı oyun ile **Kaynakta çizilmiş hareketler** modu kaynak gösterimini korur. Bu sistem rotaya bağlı gövde/temas yaklaşımıdır; oyuncu gücü, beceri puanları, ragdoll veya hakem sistemi içermez. [Uygulanan pas ve temas kuralları](docs/PLAY-DYNAMICS.md).
 
 ## Doğrulama sınırları
 

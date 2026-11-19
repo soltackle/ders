@@ -1,5 +1,6 @@
 import { prepareOpponent, restoreOpponentOwnership, opponentPackages } from "./opponent.ts";
 import { reactOpponent } from "./opponent-reaction.ts";
+import { eligiblePassTargets, isRavensPass, passWindow } from "./ravens-pass.ts";
 import { ravensProfile, RAVENS_PROFILE_REVISION } from "./ravens-catalog.ts";
 import { applyRavensSpecial } from "./ravens-special.ts";
 import {
@@ -579,6 +580,26 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   out.playbook = `Ravens MOST · ${blockingLabels[meta.blocking]}`;
   let result = { ...base, scenario: Scenario.parse(out) };
   const complete = (p: ProtectionResult | ZoneResult) => {
+    const meta = p.scenario.ravens!;
+    if (!isRavensPass(p.scenario) || !eligiblePassTargets(p.scenario).some((x) => x.id === meta.passTarget)) {
+      meta.passTarget = undefined;
+      meta.passReleaseAt = undefined;
+      meta.passResult = undefined;
+    } else {
+      const window = passWindow(p.scenario);
+      if (window.latest >= window.earliest)
+        meta.passReleaseAt = Math.max(window.earliest, Math.min(window.latest, meta.passReleaseAt ?? window.snap + 1.6));
+      else {
+        meta.passTarget = undefined;
+        meta.passReleaseAt = undefined;
+        p.warnings.push("QB LOS'u geçmeden bu oyun bölümünde geçerli pas çıkış penceresi yok.");
+      }
+      if (meta.passTarget) {
+        const qb = p.scenario.players.find((x) => x.side === "OFF" && x.pos === "QB");
+        if (qb) for (const step of p.scenario.steps)
+          step.notes[qb.id] = `${step.notes[qb.id] ?? ""} Pas hedefi ${meta.passTarget}; çıkış ${meta.passReleaseAt!.toFixed(1)} sn. Top sabit bir uçuşla oyun rotasına atılır.`;
+      }
+    }
     if (!p.scenario.opponent) return p;
     restoreOpponentOwnership(p.scenario);
     if (p.scenario.opponent.mode === "source")

@@ -40,7 +40,7 @@ Kaynak modunda çizilmiş savunma yolu sonuna kadar korunur; çizgisiz oyuncu ye
 
 Bir savunma aksiyonu kaydedildiğinde veya yol noktası düzenlendiğinde oyuncunun tüm üretilmiş yolu manuel sahipliğe geçer. Sonraki Oynat bu yolu veya zamanlarını yeniden üretmez. Konumu değiştirmek ise kaynak hareketini yeni başlangıç konumuna taşır. Hold/show niyetleri adaptif takipten çıkarılır.
 
-Bu sistem taktik eğitim animasyonudur. Tackling, momentum, gerçek çarpışma çözümü, otomatik completion/interception veya rakibin bilinmeyen coverage çağrısını tahmin etmez. Pas top hedefi ve option dalı mevcut ofans kontrollerinde açıkça seçilir. Bir senaryoda en fazla 300 aksiyon üretilir; uzun oyunlarda savunma segmentleri bu bütçeye göre seyreltilir.
+Bu sistem taktik eğitim animasyonudur. Ravens pas hedefi seçimi, geometrik tamamlanan/eksik pas ve rotaya bağlı canlı gövde/temas katmanı [pas ve temas kurallarında](PLAY-DYNAMICS.md) açıklanır. Oyuncu verisine dayalı momentum, ragdoll, interception olasılığı veya rakibin bilinmeyen coverage çağrısı tahmin edilmez. Option dalı ofans kontrollerinde açıkça seçilir. Bir senaryoda en fazla 300 aksiyon üretilir; uzun oyunlarda savunma segmentleri bu bütçeye göre seyreltilir.
 
 ## Yeniden aktarım ve doğrulama
 

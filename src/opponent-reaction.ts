@@ -9,6 +9,7 @@ import {
 import type { ProtectionResult, DefenseCoverage } from "./protection.ts";
 import type { ZoneResult } from "./zone.ts";
 import { ravensProfile } from "./ravens-catalog.ts";
+import { passIntent, passState } from "./ravens-pass.ts";
 
 export const opponentTiming = {
   dlMaxSpeed: 2.6,
@@ -86,7 +87,8 @@ export function reactOpponent<T extends Plan>(plan: T): T {
       "trap5",
       "source-special",
     ].includes(kind);
-  const qb = s.players.find((p) => p.side === "OFF" && p.pos === "QB"),
+  const pass = passIntent(s),
+    qb = s.players.find((p) => p.side === "OFF" && p.pos === "QB"),
     rb = s.players.find((p) => p.side === "OFF" && p.pos === "RB"),
     offense = s.players.filter((p) => p.side === "OFF"),
     defenders = s.players.filter((p) => p.side === "DEF");
@@ -229,6 +231,7 @@ export function reactOpponent<T extends Plan>(plan: T): T {
     return id ? position(sourceView, id, Math.max(0, time)) : [center, -2];
   }
   function carrierAt(time: number) {
+    if (pass) return time < pass.catchAt ? qb : offense.find((p) => p.id === pass.target);
     const explicit = offense.find((p) => p.id === s.ravens?.carrier),
       transfer =
         s.ravens?.transferAt ??
@@ -299,6 +302,16 @@ export function reactOpponent<T extends Plan>(plan: T): T {
       d.pos === "DL" ||
       d.intent === "blitz" ||
       ownScript.some((a) => a.kind === "opponent-rush");
+    if (pass && read >= pass.releaseAt + .12) {
+      if (read >= pass.catchAt) {
+        const caught = observed(pass.target, read);
+        return { aim: [caught[0], caught[1] + .45], target: pass.target, gaze: pass.target, role: "rally" };
+      }
+      if (!rush) {
+        const ball = passState(sourceView, read), at = ball?.at;
+        if (at) return { aim: [at[0], at[2]], gaze: pass.target, role: "ball-break" };
+      }
+    }
     if (isPass && rush)
       return { aim: qbAt, target: qb?.id, gaze: qb?.id, role: "rush" };
     if (isPass) {
