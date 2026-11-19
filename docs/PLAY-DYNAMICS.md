@@ -22,6 +22,8 @@ Ofans covered/uncovered, field ALERT ve big-on-big atamaları korunur. Bu katman
 
 Counter/Dart/trap ve 29 numaralı özel koşuda otomatik top devri, son carry segmentini beklemek yerine ilk iki saniyedeki yakın backfield mesh'e bağlanır. Çizimde böyle bir buluşma yoksa taşıyıcıya kısa ve hız sınırlı QB yaklaşması eklenir; sonraki kaynak fake/rota noktaları korunur. QB–taşıyıcı mesh sırasında birbirinden kaçınmaz; gövde ayrımı korunur ve diğer takım arkadaşları yer açar. Manuel devir zamanı `transferManual` ile saklanır. Ulaşılamayan taşıyıcıya saha boyunca handoff yapılmaz.
 
+Counter/Dart/trap taşıyıcısı fake sonrası puller'ın temasını birkaç saniye sabit beklemez. Aynı çizilmiş koridorda kontrollü takip yapar; puller girişini tamamlayınca ileri carry bölümü başlar. Kaynak fake noktaları, blokçuların yolları ve hedef koridor korunur.
+
 ## Doğrulama ve sınırlar
 
 Saf model testleri; gövde ayrımı, uzak bağlantı, blok direnci, takım arkadaşıyla rota kesişmesi, hız/ivme, saha sınırı, taşıyıcının durması, pas uçuşu/karşılama ve geri sarma tutarlılığını kapsar. 35 Ravens oyunu ve rakip paket kombinasyonları ayrıca kontrol edilir. Headless Chromium görüntüleri gerçek WebGL sahnesinde snap, temas ve oyun sonunu karşılaştırmak için alınır.

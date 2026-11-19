@@ -730,6 +730,20 @@ export function applyRavensSpecial(
       if (s.ravens) {
         s.ravens.carrier = carrier.id;
         s.ravens.transferAt = prepareRunHandoff(s, carrier.id, start, warnings);
+        const ready = (last?.end ?? snap) + 0.12;
+        if (track.start - ready > 0.45 && track.path?.length) {
+          // Follow the puller's approach instead of standing through the entire
+          // block setup. Keep the same corridor, then burst once the lane opens.
+          const entry = track.path.at(-1)!;
+          s.actions.push({
+            source: "ravens", player: carrier.id, label: "special-follow-pull",
+            start: ready, end: track.start, to: [...entry],
+            path: track.path.slice(0, -1).map((p) => [...p]),
+          });
+          track.path = undefined;
+          track.end = track.start + travelDuration(pathLength(entry, track), 3);
+          notes[carrier.id] += " Puller hazırlanırken aynı koridorda kontrollü ilerle; koridor açılınca hızlan.";
+        }
         finish = Math.max(finish, ...s.actions.map((a) => a.end + 0.1));
       }
       if (profile.number === 28)

@@ -345,3 +345,20 @@ test("ulaşılamayan seçili taşıyıcıya saha boyunca handoff yapılmaz", () 
   assert.deepEqual(s.actions, before);
   assert.match(warnings.join(" "), /uzaktan top aktarımı yapılmadı/);
 });
+test("counter taşıyıcısı fake sonrası puller temasını sabit beklemek yerine aynı koridorda takip eder", () => {
+  for (const n of [12, 13, 14, 26, 28, 30]) {
+    const s = planRavens(ravensScenario(ravensPlays[n - 1].id)).scenario,
+      id = s.ravens!.carrier!,
+      tracks = s.actions.filter((a) => a.player === id && a.label !== "motion").sort((a, b) => a.start - b.start),
+      follow = tracks.find((a) => a.label === "special-follow-pull")!,
+      carry = tracks.find((a) => a.label === "special-carry")!;
+    assert.ok(follow, `${n}: puller takibi`);
+    for (let i = 1; i < tracks.length; i++)
+      assert.ok(tracks[i].start - tracks[i - 1].end <= .13, `${n}: gereksiz sabit bekleme`);
+    assert.equal(follow.end, carry.start);
+    assert.ok(follow.to[1] < 0 && carry.to[1] > 0);
+    const before = position(s, id, follow.start), later = position(s, id, (follow.start + follow.end) / 2);
+    assert.ok(Math.hypot(before[0] - later[0], before[1] - later[1]) > .25);
+    assert.deepEqual(planRavens(s).scenario.actions, s.actions);
+  }
+});
