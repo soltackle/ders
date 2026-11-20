@@ -22,6 +22,46 @@ export type OpponentPackage = {
   }[];
 };
 export const opponentPackages = data as OpponentPackage[];
+export type OpponentAlignment = 'auto' | 'source' | 'mirror';
+export const opponentSign = (s: ScenarioType) => s.opponent?.mirrored ? -1 : 1;
+type FormationPoint = {id:string; at:[number,number]};
+/** Read only the offense's declared snap alignment, never a future route. */
+export function opponentFormation(s:ScenarioType, atSnap?:FormationPoint[]){
+ const center=s.players.find(p=>p.side==='OFF'&&p.pos==='C')?.at[0]??0;
+ const points=new Map(atSnap?.map(p=>[p.id,p.at]));
+ const eligible=s.players.filter(p=>p.side==='OFF'&&!['LT','LG','C','RG','RT','QB'].includes(p.pos));
+ const count=(side:number)=>eligible.filter(p=>{const at=points.get(p.id)??p.at;return at[1]>=-1.6&&(at[0]-center)*side>1.5;}).length;
+ const left=count(-1),right=count(1);
+ return {left,right,strong:Math.max(left,right)>=3&&left!==right?(right>left?1:-1):0};
+}
+export function opponentWantsMirror(s:ScenarioType,atSnap?:FormationPoint[]){
+ if(!s.opponent)return false;
+ const alignment=s.opponent.alignment??'auto';
+ if(alignment!=='auto')return alignment==='mirror';
+ const pack=opponentPackages.find(p=>p.id===s.opponent!.id),strong=opponentFormation(s,atSnap).strong;
+ if(!pack||!strong)return false;
+ const db=pack.players.filter(p=>['CB','SS','FS','DB','S'].includes(p.pos)&&Math.abs(p.at[0])>1.5);
+ const left=db.filter(p=>p.at[0]<0).length,right=db.filter(p=>p.at[0]>0).length;
+ const support=left!==right?(right>left?1:-1):Math.sign(pack.players.find(p=>p.pos==='SS')?.at[0]??0);
+ return !!support&&support!==strong;
+}
+/** Reflect the current defense as a unit, including coach edits, without reloading it. */
+export function alignOpponent(input:ScenarioType,atSnap?:FormationPoint[]){
+ if(!input.opponent)return input;
+ const mirrored=opponentWantsMirror(input,atSnap);
+ if(mirrored===(input.opponent.mirrored??false))return input;
+ const s=structuredClone(input),center=s.players.find(p=>p.side==='OFF'&&p.pos==='C')?.at[0]??0;
+ const flip=([x,z]:[number,number]):[number,number]=>[2*center-x,z];
+ const ids=new Set(s.players.filter(p=>p.side==='DEF').map(p=>p.id));
+ for(const p of s.players)if(ids.has(p.id))p.at=flip(p.at);
+ for(const a of s.actions)if(ids.has(a.player)){a.to=flip(a.to);a.path=a.path?.map(flip);if(a.dir)a.dir=a.dir==='L'?'R':'L';if(a.gap)a.gap=a.gap.replace(/^[LR]/,d=>d==='L'?'R':'L');}
+ for(const [id,e] of Object.entries(s.defenseEdits??{}))if(ids.has(id)){if(e.zone)e.zone=flip(e.zone);if(e.preSnap)e.preSnap=flip(e.preSnap);}
+ s.opponent!.mirrored=mirrored;
+ return s;
+}
+export function changeOpponentAlignment(input:ScenarioType,alignment:OpponentAlignment){
+ const s=structuredClone(input);if(s.opponent)s.opponent.alignment=alignment;return s;
+}
 export function opponentCue(p: OpponentPackage["players"][number]) {
   const end = p.paths.at(-1)?.points.at(-1),
     z = end ? p.at[1] + end[1] : p.at[1];
@@ -57,6 +97,15 @@ export function applyOpponentPackage(input: ScenarioType, id: string) {
     };
   const center =
     s.players.find((p) => p.side === "OFF" && p.pos === "C")?.at[0] ?? 0;
+  // New package players start in source coordinates. Bring retained coach
+  // landmarks back to that frame before applying the requested orientation.
+  if(s.opponent?.mirrored){
+    const ids=new Set(s.players.filter(p=>p.side==='DEF').map(p=>p.id));
+    for(const [id,e] of Object.entries(s.defenseEdits??{}))if(ids.has(id)){
+      if(e.zone)e.zone=[2*center-e.zone[0],e.zone[1]];
+      if(e.preSnap)e.preSnap=[2*center-e.preSnap[0],e.preSnap[1]];
+    }
+  }
   s.players = s.players.filter((p) => p.side === "OFF");
   s.players.push(
     ...pack.players.map((p) => ({
@@ -64,7 +113,7 @@ export function applyOpponentPackage(input: ScenarioType, id: string) {
       at: [center + p.at[0], p.at[1]] as [number, number],
     })),
   );
-  s.opponent = { id, mode: input.opponent?.mode ?? "adaptive", backup };
+  s.opponent = { id, mode: input.opponent?.mode ?? "adaptive", alignment:input.opponent?.alignment??"auto", mirrored:false, backup };
   s.actions = [];
   s.rules = [];
   s.steps = [
@@ -77,7 +126,7 @@ export function applyOpponentPackage(input: ScenarioType, id: string) {
       focus: [],
     },
   ];
-  return Scenario.parse(s);
+  return alignOpponent(Scenario.parse(s));
 }
 export function removeOpponentPackage(input: ScenarioType) {
   const s = structuredClone(input);
@@ -131,6 +180,7 @@ export function prepareOpponent(input: ScenarioType) {
   s.actions = s.actions.filter(
     (a) => a.source !== "opponent",
   );
+  const direction=opponentSign(s);
   for (const original of pack.players) {
     const p = s.players.find((p) => p.side === "DEF" && p.id === original.id);
     if (!p || manual.has(p.id)) continue;
@@ -143,7 +193,7 @@ export function prepareOpponent(input: ScenarioType) {
       );
     const absolute = points
         .slice(1)
-        .map(([x, z]) => [p.at[0] + x, p.at[1] + z] as [number, number]),
+        .map(([x, z]) => [p.at[0] + direction*x, p.at[1] + z] as [number, number]),
       kind =
         p.pos === "DL" || p.intent === "blitz"
           ? "rush"

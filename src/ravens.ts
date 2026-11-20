@@ -1,5 +1,5 @@
 import {stageDefense,finishDefense} from './defense-edit.ts';
-import { prepareOpponent, restoreOpponentOwnership, opponentPackages } from "./opponent.ts";
+import { alignOpponent, prepareOpponent, restoreOpponentOwnership, opponentPackages } from "./opponent.ts";
 import { reactOpponent } from "./opponent-reaction.ts";
 import { eligiblePassTargets, isRavensPass, passWindow } from "./ravens-pass.ts";
 import { ravensProfile, RAVENS_PROFILE_REVISION } from "./ravens-catalog.ts";
@@ -357,9 +357,8 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   input = migrateRavensScenario(input);
   const play = ravensPlays.find((p) => p.id === input.ravens!.id);
   if (!play) throw Error("Ravens kaynağı bulunamadı");
-  const staged=stageDefense(input);
-  const profile = ravensProfile(input.ravens!.id),
-    s = prepareOpponent(staged.scenario);
+  const profile = ravensProfile(input.ravens!.id);
+  let s = structuredClone(input);
   const desired =
     s.ravens!.blocking !== "diagram" && profile.direction !== "drawing"
       ? fieldSide(s)
@@ -377,8 +376,11 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
     }
   }
   s.ravens!.orientation = desired;
-  const meta = s.ravens!,
-    roster = runtimeRoster(play, s);
+  const roster = runtimeRoster(play, s);
+  const atSnap=s.players.filter(p=>p.side==='OFF').map(own=>{const motion=roster.find(p=>p.id===own.id)?.paths.filter(a=>a.motion).at(-1)?.points.at(-1);return {id:own.id,at:motion?[own.at[0]+motion[0],own.at[1]+motion[1]] as [number,number]:own.at};});
+  s=alignOpponent(s,atSnap);
+  const staged=stageDefense(s);s=prepareOpponent(staged.scenario);
+  const meta = s.ravens!;
   const special =
     meta.blocking === "team" &&
     !["pass", "zone", "rollout", "pass-wrap", "zone-lead"].includes(

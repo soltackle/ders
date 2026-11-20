@@ -1,7 +1,7 @@
 import { authoredPosition as position, position as legacyPosition, motion, type ScenarioType, type PlayerType, type ActionType } from "./model.ts";
 import { isRavensPass, passIntent, passState, type PassIntent } from "./ravens-pass.ts";
 import { ravensBall,tossWindow } from "./ravens-ball.ts";
-import { opponentPackages } from "./opponent.ts";
+import { opponentPackages,opponentSign } from "./opponent.ts";
 import { createFootballAi, decideFootballAi, type FootballAi, type AiDecision, type AiObservation } from "./player-ai.ts";
 
 type Point = [number, number];
@@ -63,7 +63,7 @@ function initialize(s: ScenarioType) {
     const original = pack?.players.find((d) => d.id === p.id), end = original?.paths.at(-1)?.points.at(-1);
     const anchor=s.defenseEdits?.[p.id]?.preSnap??p.at;
     if(s.defenseEdits?.[p.id]?.coverage==='rush')callLandmarks[p.id]=[anchor[0],Math.min(-1.5,anchor[1]-2)];
-    else if (end) callLandmarks[p.id] = [anchor[0] + end[0], anchor[1] + end[1]];
+    else if (end) callLandmarks[p.id] = [anchor[0] + opponentSign(s)*end[0], anchor[1] + end[1]];
   }
   const headings = Object.fromEntries(players.map((p) => [p.id, p.side === "DEF" ? Math.PI : 0]));
   sim = { players, actions, index: new Map(players.map((p, i) => [p.id, i])), frames: [{ time: 0, positions: Object.fromEntries(players.map((p) => [p.id, [...p.at] as Point])), velocity: players.map(() => [0, 0]), distance: players.map(() => 0), contacts: [], headings, bodyHeadings: {...headings} }], intent: passIntent(s), pass: isRavensPass(s), snap: s.steps[0]?.end ?? 1.1, end: Math.max(...s.steps.map((st) => st.end)), dwell: new Map(), ai: playerAiEnabled(s) ? createFootballAi(s) : undefined, callLandmarks };

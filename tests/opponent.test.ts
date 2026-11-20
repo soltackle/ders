@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   opponentPackages,
   opponentCue,
+  opponentSign,
   applyOpponentPackage,
   removeOpponentPackage,
 } from "../src/opponent.ts";
@@ -60,7 +61,7 @@ test("35 Ravens oyunu beş pakete karşı her iki field yönünde ve iki reaksiy
             for (const original of pkg.players) {
               const current = out.players.find((p) => p.id === original.id)!, delta = original.paths.at(-1)?.points.at(-1) ?? [0, 0];
               const actual = position(out, current.id, end);
-              assert.ok(Math.hypot(actual[0] - current.at[0] - delta[0], actual[1] - current.at[1] - delta[1]) < 1e-5, label + "/source " + current.id);
+              assert.ok(Math.hypot(actual[0] - current.at[0] - opponentSign(out)*delta[0], actual[1] - current.at[1] - delta[1]) < 1e-5, label + "/source " + current.id);
             }
           }
         }

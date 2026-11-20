@@ -79,7 +79,7 @@ test("Trips paketi seçilince 11 rakip yüklenir, ofans ve Ravens kimliği korun
   assert.equal(e.get().ravens!.id, id);
   assert.equal(
     e.host
-      .querySelector('[aria-pressed="true"]')!
+      .querySelector('[data-opponent-package][aria-pressed="true"]')!
       .getAttribute("data-opponent-package"),
     pkg.id,
   );
@@ -133,7 +133,7 @@ test("paketler arası geçişten sonra kaldırmak orijinal hazır savunmayı ve 
     )!.value,
     "",
   );
-  assert.equal(e.host.querySelectorAll('[aria-pressed="true"]').length, 0);
+  assert.equal(e.host.querySelectorAll('[data-opponent-package][aria-pressed="true"]').length, 0);
   assert.match(
     e.host.querySelector('[role="status"]')!.textContent!,
     /önceki savunma/,
@@ -157,7 +157,7 @@ test("boş paket seçeneği kaldırır; kaydedilmiş paket ve kaynak modu ilk a�
     "source",
   );
   assert.equal(
-    restored.host.querySelectorAll('[aria-pressed="true"]').length,
+    restored.host.querySelectorAll('[data-opponent-package][aria-pressed="true"]').length,
     1,
   );
   restored.change("Kocaeli rakip paket", "");

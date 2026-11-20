@@ -186,6 +186,7 @@ export function mountRavens(
         if (current.opponent && current.ravens?.id !== p.id) {
           next = applyOpponentPackage(next, current.opponent.id);
           next.opponent!.mode = current.opponent.mode;
+          next.opponent!.alignment = current.opponent.alignment;
         }
         api.set(planRavens(next).scenario);
       };
