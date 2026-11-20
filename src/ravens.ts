@@ -581,7 +581,6 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   let result = { ...base, scenario: Scenario.parse(out) };
   const complete = (p: ProtectionResult | ZoneResult) => {
     const meta = p.scenario.ravens!;
-    if(profile.kind === "screen" && meta.blocking !== "diagram" && isRavensPass(p.scenario)){if(meta.passTarget!=="U")meta.passReleaseAt=undefined;meta.passTarget="U";meta.carrier="U";}
     if (!isRavensPass(p.scenario) || !eligiblePassTargets(p.scenario).some((x) => x.id === meta.passTarget)) {
       meta.passTarget = undefined;
       meta.passReleaseAt = undefined;
@@ -601,6 +600,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
           step.notes[qb.id] = `${step.notes[qb.id] ?? ""} Pas hedefi ${meta.passTarget}; çıkış ${meta.passReleaseAt!.toFixed(1)} sn. Top sabit bir uçuşla oyun rotasına atılır.`;
       }
     }
+    if(profile.kind === "screen")meta.carrier=meta.passTarget;
     if (!p.scenario.opponent) return p;
     restoreOpponentOwnership(p.scenario);
     if (p.scenario.opponent.mode === "source")

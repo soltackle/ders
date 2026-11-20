@@ -422,5 +422,8 @@ test("bütün 35 oyunda Pas oyna seçeneği takım pas korumasını ve alıcı l
   const listeners:(()=>void)[]=[], root=document.querySelector<HTMLElement>('section')!;
   mountRavens(root,{get:()=>state,set:s=>{state=s;listeners.forEach(f=>f())},subscribe:f=>listeners.push(f)});
   for(const play of ravensPlays){state=planRavens(ravensScenario(play.id)).scenario;listeners.forEach(f=>f());root.querySelector<HTMLButtonElement>('[data-ravens-pass-play]')!.click();assert.ok(isRavensPass(state),play.name);assert.ok(eligiblePassTargets(state).length>0,play.name);assert.equal(root.querySelector<HTMLElement>('.ravens-pass-controls')!.hidden,false);assert.equal(state.ravens!.id,play.id);}
+  state=planRavens(ravensScenario(ravensPlays[20].id)).scenario;listeners.forEach(f=>f());
+  const receiver=root.querySelector<HTMLSelectElement>('[aria-label="Ravens pas alıcısı"]')!;
+  for(const id of ['X','U','Y','']){receiver.value=id;receiver.dispatchEvent(new dom.window.Event('change'));assert.equal(state.ravens!.passTarget,id||undefined);assert.equal(receiver.value,id);state=planRavens(state).scenario;listeners.forEach(f=>f());assert.equal(receiver.value,id);}
   dom.window.close();
 });

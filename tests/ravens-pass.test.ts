@@ -203,26 +203,23 @@ test("gelecekteki savunma rotası niyet edilen pası veya release/catch zamanın
   const state = passState(s, 2.3)!;
   assert.equal(state.outcome, "pending");
 });
-test("screen yalnız field screen koridorundaki alıcıyı sunar; deep X/Z hedefi olmaz", () => {
-  const s = planRavens(ravensScenario(ravensProfile(21).id)).scenario;
-  assert.equal(isRavensPass(s), true);
-  const ids = eligiblePassTargets(s).map((p) => p.id);
-  assert.deepEqual(ids, ["U"]);
-  assert.equal(s.ravens!.passTarget,"U");
-  assert.equal(s.ravens!.carrier,"U");
-  const route=s.actions.find(a=>a.player==="U"&&a.label==="kaynak-rota")!;
-  const carry=s.actions.find(a=>a.player==="U"&&a.label==="special-screen-carry")!;
-  assert.ok(carry.to[1]>route.to[1]);
-  assert.ok(carry.path!.every(p=>p[1]>=route.to[1]));
-  assert.ok(!ids.includes("X"));
-  assert.ok(!ids.includes("Z"));
-  assert.ok(!ids.includes("H"));
-  assert.ok(!ids.includes("Y"));
-  for (const n of [11, 35])
-    assert.equal(
-      isRavensPass(planRavens(ravensScenario(ravensProfile(n).id)).scenario),
-      false,
-    );
-  s.zone = { enabled: true, variant: "inside" };
-  assert.equal(isRavensPass(s), false);
+test("Yüzük E7 alıcısı serbest seçilir, yeniden hesaplama kilitlemez ve QB tutma korunur", () => {
+  let s=planRavens(ravensScenario(ravensProfile(21).id)).scenario;
+  assert.equal(s.ravens!.passTarget,undefined);
+  const ids=eligiblePassTargets(s).map(p=>p.id);
+  assert.ok(ids.includes("X")&&ids.includes("Y")&&ids.includes("U")&&ids.includes("H"));
+  assert.ok(!ids.includes("Q")&&!ids.includes("RG"));
+  for(const id of ids){
+    s.ravens!.passTarget=id;
+    s=planRavens(s).scenario;
+    assert.equal(s.ravens!.passTarget,id);
+    assert.equal(s.ravens!.carrier,id);
+    assert.equal(passIntent(s)!.target,id);
+    assert.equal(planRavens(s).scenario.ravens!.passTarget,id);
+  }
+  s.ravens!.passTarget=undefined;
+  s=planRavens(s).scenario;
+  assert.equal(s.ravens!.carrier,undefined);
+  assert.equal(passIntent(s),null);
+  assert.ok(!s.actions.some(a=>a.label==="special-screen-carry"));
 });

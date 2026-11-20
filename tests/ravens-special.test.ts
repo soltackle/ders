@@ -160,7 +160,9 @@ test("29’da iki guard karşıt yönlerde kalır; 28’de ters H fake rotası v
   assert.match(ct.warnings.join(" "), /H fake yolu korunuyor/);
 });
 test("screen RG/RT release gösterir, speed option pitch kararını uydurmaz, tush QB ve destekçileri ileri taşır", () => {
-  const screen = applyRavensSpecial(source(21), {
+  const screenInput=source(21);
+  screenInput.ravens!.passTarget="U";
+  const screen = applyRavensSpecial(screenInput, {
     number: 21,
     kind: "screen",
     direction: "field",

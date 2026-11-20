@@ -13,7 +13,7 @@ Numaralar MOST kaynağındaki 35 kartın sabit sırasıdır. Oyun isimleri deği
 | 13 | GT counter | Kaynak LG + LT sağa pull; yarım bırakılmış arka hat yolu canlı hedefe kadar tamamlanır. |
 | 14 | Dart | Kaynak boundary LT sağa, hattın arkasından pull/lead yapar. Field tackle kendi DL’sini korur; puller LB’ye çıkar. |
 | 19,26 | 3-tech trap | Kaynak LG sağa trap, RG hedef DL’yi bypass edip ikinci seviyeye çıkar. Hedef, pull yönündeki gerçek 3-tech’tir. |
-| 21 | Field screen pas · U | U screen pasın alıcısıdır. RG/RT kısa pas görünüşü sonrası gecikmeli field çıkışı ve eskort. Uzak iç LB için tekrar hattın içine koşulmaz. |
+| 21 | Field screen pas | Alıcı kullanıcı tarafından seçilir. RG/RT kısa pas görünüşü sonrası gecikmeli field çıkışı ve eskort. Uzak iç LB için tekrar hattın içine koşulmaz. |
 | 28 | Boundary CT counter | Kaynak C + RT sola; center kick/kenar, tackle wrap/ikinci seviye. H’nin ters fake yolu korunur; F başlangıç taşıyıcısı olarak gösterilir. |
 | 29 | Çizime özel | LG sola, RG sağa karşıt dış pull. H/F sol akış ve Z motion/fake korunur; başlangıç taşıyıcı H’dir. Genel GT şemasıyla değiştirilmez. |
 | 30 | Boundary GT counter | Kaynak RG + RT sola; pull ve down bloklar korunur. |

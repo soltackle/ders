@@ -105,13 +105,7 @@ export function eligiblePassTargets(s: ScenarioType): PlayerType[] {
             /pickup|pass-set|punch|special-hold|source-pull/.test(a.label)),
       ),
   );
-  let screen = false;
-  try {
-    screen = ravensProfile(s.ravens!.id).kind === "screen";
-  } catch {}
-  if (!screen) return eligible;
-  // Team call: Yüzük E7 is the screen to U.
-  return eligible.filter((p) => p.id === "U");
+  return eligible;
 }
 
 function episodeEnd(s: ScenarioType) {

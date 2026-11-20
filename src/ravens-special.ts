@@ -764,7 +764,7 @@ export function applyRavensSpecial(
           p.id === s.ravens?.carrier,
       ),
       carrier =
-        (profile.kind === "screen" ? s.players.find((p) => p.side === "OFF" && p.id === "U") : requested) ?? s.players.find((p) => p.side === "OFF" && p.pos === "RB");
+        profile.kind === "screen" ? s.players.find((p) => p.side === "OFF" && p.pos !== "QB" && !linePositions.includes(p.pos) && p.id === s.ravens?.passTarget) : requested ?? s.players.find((p) => p.side === "OFF" && p.pos === "RB");
     if (carrier) {
       const last = ends(s, carrier.id),
         start = Math.max(snap + 0.8, last?.end ?? snap + 0.8);
