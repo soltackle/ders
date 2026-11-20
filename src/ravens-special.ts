@@ -768,24 +768,6 @@ export function applyRavensSpecial(
     if (carrier) {
       const last = ends(s, carrier.id),
         start = Math.max(snap + 0.8, last?.end ?? snap + 0.8);
-      if (profile.kind === "screen") {
-        const from = last?.to ?? carrier.at,
-          to: [number, number] = [from[0], Math.max(3.2, from[1] + 5)],
-          run: ActionType = {
-            source: "ravens",
-            player: carrier.id,
-            label: "special-screen-carry",
-            start,
-            end: start + 1,
-            to,
-            path: [
-              [from[0], from[1] + 1.5],
-            ],
-          };
-        run.end = start + travelDuration(pathLength(from, run), 3);
-        s.actions.push(run);
-        finish = Math.max(finish, run.end + 0.6);
-      }
       const transferAt = Math.max(
         snap,
         Math.min(
@@ -800,7 +782,7 @@ export function applyRavensSpecial(
           profile.number === 29
             ? prepareRunHandoff(s, carrier.id, snap + 1, warnings)
             : transferAt;
-        finish = Math.max(finish, ...s.actions.map((a) => a.end + 0.1));
+        if (profile.number === 29) finish = Math.max(finish, ...s.actions.map((a) => a.end + 0.1));
       }
       notes[carrier.id] =
         profile.kind === "screen"
