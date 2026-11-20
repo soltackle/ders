@@ -62,3 +62,13 @@ test('defense panel selects defenders, persists coverage and presnap settings an
  q('coverage').value='auto';q('move').checked=false;host.querySelector<HTMLButtonElement>('[data-def-save]')!.click();
  assert.ok(!scenario.actions.some(a=>a.player==='DL1'&&a.source==='defense'));
 });
+
+test('a linebacker switched to rush leaves his old fit or package drop landmark behind',()=>{
+ for(const pack of [undefined,opponentPackages[0]]){
+  let input=ravensScenario(ravensPlays[0].id);if(pack)input=applyOpponentPackage(input,pack.id);
+  const lb=input.players.find(p=>p.side==='DEF'&&p.pos==='LB')!;input.defenseEdits={[lb.id]:{coverage:'rush'}};
+  const s=planRavens(input).scenario,frame=playFrame(s,s.steps[0].end+1.4),decision=frame.decisions![lb.id];
+  assert.ok(decision.aim[1]<=frame.positions[lb.id][1]+.03,`${pack?.name??'base'}: rush must not return toward old positive-depth fit`);
+  assert.ok(['rush','rush-lane','hand-fight'].includes(decision.phase));
+ }
+});

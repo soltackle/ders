@@ -62,7 +62,8 @@ function initialize(s: ScenarioType) {
   for (const p of players.filter((p) => p.side === "DEF")) {
     const original = pack?.players.find((d) => d.id === p.id), end = original?.paths.at(-1)?.points.at(-1);
     const anchor=s.defenseEdits?.[p.id]?.preSnap??p.at;
-    if (end) callLandmarks[p.id] = [anchor[0] + end[0], anchor[1] + end[1]];
+    if(s.defenseEdits?.[p.id]?.coverage==='rush')callLandmarks[p.id]=[anchor[0],Math.min(-1.5,anchor[1]-2)];
+    else if (end) callLandmarks[p.id] = [anchor[0] + end[0], anchor[1] + end[1]];
   }
   const headings = Object.fromEntries(players.map((p) => [p.id, p.side === "DEF" ? Math.PI : 0]));
   sim = { players, actions, index: new Map(players.map((p, i) => [p.id, i])), frames: [{ time: 0, positions: Object.fromEntries(players.map((p) => [p.id, [...p.at] as Point])), velocity: players.map(() => [0, 0]), distance: players.map(() => 0), contacts: [], headings, bodyHeadings: {...headings} }], intent: passIntent(s), pass: isRavensPass(s), snap: s.steps[0]?.end ?? 1.1, end: Math.max(...s.steps.map((st) => st.end)), dwell: new Map(), ai: playerAiEnabled(s) ? createFootballAi(s) : undefined, callLandmarks };

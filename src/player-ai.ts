@@ -174,7 +174,7 @@ export function createFootballAi(
       .at(-1);
     const anchor=s.defenseEdits?.[p.id]?.preSnap??p.at;
     const fallback: AiPoint =
-      p.pos === "DL"
+      p.pos === "DL" || s.defenseEdits?.[p.id]?.coverage === "rush"
         ? [anchor[0], Math.min(-1.5, anchor[1] - 2)]
         : p.pos === "LB"
           ? [anchor[0], Math.max(0.65, anchor[1] - 1.2)]
