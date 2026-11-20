@@ -412,3 +412,15 @@ test("rollout, boundary wrap ve screen pas kontrollerini kullanır; koşu oyunla
   await new Promise((r) => setTimeout(r, 0));
   dom.window.close();
 });
+
+test("bütün 35 oyunda Pas oyna seçeneği takım pas korumasını ve alıcı listesini açar", async () => {
+  const {ravensScenario,planRavens}=await import('../src/ravens.ts');
+  const {isRavensPass,eligiblePassTargets}=await import('../src/ravens-pass.ts');
+  const dom=new JSDOM('<section></section>',{url:'https://example.com/#ravens'});
+  Object.assign(globalThis,{window:dom.window,document:dom.window.document,localStorage:dom.window.localStorage,location:dom.window.location});
+  let state=planRavens(ravensScenario(ravensPlays[0].id)).scenario;
+  const listeners:(()=>void)[]=[], root=document.querySelector<HTMLElement>('section')!;
+  mountRavens(root,{get:()=>state,set:s=>{state=s;listeners.forEach(f=>f())},subscribe:f=>listeners.push(f)});
+  for(const play of ravensPlays){state=planRavens(ravensScenario(play.id)).scenario;listeners.forEach(f=>f());root.querySelector<HTMLButtonElement>('[data-ravens-pass-play]')!.click();assert.ok(isRavensPass(state),play.name);assert.ok(eligiblePassTargets(state).length>0,play.name);assert.equal(root.querySelector<HTMLElement>('.ravens-pass-controls')!.hidden,false);assert.equal(state.ravens!.id,play.id);}
+  dom.window.close();
+});

@@ -764,13 +764,13 @@ export function applyRavensSpecial(
           p.id === s.ravens?.carrier,
       ),
       carrier =
-        requested ?? s.players.find((p) => p.side === "OFF" && p.pos === "RB");
+        (profile.kind === "screen" ? s.players.find((p) => p.side === "OFF" && p.id === "U") : requested) ?? s.players.find((p) => p.side === "OFF" && p.pos === "RB");
     if (carrier) {
       const last = ends(s, carrier.id),
         start = Math.max(snap + 0.8, last?.end ?? snap + 0.8);
       if (profile.kind === "screen") {
         const from = last?.to ?? carrier.at,
-          to: [number, number] = [center + field * 4.4, 3.2],
+          to: [number, number] = [from[0], Math.max(3.2, from[1] + 5)],
           run: ActionType = {
             source: "ravens",
             player: carrier.id,
@@ -779,8 +779,7 @@ export function applyRavensSpecial(
             end: start + 1,
             to,
             path: [
-              [from[0], Math.min(-1, from[1])],
-              [center + field * 4.4, -0.5],
+              [from[0], from[1] + 1.5],
             ],
           };
         run.end = start + travelDuration(pathLength(from, run), 3);

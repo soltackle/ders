@@ -207,10 +207,16 @@ test("screen yalnız field screen koridorundaki alıcıyı sunar; deep X/Z hedef
   const s = planRavens(ravensScenario(ravensProfile(21).id)).scenario;
   assert.equal(isRavensPass(s), true);
   const ids = eligiblePassTargets(s).map((p) => p.id);
-  assert.ok(ids.includes("H"));
+  assert.deepEqual(ids, ["U"]);
+  assert.equal(s.ravens!.passTarget,"U");
+  assert.equal(s.ravens!.carrier,"U");
+  const route=s.actions.find(a=>a.player==="U"&&a.label==="kaynak-rota")!;
+  const carry=s.actions.find(a=>a.player==="U"&&a.label==="special-screen-carry")!;
+  assert.ok(carry.to[1]>route.to[1]);
+  assert.ok(carry.path!.every(p=>p[1]>=route.to[1]));
   assert.ok(!ids.includes("X"));
   assert.ok(!ids.includes("Z"));
-  assert.ok(!ids.includes("U"));
+  assert.ok(!ids.includes("H"));
   assert.ok(!ids.includes("Y"));
   for (const n of [11, 35])
     assert.equal(

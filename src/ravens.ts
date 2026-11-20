@@ -581,6 +581,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   let result = { ...base, scenario: Scenario.parse(out) };
   const complete = (p: ProtectionResult | ZoneResult) => {
     const meta = p.scenario.ravens!;
+    if(profile.kind === "screen" && meta.blocking !== "diagram" && isRavensPass(p.scenario)){if(meta.passTarget!=="U")meta.passReleaseAt=undefined;meta.passTarget="U";meta.carrier="U";}
     if (!isRavensPass(p.scenario) || !eligiblePassTargets(p.scenario).some((x) => x.id === meta.passTarget)) {
       meta.passTarget = undefined;
       meta.passReleaseAt = undefined;
@@ -588,7 +589,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
     } else {
       const window = passWindow(p.scenario);
       if (window.latest >= window.earliest)
-        meta.passReleaseAt = Math.max(window.earliest, Math.min(window.latest, meta.passReleaseAt ?? window.snap + 1.6));
+        meta.passReleaseAt = Math.max(window.earliest, Math.min(window.latest, meta.passReleaseAt ?? window.snap + (profile.kind === "screen" ? .7 : 1.6)));
       else {
         meta.passTarget = undefined;
         meta.passReleaseAt = undefined;

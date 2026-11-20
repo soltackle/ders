@@ -176,7 +176,7 @@ test("screen RG/RT release gösterir, speed option pitch kararını uydurmaz, tu
     ),
   );
   assert.match(screen.warnings.join(" "), /Screen taşıyıcısı/);
-  assert.equal(screen.scenario.ravens!.carrier, "H");
+  assert.equal(screen.scenario.ravens!.carrier, "U");
   assert.ok(
     screen.scenario.actions.some((a) => a.label === "special-screen-carry"),
   );

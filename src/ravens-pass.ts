@@ -1,6 +1,5 @@
 import {
   position,
-  fieldSide,
   type ScenarioType,
   type PlayerType,
 } from "./model.ts";
@@ -111,37 +110,8 @@ export function eligiblePassTargets(s: ScenarioType): PlayerType[] {
     screen = ravensProfile(s.ravens!.id).kind === "screen";
   } catch {}
   if (!screen) return eligible;
-  const sign = fieldSide(s) === "right" ? 1 : -1,
-    center =
-      s.players.find((p) => p.side === "OFF" && p.pos === "C")?.at[0] ?? 0;
-  const escorts = s.actions.filter(
-    (a) =>
-      s.players.some((p) => p.id === a.player && line.includes(p.pos)) &&
-      !a.label.startsWith("special-") &&
-      (a.assignment === "pull" ||
-        a.kind === "screen" ||
-        /screen|source-pull/.test(a.label)),
-  );
-  const extent =
-    Math.max(
-      4.5,
-      ...escorts.flatMap((a) =>
-        [...(a.path ?? []), a.to].map((p) => (p[0] - center) * sign),
-      ),
-    ) + 1.75;
-  return eligible.filter((p) =>
-    s.actions.some(
-      (a) =>
-        a.player === p.id &&
-        a.end > snap &&
-        a.label !== "motion" &&
-        !/carry|fake|push/.test(a.label) &&
-        a.assignment === undefined &&
-        a.to[1] <= 0.55 &&
-        (a.to[0] - center) * sign >= -0.4 &&
-        (a.to[0] - center) * sign <= extent,
-    ),
-  );
+  // Team call: Yüzük E7 is the screen to U.
+  return eligible.filter((p) => p.id === "U");
 }
 
 function episodeEnd(s: ScenarioType) {
