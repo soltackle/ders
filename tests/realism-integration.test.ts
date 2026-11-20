@@ -12,7 +12,7 @@ test("dokuz özel koşunun fiziksel top devri bütün rakip paketlerinde gerçek
     for (const pkg of opponentPackages)
       for (const hash of ["left", "right"] as const) {
         const input = applyOpponentPackage(ravensScenario(ravensProfile(n).id), pkg.id);
-        input.hash = hash;
+        input.hash = hash;input.ravens!.exchange="handoff";
         const s = planRavens(input).scenario, t = s.ravens!.transferAt!, id = s.ravens!.carrier!,
           q = worldPosition(s, "Q", t), runner = worldPosition(s, id, t), d = Math.hypot(q[0] - runner[0], q[1] - runner[1]);
         assert.ok(t - s.steps[0].end <= 2.01, `${n}/${hash}/${pkg.name}: geç devir`);

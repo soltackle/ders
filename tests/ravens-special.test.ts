@@ -249,7 +249,8 @@ test("GT12/30 ve CT28 geçerli yerel down blokları uzak eşleşme uğruna kaybe
 
 test("counter/dart/trap taşıyıcısı son carry segmentini beklemeden gerçek erken QB mesh ile topu alır", () => {
   for (const n of [12, 13, 14, 19, 26, 28, 29, 30, 34]) {
-    const out = planRavens(ravensScenario(ravensPlays[n - 1].id)).scenario,
+    const input=ravensScenario(ravensPlays[n - 1].id);input.ravens!.exchange="handoff";
+    const out = planRavens(input).scenario,
       snap = out.steps[0].end,
       at = out.ravens!.transferAt!,
       id = out.ravens!.carrier!;
@@ -284,7 +285,9 @@ test("eksik kaynak mesh için kısa yaklaşma hız sınırını ve sonraki kayna
       raw = input.actions.filter(
         (a) => a.player === carrierId && a.label !== "motion",
       ),
-      out = planRavens(ravensScenario(ravensPlays[n - 1].id)).scenario;
+      handoff = ravensScenario(ravensPlays[n - 1].id);
+    handoff.ravens!.exchange="handoff";
+    const out=planRavens(handoff).scenario;
     const approach = out.actions.find(
       (a) => a.player === carrierId && a.label === "special-mesh-approach",
     )!;

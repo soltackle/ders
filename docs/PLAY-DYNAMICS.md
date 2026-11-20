@@ -20,9 +20,19 @@ Taşıyıcıyla sürdürülen yakın temas oyunu durdurur. Pas çıkmadan QB ark
 
 Ofans covered/uncovered, field ALERT ve big-on-big atamaları korunur. Bu katman animasyon sırasında ilerlemeyi temasla sınırlar. Tasarla modunda kaynak yolları ve düzenleme noktaları gösterilir. Kullanıcının kaynak çizimi olarak tuttuğu 9 numara ve rakip paketin kaynak hareket modu otomatik temas katmanına girmez.
 
-Counter/Dart/trap ve 29 numaralı özel koşuda otomatik top devri, son carry segmentini beklemek yerine ilk iki saniyedeki yakın backfield mesh'e bağlanır. Çizimde böyle bir buluşma yoksa taşıyıcıya kısa ve hız sınırlı QB yaklaşması eklenir; sonraki kaynak fake/rota noktaları korunur. QB–taşıyıcı mesh sırasında birbirinden kaçınmaz; gövde ayrımı korunur ve diğer takım arkadaşları yer açar. Manuel devir zamanı `transferManual` ile saklanır. Ulaşılamayan taşıyıcıya saha boyunca handoff yapılmaz.
+Elden devir seçili Counter/Dart/trap ve 29 numaralı özel koşuda otomatik top devri, son carry segmentini beklemek yerine ilk iki saniyedeki yakın backfield mesh'e bağlanır. Çizimde böyle bir buluşma yoksa taşıyıcıya kısa ve hız sınırlı QB yaklaşması eklenir; sonraki kaynak fake/rota noktaları korunur. QB–taşıyıcı mesh sırasında birbirinden kaçınmaz; gövde ayrımı korunur ve diğer takım arkadaşları yer açar. Manuel devir zamanı `transferManual` ile saklanır. Ulaşılamayan taşıyıcıya saha boyunca handoff yapılmaz.
 
 Counter/Dart/trap taşıyıcısı fake sonrası puller'ın temasını birkaç saniye sabit beklemez. Aynı çizilmiş koridorda kontrollü takip yapar; puller girişini tamamlayınca ileri carry bölümü başlar. Kaynak fake noktaları, blokçuların yolları ve hedef koridor korunur.
+
+## Toss ve savunma düzenleme
+
+**Top aktarımı** alanından handoff veya geriye toss seçilir. MAZE koşularının varsayılanı toss'tur. Toss için RB önce gerideki karşılama noktasına gelir, top kısa ve sabit bir yay boyunca uçar; uçuşta QB veya RB taşıyıcı sayılmaz. Karşılama sonrası RB kaynak fake/koşu noktalarına devam eder. Ulaşılabilir bir geriye atış bulunmazsa yakındaki elden devir kullanılır. Pas hedefi seçimi ve takım koruma kuralları bundan bağımsızdır.
+
+Özel koşuların down blokçuları bitiş okuna doğrudan koşmak yerine ilk adımda atanmış DL'nin temas noktasına yönelir. GT/CT down blok dağılımı, puller'ın arka hat yolu ve trap bypass görevi korunur. Temas sonrası ilerlemeyi fizik katmanı sınırlar.
+
+**Defansı düzenle**, sahada veya kadroda savunmacı seçildiğinde açılır. Otomatik takım çağrısı, belirli alıcıya adam coverage, koordinatla bölge coverage, rush/blitz ve yerinde kal görevleri seçilebilir. Coverage bölgesi ve snap öncesi varış noktası sayı girerek veya sahaya tıklayarak belirlenebilir; **Seçili savunmacıya uygula** kaydeder ve oynatmayı sıfırlar. Snap öncesi hareket için yeterli süre ayrılır; hücum atamaları varış dizilişine göre hesaplanır. Başlangıç dizilişi korunur, yeniden hesaplama hareketleri biriktirmez. Seçilmeyen savunmacıların rakip paket görevleri devam eder. AI açıkken adam takibi yalnız görülen/hatırlanan konuma dayanır; bölge görevi kendi seçilen alanına yönelir. AI kapalıyken düzenlenen görevlerin çizilmiş yolları izlenir.
+
+Oyuncu bilgi kutusu saha altında açılıp kapanır; açıkken de sahayı örtmez. Kararları göster seçeneği bilgi bölümünü açar.
 
 ## Doğrulama ve sınırlar
 

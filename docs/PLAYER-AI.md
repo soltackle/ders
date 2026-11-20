@@ -4,7 +4,7 @@
 
 ## Kontroller
 
-Ravens sahasının üstündeki **Saha AI etkin** varsayılan olarak açıktır. Kapatmak önceki atama/rotaya bağlı oynatmayı kullanır. **Kararları göster**, seçili oyuncunun karar nedenini ve görülen/hatırlanan oyuncu sayısını HUD'a ekler. Bu görüntüleme tercihi fiziksel sonucu değiştirmez ve zamanı sıfırlamaz. Davranışı açmak/kapatmak yeni bir oynatma başlatır.
+Ravens sahasının üstündeki **Saha AI etkin** varsayılan olarak açıktır. Kapatmak önceki atama/rotaya bağlı oynatmayı kullanır. **Kararları göster**, seçili oyuncunun karar nedenini ve görülen/hatırlanan oyuncu sayısını saha altındaki açılır oyuncu bilgisine ekler. Bu görüntüleme tercihi fiziksel sonucu değiştirmez ve zamanı sıfırlamaz. Davranışı açmak/kapatmak yeni bir oynatma başlatır.
 
 Tercihler `scenario.playerAI` içinde saklanır; oyun kartı değiştirme, JSON dışa aktarma/yükleme ve yerel kayıtla korunur. 9 numaralı kaynak çizimi, seçilmiş diagram modu, rakibin kaynak hareket modu ve otomatik oynatma kapalıyken AI uygulanmaz. Kaynak yolları ve manuel savunma yolu sahipliği korunur.
 

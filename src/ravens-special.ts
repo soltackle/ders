@@ -1,3 +1,4 @@
+import {runExchange} from './ravens-ball.ts';
 import {
   Scenario,
   fieldSide,
@@ -121,6 +122,19 @@ export function prepareRunHandoff(
   }
   meta.transferManual = false;
   if (carrier.id === qb.id) return snap;
+  if (runExchange(s) === 'toss') {
+    const from=position(s,carrier.id,snap);
+    for(let at=snap+.85;at<=snap+2;at+=.05){
+      const launch=position(s,qb.id,at-.55),to:[number,number]=[from[0],Math.min(from[1],launch[1]-.65)];
+      if(pointDistance(launch,to)>6||travelDuration(pointDistance(from,to),3)>at-snap-.05)continue;
+      for(const a of s.actions.filter(a=>a.player===carrier.id&&a.label!=='motion'&&a.start>=snap-1e-6)){
+        a.start+=at-snap;a.end+=at-snap;for(const phase of a.phases??[]){phase.start+=at-snap;phase.end+=at-snap;}
+      }
+      s.actions.push({source:'ravens',player:carrier.id,label:'special-toss-receive',start:snap+.05,end:at,to});
+      return at;
+    }
+    warnings.push(`${carrier.id}: ulaşılabilir geriye toss yok; yakın elden devir kullanılıyor.`);
+  }
   // Choose the closest early backfield meeting, not the first long arm's-reach pass.
   // The contact layer retains body separation if the drawn center paths cross.
   let closest: { time: number; distance: number } | undefined;
@@ -480,6 +494,9 @@ export function applyRavensSpecial(
             : "run"
         : "drive";
       a.phases = [{ name: phase, start: a.start, end: a.end }];
+      const own=s.players.find(d=>d.id===a.target&&d.pos==='DL');
+      if(!pull&&!secondLevel.has(p.id)&&i===0&&own){a.path=(a.path??[]).filter(q=>q[1]<.15);a.to=[own.at[0],own.at[1]-.6];}
+
     }
   }
   // Pullers finish their drawn rear-of-line track before gathering to the actual target.

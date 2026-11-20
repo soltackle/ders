@@ -14,3 +14,9 @@
 .ravens-special-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;grid-column:1/-1}.ravens-special-controls[hidden],.ravens-option-control[hidden]{display:none}.ravens-type{display:block;color:#c6de9b;font-size:10px;margin-top:6px}.ravens-call{grid-column:1/-1;color:#d8e89b;font-size:12px;line-height:1.6}
 
 .ravens-pass-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;grid-column:1/-1;padding:14px;background:#182f22;border:1px solid #587746;border-radius:6px}.ravens-pass-controls[hidden]{display:none}.ravens-pass-status{grid-column:1/-1;color:#d0e1b8!important}.ravens-pass-controls input:disabled,.ravens-pass-controls select:disabled{opacity:.55}
+
+.training-hud{position:static;max-width:none;margin:8px 0;padding:7px 12px;pointer-events:auto}.training-hud summary{cursor:pointer;font-size:11px;color:#d7ec9a}.training-hud details>*:not(summary){display:block;margin-top:6px}.training-hud [hidden]{display:none!important}
+
+.defense-edit-panel{padding:12px;margin:12px 0;background:#14291e;border:1px solid #526947;border-radius:8px}.defense-edit-panel summary{cursor:pointer;color:#d7ec9a;font-weight:bold}.defense-edit-panel label{display:inline-flex;align-items:center;gap:7px;margin:10px;font-size:12px;flex-wrap:wrap}.defense-edit-panel select,.defense-edit-panel input{max-width:150px;background:#102017;color:#e0ecd5;padding:7px;border:1px solid #526947}.defense-edit-panel input[type=number]{width:80px}.defense-edit-panel p{font-size:12px}
+
+.defense-edit-panel button{background:#273d29;color:#e0ecd5;border:1px solid #68854e;border-radius:4px;padding:8px 10px;margin:5px;font-size:12px;cursor:pointer}.defense-edit-panel [data-def-save]{background:#cee68b;color:#17271b;font-weight:700}.defense-edit-panel :disabled{opacity:.45}.defense-edit-panel [hidden]{display:none}

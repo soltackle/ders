@@ -1,6 +1,6 @@
 import { authoredPosition as position, position as legacyPosition, motion, type ScenarioType, type PlayerType, type ActionType } from "./model.ts";
 import { isRavensPass, passIntent, passState, type PassIntent } from "./ravens-pass.ts";
-import { ravensBall } from "./ravens-ball.ts";
+import { ravensBall,tossWindow } from "./ravens-ball.ts";
 import { opponentPackages } from "./opponent.ts";
 import { createFootballAi, decideFootballAi, type FootballAi, type AiDecision, type AiObservation } from "./player-ai.ts";
 
@@ -50,6 +50,7 @@ function scriptedCarrier(s: ScenarioType, sim: Simulation, t: number) {
   }
   const rb = sim.players.find((p) => p.side === "OFF" && p.pos === "RB"),
     transfer = s.zone?.enabled ? (s.actions.find((a) => a.player === rb?.id && a.label === "mesh")?.end ?? sim.snap + .8) : (s.ravens?.transferAt ?? sim.snap + .8);
+  const toss=tossWindow(s);if(toss&&t>=toss.releaseAt&&t<toss.catchAt)return undefined;
   return t < transfer ? qb?.id : s.zone?.enabled ? rb?.id : (s.ravens?.carrier ?? qb?.id);
 }
 function initialize(s: ScenarioType) {
@@ -60,7 +61,8 @@ function initialize(s: ScenarioType) {
   const pack = opponentPackages.find((p) => p.id === s.opponent?.id), callLandmarks: Record<string, Point> = {};
   for (const p of players.filter((p) => p.side === "DEF")) {
     const original = pack?.players.find((d) => d.id === p.id), end = original?.paths.at(-1)?.points.at(-1);
-    if (end) callLandmarks[p.id] = [p.at[0] + end[0], p.at[1] + end[1]];
+    const anchor=s.defenseEdits?.[p.id]?.preSnap??p.at;
+    if (end) callLandmarks[p.id] = [anchor[0] + end[0], anchor[1] + end[1]];
   }
   const headings = Object.fromEntries(players.map((p) => [p.id, p.side === "DEF" ? Math.PI : 0]));
   sim = { players, actions, index: new Map(players.map((p, i) => [p.id, i])), frames: [{ time: 0, positions: Object.fromEntries(players.map((p) => [p.id, [...p.at] as Point])), velocity: players.map(() => [0, 0]), distance: players.map(() => 0), contacts: [], headings, bodyHeadings: {...headings} }], intent: passIntent(s), pass: isRavensPass(s), snap: s.steps[0]?.end ?? 1.1, end: Math.max(...s.steps.map((st) => st.end)), dwell: new Map(), ai: playerAiEnabled(s) ? createFootballAi(s) : undefined, callLandmarks };

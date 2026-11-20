@@ -343,7 +343,8 @@ test("source/diagram bypass is exact and disabling AI keeps the authored physica
 
 test("AI preserves the intended early mesh on the special running calls", () => {
   for (const n of [12, 13, 14, 19, 26, 28, 29, 30, 34]) {
-    const s = planRavens(applyOpponentPackage(ravensScenario(ravensProfile(n).id), opponentPackages[2].id)).scenario;
+    const input=applyOpponentPackage(ravensScenario(ravensProfile(n).id), opponentPackages[2].id);input.ravens!.exchange="handoff";
+    const s = planRavens(input).scenario;
     s.playerAI = { enabled: true };
     const at = s.ravens!.transferAt!, carrier = s.ravens!.carrier!, qb = s.players.find((p) => p.side === "OFF" && p.pos === "QB")!.id;
     const q = worldPosition(s, qb, at), r = worldPosition(s, carrier, at);

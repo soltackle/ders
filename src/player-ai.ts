@@ -172,12 +172,13 @@ export function createFootballAi(
           ),
       )
       .at(-1);
+    const anchor=s.defenseEdits?.[p.id]?.preSnap??p.at;
     const fallback: AiPoint =
       p.pos === "DL"
-        ? [p.at[0], Math.min(-1.5, p.at[1] - 2)]
+        ? [anchor[0], Math.min(-1.5, anchor[1] - 2)]
         : p.pos === "LB"
-          ? [p.at[0], Math.max(0.65, p.at[1] - 1.2)]
-          : [p.at[0], Math.max(6, p.at[1])];
+          ? [anchor[0], Math.max(0.65, anchor[1] - 1.2)]
+          : [anchor[0], Math.max(6, anchor[1])];
     landmarks.set(p.id, called ? [...called.to] : fallback);
   }
   return {
@@ -613,7 +614,14 @@ export function decideFootballAi(
         const landmark = finite(input.callLandmarks?.[p.id])
           ? input.callLandmarks![p.id]
           : (brain.landmarks.get(p.id) ?? p.at);
-        if (p.pos === "DL" || p.intent === "blitz") {
+        const edit=brain.scenario.defenseEdits?.[p.id];
+        if(edit?.coverage==='man'){
+          const mark=edit.target?memory.players.get(edit.target):undefined;
+          phase='route-match';reason='Koçun seçtiği adamı görülen veya hatırlanan konumundan takip et.';
+          aim=mark?add(predicted(mark,input.time),[0,.65]):landmark;gaze=mark?.id;
+        } else if(edit?.coverage==='zone'){
+          aim=edit.zone??landmark;phase='zone-landmark';reason='Koçun seçtiği coverage bölgesini koru.';
+        } else if (p.pos === "DL" || p.intent === "blitz") {
           if (contact) {
             phase = "hand-fight";
             gaze = contact.id;

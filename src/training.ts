@@ -1,3 +1,4 @@
+import {stageDefense,finishDefense} from './defense-edit.ts';
 import {removeOpponentPackage} from './opponent.ts';
 import { ravensProfile } from "./ravens-catalog.ts";
 import { planRavens } from "./ravens.ts";
@@ -16,7 +17,13 @@ export const automaticTraining = (s: ScenarioType) =>
     ? s.ravens.enabled !== false
     : !!(s.zone?.enabled || s.protection?.enabled);
 export function planTraining(s: ScenarioType) {
-  return s.ravens ? planRavens(s) : s.zone ? planZone(s) : planProtection(s);
+  if(s.ravens)return planRavens(s);
+  const staged=stageDefense(s),plan=staged.scenario.zone?planZone(staged.scenario):planProtection(staged.scenario);
+  if(staged.delay>0){
+    for(const a of plan.scenario.actions){if(!a.source||a.source==='manual')continue;a.start+=staged.delay;a.end+=staged.delay;for(const phase of a.phases??[]){phase.start+=staged.delay;phase.end+=staged.delay;}}
+    plan.scenario.steps.forEach((st,i)=>{if(i)st.start+=staged.delay;st.end+=staged.delay;});
+  }
+  plan.scenario=finishDefense(plan.scenario,staged.starts);return plan;
 }
 function preserveZone(previous: ScenarioType, next: ScenarioType) {
   if (!previous.zone) return next;

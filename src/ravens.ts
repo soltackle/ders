@@ -1,3 +1,4 @@
+import {stageDefense,finishDefense} from './defense-edit.ts';
 import { prepareOpponent, restoreOpponentOwnership, opponentPackages } from "./opponent.ts";
 import { reactOpponent } from "./opponent-reaction.ts";
 import { eligiblePassTargets, isRavensPass, passWindow } from "./ravens-pass.ts";
@@ -356,8 +357,9 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
   input = migrateRavensScenario(input);
   const play = ravensPlays.find((p) => p.id === input.ravens!.id);
   if (!play) throw Error("Ravens kaynağı bulunamadı");
+  const staged=stageDefense(input);
   const profile = ravensProfile(input.ravens!.id),
-    s = prepareOpponent(structuredClone(input));
+    s = prepareOpponent(staged.scenario);
   const desired =
     s.ravens!.blocking !== "diagram" && profile.direction !== "drawing"
       ? fieldSide(s)
@@ -441,7 +443,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
           ),
         0,
       );
-  const delay = Math.max(0, ...sourcePlayers.map((p) => motionTime(p))),
+  const delay = Math.max(0, staged.delay, ...sourcePlayers.map((p) => motionTime(p))),
     snap = 1.1 + delay;
   const authoredDefense = (a: ActionType) =>
     (!a.source || a.source === "manual") &&
@@ -601,7 +603,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
       }
     }
     if(profile.kind === "screen")meta.carrier=meta.passTarget;
-    if (!p.scenario.opponent) return p;
+    if (!p.scenario.opponent){p.scenario=finishDefense(p.scenario,staged.starts);return p;}
     restoreOpponentOwnership(p.scenario);
     if (p.scenario.opponent.mode === "source")
       for (const a of p.scenario.actions)
@@ -609,6 +611,7 @@ export function planRavens(input: ScenarioType): ProtectionResult | ZoneResult {
           a.engage = undefined;
     const result = reactOpponent(p), pack = opponentPackages.find((x) => x.id === p.scenario.opponent!.id)!;
     result.scenario.steps[0].description += ` Rakip: ${pack.name}. ${p.scenario.opponent.mode === "source" ? "Kaynak savunma yolları oynatılır; otomatik takip uygulanmaz." : "Coverage eşleşmeleri, koşu okuması ve takip tepkileri eğitim uyarlamasıdır; kaynakta coverage çağrısı belirtilmemiştir."}`;
+    result.scenario=finishDefense(result.scenario,staged.starts);
     return result;
   };
   if (meta.blocking === "team") {
